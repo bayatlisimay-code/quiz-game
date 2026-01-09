@@ -1,0 +1,8 @@
+[
+  {
+    "id": "art_painting_l1_q1",
+    "question": "Which tool is most associated with painting?",
+    "options": ["Chisel", "Paintbrush", "Compass", "Hammer"],
+    "correctIndex": 1
+  }
+]

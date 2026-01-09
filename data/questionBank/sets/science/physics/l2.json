@@ -1,0 +1,8 @@
+[
+  {
+    "id": "science_physics_l2_q1",
+    "question": "Which law says: for every action, there is an equal and opposite reaction?",
+    "options": ["Newton’s 1st law", "Newton’s 2nd law", "Newton’s 3rd law", "Ohm’s law"],
+    "correctIndex": 2
+  }
+]

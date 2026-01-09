@@ -1,0 +1,14 @@
+[
+  {
+    "id": "science_physics_l1_q1",
+    "question": "What is the unit of force?",
+    "options": ["Watt", "Newton", "Joule", "Pascal"],
+    "correctIndex": 1
+  },
+  {
+    "id": "science_physics_l1_q2",
+    "question": "Which of these is a vector quantity?",
+    "options": ["Speed", "Mass", "Temperature", "Velocity"],
+    "correctIndex": 3
+  }
+]
