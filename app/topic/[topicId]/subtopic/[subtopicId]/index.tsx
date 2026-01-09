@@ -117,7 +117,14 @@ export default function SubtopicScreen() {
             ]}
             disabled={locked}
             onPress={() =>
-              router.push(`/topic/${topicId}/subtopic/${subtopicId}/level/${lvl.id}`)
+              router.push({
+                pathname: "/topic/[topicId]/subtopic/[subtopicId]/[levelId]",
+                params: {
+                  topicId: String(topicId),
+                  subtopicId: String(subtopicId),
+                  levelId: String(lvl.id),
+                },
+              })
             }
           >
             <Text style={styles.cardTitle}>

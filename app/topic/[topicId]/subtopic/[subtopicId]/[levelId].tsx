@@ -1,221 +1,184 @@
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { getQuestionSetOrEmpty, type MCQQuestion } from "../../../../../data/questionBank/registry";
-import {
-  addXp,
-  getStreakBonusXp,
-  loadProgress,
-  saveProgress,
-  updateStreak,
-  XP_PART_BONUS,
-  XP_PER_CORRECT,
-} from "../../../../../src/state/progress";
+import { TOPIC_BY_ID } from "../../../../../data/catalog";
+import { isPartCompleted, loadProgress } from "../../../../../src/state/progress";
+import { useStreak } from "../../../../../src/state/useStreak";
+import { useTotalXp } from "../../../../../src/state/useTotalXp";
 
-
-export default function QuizScreen() {
+export default function LevelScreen() {
   const router = useRouter();
-  const { topicId, subtopicId, levelId, partId, set } = useLocalSearchParams<{
-  topicId: string;
-  subtopicId: string;
-  levelId: string;
-  partId: string;
-  set: string;
-}>();
+  const { topicId, subtopicId, levelId } = useLocalSearchParams<{
+    topicId: string;
+    subtopicId: string;
+    levelId: string;
+  }>();
 
-  const questions = useMemo(() => {
-    if (!set) return [];
-    return getQuestionSetOrEmpty(String(set));
-  }, [set]);
+  const totalXP = useTotalXp();
+  const streak = useStreak();
 
-  const [index, setIndex] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [checked, setChecked] = useState(false);
-  const [correctCount, setCorrectCount] = useState(0);
+  const topic = TOPIC_BY_ID[String(topicId)];
+  const subtopic = topic?.subtopics.find((s) => s.id === String(subtopicId));
+  const level = subtopic?.levels.find((l) => l.id === String(levelId));
 
-  const q: MCQQuestion | undefined = questions[index];
-  const total = questions.length;
+  const [completedPartsMap, setCompletedPartsMap] = useState<Record<string, boolean>>({});
 
-  const onPick = (i: number) => {
-    if (checked) return;
-    setSelected(i);
-  };
+  const refreshProgress = useCallback(() => {
+    let alive = true;
 
-  const onCheck = async () => {
-  if (!q || selected == null) return;
-  setChecked(true);
-  if (selected === q.correctIndex) {
-    setCorrectCount((c) => c + 1);
-    await addXp(XP_PER_CORRECT);
-  }
-};
-  
-const finishPart = async () => {
-  const t = String(topicId);
-  const s = String(subtopicId);
-  const l = String(levelId);
-  const p = Number(partId);
+    (async () => {
+      const progress = await loadProgress();
+      if (!alive) return;
 
-  const progress = await loadProgress();
-  const existing: number[] = progress.completedParts?.[t]?.[s]?.[l] ?? [];
-  
-  const newStreak = await updateStreak();
-  const bonus = getStreakBonusXp(newStreak);
-  if (bonus > 0) await addXp(bonus);
+      const map: Record<string, boolean> = {};
+      level?.parts?.forEach((part) => {
+        map[part.id] = isPartCompleted(
+          progress,
+          String(topicId),
+          String(subtopicId),
+          String(levelId),
+          part.id
+        );
+      });
 
-  if (Number.isFinite(p) && p > 0 && !existing.includes(p)) {
-    const next = [...existing, p].sort((a, b) => a - b);
+      setCompletedPartsMap(map);
+    })();
 
-    const updated = {
-      ...progress,
-      completedParts: {
-        ...(progress.completedParts ?? {}),
-        [t]: {
-          ...((progress.completedParts ?? {})[t] ?? {}),
-          [s]: {
-            ...((progress.completedParts ?? {})[t]?.[s] ?? {}),
-            [l]: next,
-          },
-        },
-      },
+    return () => {
+      alive = false;
     };
+  }, [topicId, subtopicId, levelId, level]);
 
-    await saveProgress(updated);
-    await addXp(XP_PART_BONUS);
+  useFocusEffect(refreshProgress);
+
+  if (!topic || !subtopic || !level) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Unknown level</Text>
+        <Pressable style={styles.backButton} onPress={() => router.back()}>
+          <Text style={styles.backText}>← Back</Text>
+        </Pressable>
+      </View>
+    );
   }
 
-  router.back(); // go back to LevelScreen (parts list)
-  };
-
-  const onNext = async () => {
-  if (!checked) return;
-  const nextIndex = index + 1;
-
-  if (nextIndex < total) {
-    setIndex(nextIndex);
-    setSelected(null);
-    setChecked(false);
-    return;
+  if (!level.parts || level.parts.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>No parts yet</Text>
+        <Text style={styles.value}>This level has no parts in data/catalog.</Text>
+        <Pressable style={styles.backButton} onPress={() => router.back()}>
+          <Text style={styles.backText}>← Back</Text>
+        </Pressable>
+      </View>
+    );
   }
 
-  await finishPart();
+  const isUnlocked = (partNumber: number) => {
+    if (partNumber <= 1) return true;
+    return completedPartsMap[String(partNumber - 1)] === true;
   };
 
-  const empty = total === 0;
+  const isCompleted = (partId: string) => completedPartsMap[partId] === true;
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: "Quiz" }} />
+      <View style={styles.headerRow}>
+        <Pressable onPress={() => router.back()} style={styles.backButton}>
+          <Text style={styles.backText}>← Back</Text>
+        </Pressable>
 
-      {empty ? (
-        <View style={styles.card}>
-          <Text style={styles.title}>No questions yet</Text>
-          <Text style={styles.subtitle}>Missing set: {String(set ?? "")}</Text>
+        <Text numberOfLines={1} style={styles.headerTitle}>
+          {topic.emoji} {subtopic.title} • {level.title}
+        </Text>
 
-          <Pressable style={styles.primaryBtn} onPress={() => router.back()}>
-            <Text style={styles.primaryBtnText}>Go back</Text>
-          </Pressable>
+        <View style={styles.xpPill}>
+          <Text style={styles.xpText}>🔥 {streak} • XP {totalXP}</Text>
         </View>
-      ) : (
-        <View style={styles.card}>
-          <Text style={styles.progress}>
-            {index + 1}/{total}
-          </Text>
+      </View>
 
-          <Text style={styles.title}>{q?.question}</Text>
+      <Text style={styles.subtitle}>Choose a part</Text>
 
-          <View style={styles.options}>
-            {q?.options.map((opt, i) => {
-              const isSelected = selected === i;
-              const isCorrect = checked && i === q.correctIndex;
-              const isWrongPicked = checked && isSelected && i !== q.correctIndex;
+      {level.parts.map((part) => {
+        const n = Number(part.id);
+        const partNumber = Number.isFinite(n) && n > 0 ? n : 1;
 
-              return (
-                <Pressable
-                  key={`${q.id}_${i}`}
-                  onPress={() => onPick(i)}
-                  style={[
-                    styles.option,
-                    isSelected && styles.optionSelected,
-                    isCorrect && styles.optionCorrect,
-                    isWrongPicked && styles.optionWrong,
-                  ]}
-                >
-                  <Text style={styles.optionText}>{opt}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
+        const locked = !isUnlocked(partNumber);
+        const done = isCompleted(part.id);
 
-          {!checked ? (
-            <Pressable
-              style={[styles.primaryBtn, selected == null && styles.btnDisabled]}
-              onPress={onCheck}
-              disabled={selected == null}
-            >
-              <Text style={styles.primaryBtnText}>Check</Text>
-            </Pressable>
-          ) : (
-            <Pressable style={styles.primaryBtn} onPress={onNext}>
-              <Text style={styles.primaryBtnText}>
-                {index + 1 === total ? "Finish" : "Next"}
-              </Text>
-            </Pressable>
-          )}
-
-          {checked ? (
-            <Text style={styles.scoreText}>
-             Score: {correctCount}/{index + 1}
+        return (
+          <Pressable
+            key={part.id}
+            style={[
+              styles.card,
+              { borderLeftColor: topic.color, opacity: locked ? 0.45 : 1 },
+            ]}
+            disabled={locked}
+            onPress={() =>
+              router.push({
+                pathname: "/topic/[topicId]/subtopic/[subtopicId]/level/[levelId]/[partId]",
+                params: {
+                  topicId: String(topicId),
+                  subtopicId: String(subtopicId),
+                  levelId: String(levelId),
+                  partId: String(part.id),
+                  set: String(part.questionSetId),
+                },
+              })
+            }
+          >
+            <Text style={styles.cardTitle}>
+              {part.title} {done ? "✅" : locked ? "🔒" : ""}
             </Text>
-          ) : null}
-        </View>
-      )}
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#050816", padding: 16 },
-  card: {
-    backgroundColor: "#0b1026",
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-  },
-  progress: { color: "rgba(255,255,255,0.7)", marginBottom: 8 },
-  title: { color: "white", fontSize: 18, fontWeight: "800", marginBottom: 12 },
-  subtitle: { color: "rgba(255,255,255,0.75)", marginBottom: 16 },
-  options: { gap: 10, marginBottom: 16 },
-  option: {
-    borderRadius: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    backgroundColor: "rgba(255,255,255,0.06)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-  },
-  optionSelected: {
-    borderColor: "rgba(255,255,255,0.28)",
-    backgroundColor: "rgba(255,255,255,0.10)",
-  },
-  optionCorrect: {
-    borderColor: "rgba(34,197,94,0.65)",
-    backgroundColor: "rgba(34,197,94,0.18)",
-  },
-  optionWrong: {
-    borderColor: "rgba(239,68,68,0.65)",
-    backgroundColor: "rgba(239,68,68,0.18)",
-  },
-  optionText: { color: "white", fontSize: 15, lineHeight: 20 },
-  primaryBtn: {
-    marginTop: 6,
-    borderRadius: 14,
-    paddingVertical: 12,
+  container: { flex: 1, backgroundColor: "#050816", paddingHorizontal: 24, paddingTop: 60 },
+  headerRow: {
+    flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2563EB",
+    justifyContent: "space-between",
+    marginBottom: 12,
   },
-  btnDisabled: { opacity: 0.45 },
-  primaryBtnText: { color: "white", fontWeight: "800" },
-  scoreText: { marginTop: 10, color: "rgba(255,255,255,0.7)", fontWeight: "700" },
+  backButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#3B82F6",
+  },
+  backText: { color: "#BFDBFE", fontSize: 14, fontWeight: "600" },
+  headerTitle: {
+    color: "#E5F3FF",
+    fontSize: 14,
+    fontWeight: "700",
+    flex: 1,
+    textAlign: "center",
+    marginHorizontal: 12,
+  },
+  subtitle: { color: "#B3C7E6", textAlign: "center", marginBottom: 16, fontSize: 14 },
+  card: {
+    backgroundColor: "#1F2937",
+    padding: 16,
+    borderRadius: 14,
+    marginBottom: 12,
+    borderLeftWidth: 4,
+  },
+  cardTitle: { color: "#E5F3FF", fontSize: 18, fontWeight: "700" },
+  title: { fontSize: 22, fontWeight: "700", color: "#E5F3FF", textAlign: "center" },
+  value: { fontSize: 16, color: "#B3C7E6", textAlign: "center", marginTop: 8 },
+  xpPill: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#F97316",
+    marginLeft: 10,
+  },
+  xpText: { color: "#FDBA74", fontSize: 13, fontWeight: "800" },
 });
