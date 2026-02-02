@@ -21,7 +21,12 @@ function normalizeSlashes(p) {
 
 function makeIdFromRel(rel) {
   const parts = rel.replace(/\.json$/i, "").split("/");
-  const [topic, subtopic] = parts;
+  const topic = parts[0];
+
+// everything between topic and lX is subtopic path
+const levelIndex = parts.findIndex((x) => /^l\d+$/i.test(x));
+const subtopicParts = parts.slice(1, levelIndex);
+const subtopic = subtopicParts.join("-");
   const levelPart = parts.find((x) => /^l\d+$/i.test(x)) ?? "";
   const partPart  = parts.find((x) => /^p\d+$/i.test(x)) ?? "";
   const quizPart  = parts[parts.length - 1];
