@@ -1,8 +1,0 @@
-[
-  {
-    "id": "science_physics_l3_q1",
-    "question": "Which quantity is conserved in an isolated system (no external forces)?",
-    "options": ["Temperature", "Linear momentum", "Speed", "Volume"],
-    "correctIndex": 1
-  }
-]

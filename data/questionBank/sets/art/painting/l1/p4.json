@@ -1,0 +1,12 @@
+{
+  "id": "art_painting_l1_p4",
+  "title": "Painting Styles",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Which style focuses on light and color over detail?",
+      "options": ["Impressionism", "Cubism", "Surrealism", "Realism"],
+      "correctIndex": 0
+    }
+  ]
+}
