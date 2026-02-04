@@ -6014,9 +6014,6 @@ import art_sculpture_l1_p2_quizA from "./questionBank/sets/art/sculpture/l1/p2/q
 import art_sculpture_l1_p1_quizC from "./questionBank/sets/art/sculpture/l1/p1/quizC.json";
 import art_sculpture_l1_p1_quizB from "./questionBank/sets/art/sculpture/l1/p1/quizB.json";
 import art_sculpture_l1_p1_quizA from "./questionBank/sets/art/sculpture/l1/p1/quizA.json";
-import art_painting___quizC from "./questionBank/sets/art/painting/quizC.json";
-import art_painting___quizB from "./questionBank/sets/art/painting/quizB.json";
-import art_painting___quizA from "./questionBank/sets/art/painting/quizA.json";
 import art_painting_l9_p5_quizC from "./questionBank/sets/art/painting/l9/p5/quizC.json";
 import art_painting_l9_p5_quizB from "./questionBank/sets/art/painting/l9/p5/quizB.json";
 import art_painting_l9_p5_quizA from "./questionBank/sets/art/painting/l9/p5/quizA.json";
@@ -7853,9 +7850,6 @@ export const QUESTION_SETS: Record<string, () => QuestionSet> = {
   "art_painting_l9_p5_quizA": art_painting_l9_p5_quizA,
   "art_painting_l9_p5_quizB": art_painting_l9_p5_quizB,
   "art_painting_l9_p5_quizC": art_painting_l9_p5_quizC,
-  "art_painting___quizA": art_painting___quizA,
-  "art_painting___quizB": art_painting___quizB,
-  "art_painting___quizC": art_painting___quizC,
   "art_sculpture_l1_p1_quizA": art_sculpture_l1_p1_quizA,
   "art_sculpture_l1_p1_quizB": art_sculpture_l1_p1_quizB,
   "art_sculpture_l1_p1_quizC": art_sculpture_l1_p1_quizC,
