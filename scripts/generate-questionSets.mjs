@@ -53,7 +53,9 @@ lines.push("export const QUESTION_SETS: Record<string, () => QuestionSet> = {");
 for (const f of jsonFiles) {
   const id = makeIdFromRel(f.relFromSets);
   const requirePath = "./questionBank/sets/" + f.relFromSets;
-  lines.push(`  "${id}": () => require("${requirePath}"),`);
+  const varName = id.replace(/[^a-zA-Z0-9_]/g, "_");
+  lines.unshift(`import ${varName} from "${requirePath}";`);
+  lines.push(`  "${id}": ${varName},`);
 }
 
 lines.push("};");
