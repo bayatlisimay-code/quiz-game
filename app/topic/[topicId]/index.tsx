@@ -1,8 +1,9 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TOPIC_BY_ID } from "../../../data/catalog";
 import { getXpLevel } from "../../../src/state/leveling";
+import { useStreak } from "../../../src/state/useStreak";
 import { useTotalXp } from "../../../src/state/useTotalXp";
 
 export default function TopicScreen() {
@@ -13,20 +14,21 @@ export default function TopicScreen() {
 
   const totalXP = useTotalXp();
   const xpLevel = useMemo(() => getXpLevel(totalXP), [totalXP]);
+  const streak = useStreak();
 
   if (!topic) {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Unknown topic</Text>
         <Pressable style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
-      </View>
+      </ScrollView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.headerRow}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Text style={styles.backText}>← Back</Text>
@@ -38,7 +40,7 @@ export default function TopicScreen() {
 
         <View style={styles.xpPill}>
           <Text style={styles.xpText}>
-            Lv {xpLevel.level} • XP {totalXP}
+              🔥 {streak} • XP {totalXP}
           </Text>
         </View>
       </View>
@@ -61,7 +63,7 @@ export default function TopicScreen() {
           <Text style={styles.cardMeta}>{s.levels.length} levels</Text>
         </Pressable>
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -138,4 +140,7 @@ const styles = StyleSheet.create({
     color: "#B3C7E6",
     textAlign: "center",
   },
+  scrollContent: {
+  paddingBottom: 40,
+},
 });

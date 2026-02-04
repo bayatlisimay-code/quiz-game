@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TOPICS } from "../data/catalog";
 import { useStreak } from "../src/state/useStreak";
 import { useTotalXp } from "../src/state/useTotalXp";
@@ -12,7 +12,7 @@ export default function HomeScreen() {
   
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.headerRow}>
   <Text style={styles.headerTitle}>Choose a topic</Text>
 
@@ -35,7 +35,7 @@ export default function HomeScreen() {
           <Text style={styles.cardMeta}>{t.subtopics.length} subtopics</Text>
         </Pressable>
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -77,4 +77,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: { color: "#E5F3FF", fontSize: 18, fontWeight: "700" },
   cardMeta: { color: "#B3C7E6", marginTop: 4, fontSize: 13 },
+  scrollContent: {
+  paddingBottom: 40,
+},
 });

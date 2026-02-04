@@ -1,10 +1,12 @@
+import { masteryLevels } from "@/data/catalog";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TOPIC_BY_ID } from "../../../../../data/catalog";
 import { isLevelCompleted, loadProgress } from "../../../../../src/state/progress";
 import { useStreak } from "../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../src/state/useTotalXp";
+
 
 export default function SubtopicScreen() {
   const router = useRouter();
@@ -33,7 +35,7 @@ export default function SubtopicScreen() {
       }
     }
 
-    return Math.min(Math.max(maxCompletedLevel, 1), totalLevels);
+    return Math.min(maxCompletedLevel, totalLevels);
   }, [completedLevelsMap, subtopic?.levels?.length]);
 
   const refreshProgress = useCallback(() => {
@@ -67,12 +69,12 @@ export default function SubtopicScreen() {
 
   if (!topic || !subtopic) {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Unknown subtopic</Text>
         <Pressable style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -84,7 +86,7 @@ export default function SubtopicScreen() {
   const isCompleted = (levelId: string) => completedLevelsMap[levelId] === true;
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.headerRow}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Text style={styles.backText}>← Back</Text>
@@ -101,7 +103,26 @@ export default function SubtopicScreen() {
 
       <Text style={styles.subtitle}>Choose a level</Text>
 
-      {subtopic.levels.map((lvl) => {
+      {masteryLevels.map((group) => {
+    const levelsInGroup = subtopic.levels.filter((lvl) => {
+    const n = Number(lvl.id);
+    const levelNumber = Number.isFinite(n) && n > 0 ? n : 1;
+    return levelNumber >= group.from && levelNumber <= group.to;
+  });
+
+  const groupLocked =
+    levelsInGroup.length === 0
+      ? true
+      : !isUnlocked(Number(levelsInGroup[0].id));
+
+  return (
+    <React.Fragment key={group.label}>
+      <Text style={styles.masteryHeading}>
+        {groupLocked ? "🔒 " : ""}{group.label}
+      </Text>
+      <View style={styles.masteryDivider} />
+
+      {levelsInGroup.map((lvl) => {
         const n = Number(lvl.id);
         const levelNumber = Number.isFinite(n) && n > 0 ? n : 1;
 
@@ -133,7 +154,10 @@ export default function SubtopicScreen() {
           </Pressable>
         );
       })}
-    </View>
+    </React.Fragment>
+  );
+})}
+    </ScrollView>
   );
 }
 
@@ -199,5 +223,20 @@ const styles = StyleSheet.create({
     color: "#FDBA74",
     fontSize: 13,
     fontWeight: "800",
+  },
+  masteryHeading: {
+  fontSize: 20,
+  fontWeight: "800",
+  marginTop: 18,
+  marginBottom: 10,
+  color: "#EAF2FF",
+  },
+  masteryDivider: {
+  height: 1,
+  backgroundColor: "#00000022",
+  marginBottom: 12,
+  },
+  scrollContent: {
+  paddingBottom: 40,
   },
 });

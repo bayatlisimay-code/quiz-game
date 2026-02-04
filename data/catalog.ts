@@ -1,3 +1,5 @@
+// data/catalog.ts
+
 export type Catalog = {
   topics: Topic[];
 };
@@ -17,121 +19,204 @@ export type Subtopic = {
 };
 
 export type Level = {
-  id: string; // "1" | "2" | "3" (string for routing)
+  id: string; // "1"..."10"
   title: string;
   parts: Part[];
 };
 
 export type Part = {
-  id: string; // "1" | "2" | "3" | "4"
+  id: string; // "1"..."5"
   title: string;
   questionSetId: string;
 };
 
+/**
+ * Mastery labels (used for grouping levels in the UI)
+ */
+export const masteryLevels = [
+  { label: "Explorer", from: 1, to: 3 },
+  { label: "Thinker", from: 4, to: 6 },
+  { label: "Mastermind", from: 7, to: 9 },
+  { label: "Oracle", from: 10, to: 10 },
+];
+
+export function getMasteryLabel(levelId: string) {
+  const level = Number(levelId);
+  return masteryLevels.find((m) => level >= m.from && level <= m.to)?.label;
+}
+
+/**
+ * 5 parts per level
+ * questionSetId format is stable and predictable
+ */
 function makeParts(topicId: string, subtopicId: string, levelId: string): Part[] {
   return [
     { id: "1", title: "Part 1", questionSetId: `${topicId}_${subtopicId}_l${levelId}_p1` },
     { id: "2", title: "Part 2", questionSetId: `${topicId}_${subtopicId}_l${levelId}_p2` },
     { id: "3", title: "Part 3", questionSetId: `${topicId}_${subtopicId}_l${levelId}_p3` },
     { id: "4", title: "Part 4", questionSetId: `${topicId}_${subtopicId}_l${levelId}_p4` },
+    { id: "5", title: "Part 5", questionSetId: `${topicId}_${subtopicId}_l${levelId}_p5` },
   ];
 }
 
+/**
+ * 10 levels per subtopic
+ */
 function makeLevels(topicId: string, subtopicId: string): Level[] {
-  return [
-    { id: "1", title: "Level 1", parts: makeParts(topicId, subtopicId, "1") },
-    { id: "2", title: "Level 2", parts: makeParts(topicId, subtopicId, "2") },
-    { id: "3", title: "Level 3", parts: makeParts(topicId, subtopicId, "3") },
-  ];
+  const ids = ["1","2","3","4","5","6","7","8","9","10"];
+  return ids.map((id) => ({
+    id,
+    title: `Level ${id}`,
+    parts: makeParts(topicId, subtopicId, id),
+  }));
 }
 
+function slug(s: string) {
+  return s
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[/]/g, " ")
+    .replace(/[:]/g, "")
+    .replace(/[’']/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function makeSubtopic(topicId: string, title: string): Subtopic {
+  const id = slug(title);
+  return {
+    id,
+    title,
+    levels: makeLevels(topicId, id),
+  };
+}
+
+/**
+ * =========================
+ * TOPICS (final list)
+ * =========================
+ * Note: We intentionally flatten any deeper nesting into single subtopic titles
+ * because the app structure is Topic -> Subtopic -> Level -> Part.
+ */
 export const TOPICS: Topic[] = [
   {
     id: "science",
     title: "Science",
-    emoji: "🧪",
-    color: "#3B82F6",
+    emoji: "🔬",
+    color: "#22C55E",
     subtopics: [
-      { id: "physics", title: "Physics", levels: makeLevels("science", "physics") },
-      { id: "chemistry", title: "Chemistry", levels: makeLevels("science", "chemistry") },
-      { id: "biology", title: "Biology", levels: makeLevels("science", "biology") },
-      { id: "astronomy", title: "Astronomy", levels: makeLevels("science", "astronomy") },
-      { id: "geography", title: "Geography", levels: makeLevels("science", "geography") },
-      { id: "psychology", title: "Psychology", levels: makeLevels("science", "psychology") },
-      { id: "technology", title: "Technology", levels: makeLevels("science", "technology") },
-      { id: "mathematics", title: "Mathematics", levels: makeLevels("science", "mathematics") },
-    ],
+      "Geography",
+      "Psychology",
+      "Chemistry",
+      "Physics",
+      "Astronomy",
+      "Biology",
+      "Technology",
+      "Economics",
+      "Mathematics",
+    ].map((t) => makeSubtopic("science", t)),
   },
+
   {
     id: "art",
     title: "Art",
     emoji: "🎨",
     color: "#A855F7",
     subtopics: [
-      { id: "painting", title: "Painting", levels: makeLevels("art", "painting") },
-      { id: "music", title: "Music", levels: makeLevels("art", "music") },
-      { id: "literature", title: "Literature", levels: makeLevels("art", "literature") },
-      { id: "movies", title: "Movies", levels: makeLevels("art", "movies") },
-      { id: "architecture", title: "Architecture", levels: makeLevels("art", "architecture") },
-    ],
+      "Literature",
+      "Painting",
+      "Sculpture",
+      "Architecture",
+      "Music",
+      "Theatre",
+      "Design",
+      "Movies",
+    ].map((t) => makeSubtopic("art", t)),
   },
+
   {
     id: "history",
     title: "History",
     emoji: "🏛️",
-    color: "#F97316",
+    color: "#F59E0B",
     subtopics: [
-      // Period-based
-      { id: "prehistory", title: "Prehistory", levels: makeLevels("history", "prehistory") },
-      { id: "ancient", title: "Ancient", levels: makeLevels("history", "ancient") },
-      { id: "classical_age", title: "Classical Age", levels: makeLevels("history", "classical_age") },
-      { id: "medieval", title: "Medieval", levels: makeLevels("history", "medieval") },
-      { id: "early_modern", title: "Early Modern", levels: makeLevels("history", "early_modern") },
-      { id: "modern", title: "Modern", levels: makeLevels("history", "modern") },
-      { id: "contemporary", title: "Contemporary", levels: makeLevels("history", "contemporary") },
+      // Prehistory
+      "Prehistory – Stone Age",
+      "Prehistory – Bronze Age",
+      "Prehistory – Iron Age",
 
-      // Geography-based
-      { id: "middle_east", title: "Middle East", levels: makeLevels("history", "middle_east") },
-      { id: "europe", title: "Europe", levels: makeLevels("history", "europe") },
-      { id: "asia", title: "Asia", levels: makeLevels("history", "asia") },
-      { id: "americas", title: "Americas", levels: makeLevels("history", "americas") },
-      { id: "africa", title: "Africa", levels: makeLevels("history", "africa") },
-    ],
+      // Ancient History
+      "Ancient History – Classical Age",
+      "Ancient History – Hellenistic Period",
+
+      // The Middle Ages
+      "Middle Ages – Early",
+      "Middle Ages – High",
+      "Middle Ages – Late",
+
+      // Early Modern Era
+      "Early Modern Era – Renaissance",
+      "Early Modern Era – Age of Discovery",
+
+      // Modern Era
+      "Modern Era – Industrial Revolution",
+      "Modern Era – 20th Century to Present",
+    ].map((t) => makeSubtopic("history", t)),
   },
+
   {
     id: "philosophy",
     title: "Philosophy",
-    emoji: "🧠",
-    color: "#22C55E",
+    emoji: "💭",
+    color: "#3B82F6",
     subtopics: [
-      { id: "ethics", title: "Ethics", levels: makeLevels("philosophy", "ethics") },
-      { id: "metaphysics", title: "Metaphysics", levels: makeLevels("philosophy", "metaphysics") },
-      { id: "epistemology", title: "Epistemology", levels: makeLevels("philosophy", "epistemology") },
-      { id: "logic", title: "Logic", levels: makeLevels("philosophy", "logic") },
-      { id: "aesthetics", title: "Aesthetics", levels: makeLevels("philosophy", "aesthetics") },
-      {
-        id: "political_philosophy",
-        title: "Political Philosophy",
-        levels: makeLevels("philosophy", "political_philosophy"),
-      },
-    ],
+      "Metaphysics",
+      "Epistemology",
+      "Logic",
+      "Ethics",
+      "Aesthetics",
+      "Political Philosophy",
+    ].map((t) => makeSubtopic("philosophy", t)),
   },
+
   {
     id: "sports",
     title: "Sports",
     emoji: "🏅",
     color: "#EF4444",
     subtopics: [
-      { id: "football", title: "Football", levels: makeLevels("sports", "football") },
-      { id: "basketball", title: "Basketball", levels: makeLevels("sports", "basketball") },
-      { id: "tennis", title: "Tennis", levels: makeLevels("sports", "tennis") },
-      { id: "volleyball", title: "Volleyball", levels: makeLevels("sports", "volleyball") },
-      { id: "swimming", title: "Swimming", levels: makeLevels("sports", "swimming") },
-      { id: "formula_1", title: "Formula 1", levels: makeLevels("sports", "formula_1") },
-      { id: "athletics", title: "Athletics", levels: makeLevels("sports", "athletics") },
-      { id: "gymnastics", title: "Gymnastics", levels: makeLevels("sports", "gymnastics") },
-      { id: "weightlifting", title: "Weightlifting", levels: makeLevels("sports", "weightlifting") },
-    ],
+      // Team sports
+      "Team Sports – Basketball",
+      "Team Sports – Football",
+      "Team Sports – Volleyball",
+      "Team Sports – Cricket",
+      "Team Sports – Baseball",
+      "Team Sports – Rugby",
+      "Team Sports – Hockey",
+      "Team Sports – American Football",
+
+      // Individual sports
+      "Individual Sports – Golf",
+      "Individual Sports – Figure Skating",
+      "Individual Sports – Swimming",
+      "Individual Sports – Cycling",
+      "Individual Sports – Gymnastics",
+      "Individual Sports – Athletics",
+      "Individual Sports – Skiing & Snowboarding",
+
+      // Dual sports
+      "Dual Sports – Tennis",
+      "Dual Sports – Boxing",
+      "Dual Sports – Wrestling",
+
+      // Motorsports
+      "Motorsports – Formula 1",
+      "Motorsports – MotoGP",
+      "Motorsports – NASCAR",
+      "Motorsports – Rally Raid",
+    ].map((t) => makeSubtopic("sports", t)),
   },
 ];
 
@@ -139,4 +224,6 @@ export const TOPIC_BY_ID: Record<string, Topic> = Object.fromEntries(
   TOPICS.map((t) => [t.id, t])
 );
 
-export const CATALOG: Topic[] = TOPICS;
+export const CATALOG: Catalog = {
+  topics: TOPICS,
+};

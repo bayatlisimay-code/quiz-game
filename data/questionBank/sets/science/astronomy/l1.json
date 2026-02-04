@@ -1,8 +1,0 @@
-[
-  {
-    "id": "science_astronomy_l1_q1",
-    "question": "Which planet is known as the Red Planet?",
-    "options": ["Venus", "Mars", "Jupiter", "Mercury"],
-    "correctIndex": 1
-  }
-]

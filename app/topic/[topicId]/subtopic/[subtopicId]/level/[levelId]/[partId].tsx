@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { QUESTION_SETS } from "../../../../../../../data/questionSets";
 
 type Question = {
@@ -48,19 +48,19 @@ export default function PartQuizScreen() {
 
   if (!setId) {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>No question set</Text>
         <Text style={styles.body}>This part was opened without a "set" param.</Text>
         <Pressable style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
-      </View>
+      </ScrollView>
     );
   }
 
   if (questions.length === 0) {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>No questions yet</Text>
         <Text style={styles.body}>Set: {setId}</Text>
         <Text style={styles.body}>
@@ -69,13 +69,13 @@ export default function PartQuizScreen() {
         <Pressable style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
-      </View>
+      </ScrollView>
     );
   }
 
   if (finished) {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Done ✅</Text>
         <Text style={styles.body}>
           Score: {correctCount} / {questions.length}
@@ -84,12 +84,12 @@ export default function PartQuizScreen() {
         <Pressable style={styles.primaryButton} onPress={() => router.back()}>
           <Text style={styles.primaryText}>Back to parts</Text>
         </Pressable>
-      </View>
+      </ScrollView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.topRow}>
         <Pressable style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backText}>← Back</Text>
@@ -133,7 +133,7 @@ export default function PartQuizScreen() {
           {idx + 1 === questions.length ? "Finish" : "Next"}
         </Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -172,4 +172,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   primaryText: { color: "#E5F3FF", fontSize: 16, fontWeight: "900" },
+  scrollContent: {
+  paddingBottom: 40,
+},
 });

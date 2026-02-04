@@ -1,6 +1,6 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TOPIC_BY_ID } from "../../../../../data/catalog";
 import { isPartCompleted, loadProgress } from "../../../../../src/state/progress";
 import { useStreak } from "../../../../../src/state/useStreak";
@@ -53,24 +53,24 @@ export default function LevelScreen() {
 
   if (!topic || !subtopic || !level) {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Unknown level</Text>
         <Pressable style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
-      </View>
+      </ScrollView>
     );
   }
 
   if (!level.parts || level.parts.length === 0) {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>No parts yet</Text>
         <Text style={styles.value}>This level has no parts in data/catalog.</Text>
         <Pressable style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -82,7 +82,7 @@ export default function LevelScreen() {
   const isCompleted = (partId: string) => completedPartsMap[partId] === true;
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.headerRow}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Text style={styles.backText}>← Back</Text>
@@ -133,7 +133,7 @@ export default function LevelScreen() {
           </Pressable>
         );
       })}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -181,4 +181,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   xpText: { color: "#FDBA74", fontSize: 13, fontWeight: "800" },
+  scrollContent: {
+  paddingBottom: 40,
+},
 });
