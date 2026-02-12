@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
-import React from "react";
+import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { TOPICS } from "../data/catalog";
+
+import { getLastLessonPath } from "../lib/progress";
 import { useStreak } from "../src/state/useStreak";
 import { useTotalXp } from "../src/state/useTotalXp";
 
@@ -9,32 +10,58 @@ export default function HomeScreen() {
   const router = useRouter();
   const streak = useStreak();
   const totalXP = useTotalXp();
-  
+
+  const [lastLesson, setLastLesson] = useState<string | null>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      const saved = await getLastLessonPath();
+      setLastLesson(saved);
+    };
+    load();
+  }, []);
+
+  const onContinue = () => {
+    if (lastLesson) {
+      router.push(lastLesson as any);
+      return;
+    }
+    // If we don't have anything saved yet, send user to choose a topic
+    router.push("/topics" as any);
+  };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      <View style={styles.headerRow}>
-  <Text style={styles.headerTitle}>Choose a topic</Text>
+      <View style={styles.brandBlock}>
+        <Text style={styles.appName}>Earth Guardian Quiz</Text>
+        <Text style={styles.subtitle}>Learn. Level up. Save Earth.</Text>
+      </View>
 
-  <View style={styles.xpPill}>
-    <Text style={styles.xpText}>
-      🔥 {streak} • XP {totalXP}
-    </Text>
-  </View>
-</View>
+      <View style={styles.progressCard}>
+        <View style={styles.progressRow}>
+          <Text style={styles.progressLabel}>🔥 Streak</Text>
+          <Text style={styles.progressValue}>{streak}</Text>
+        </View>
 
-      {TOPICS.map((t) => (
-        <Pressable
-          key={t.id}
-          style={[styles.card, { borderLeftColor: t.color }]}
-          onPress={() => router.push(`/topic/${t.id}` as any)}
-        >
-          <Text style={styles.cardTitle}>
-            {t.emoji} {t.title}
-          </Text>
-          <Text style={styles.cardMeta}>{t.subtopics.length} subtopics</Text>
-        </Pressable>
-      ))}
+        <View style={styles.progressRow}>
+          <Text style={styles.progressLabel}>💎 Total XP</Text>
+          <Text style={styles.progressValue}>{totalXP}</Text>
+        </View>
+
+        <View style={styles.goalHint}>
+          <Text style={styles.goalHintText}>🎯 Daily goal coming next</Text>
+        </View>
+      </View>
+
+      <Pressable style={styles.primaryButton} onPress={onContinue}>
+        <Text style={styles.primaryText}>
+          {lastLesson ? "🚀 Continue where you left off" : "🚀 Start learning"}
+        </Text>
+      </Pressable>
+
+      <Pressable style={styles.secondaryButton} onPress={() => router.push("/topics" as any)}>
+        <Text style={styles.secondaryText}>📚 Choose a topic</Text>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -44,40 +71,86 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#050816",
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 70,
   },
-  headerRow: {
+  scrollContent: {
+    paddingBottom: 40,
+  },
+
+  brandBlock: {
+    marginBottom: 18,
+  },
+  appName: {
+    color: "#E5F3FF",
+    fontSize: 28,
+    fontWeight: "900",
+    marginBottom: 6,
+  },
+  subtitle: {
+    color: "#B3C7E6",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+
+  progressCard: {
+    backgroundColor: "#111827",
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#1F2A44",
+    marginBottom: 18,
+  },
+  progressRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 16,
+    paddingVertical: 10,
   },
-  headerTitle: { color: "#E5F3FF", fontSize: 18, fontWeight: "800" },
-
-  xpPill: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "#F97316",
-    marginLeft: 10,
+  progressLabel: {
+    color: "#B3C7E6",
+    fontSize: 14,
+    fontWeight: "800",
   },
-  xpText: {
-    color: "#FDBA74",
+  progressValue: {
+    color: "#E5F3FF",
+    fontSize: 16,
+    fontWeight: "900",
+  },
+  goalHint: {
+    marginTop: 10,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#1F2A44",
+  },
+  goalHintText: {
+    color: "#93C5FD",
     fontSize: 13,
     fontWeight: "800",
   },
 
-  card: {
-    backgroundColor: "#1F2937",
-    padding: 16,
-    borderRadius: 14,
+  primaryButton: {
+    backgroundColor: "#2563EB",
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: "center",
     marginBottom: 12,
-    borderLeftWidth: 4,
   },
-  cardTitle: { color: "#E5F3FF", fontSize: 18, fontWeight: "700" },
-  cardMeta: { color: "#B3C7E6", marginTop: 4, fontSize: 13 },
-  scrollContent: {
-  paddingBottom: 40,
-},
+  primaryText: {
+    color: "#E5F3FF",
+    fontSize: 16,
+    fontWeight: "900",
+  },
+
+  secondaryButton: {
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#3B82F6",
+  },
+  secondaryText: {
+    color: "#BFDBFE",
+    fontSize: 15,
+    fontWeight: "900",
+  },
 });

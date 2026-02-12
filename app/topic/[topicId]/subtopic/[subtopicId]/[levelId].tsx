@@ -1,10 +1,11 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TOPIC_BY_ID } from "../../../../../data/catalog";
 import { isPartCompleted, loadProgress } from "../../../../../src/state/progress";
 import { useStreak } from "../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../src/state/useTotalXp";
+import { markPartCompleted } from "../../../../../src/state/progress";
 
 export default function LevelScreen() {
   const router = useRouter();
@@ -22,6 +23,8 @@ export default function LevelScreen() {
   const level = subtopic?.levels.find((l) => l.id === String(levelId));
 
   const [completedPartsMap, setCompletedPartsMap] = useState<Record<string, boolean>>({});
+  const [completedParts, setCompletedParts] = useState<string[]>([]);
+
 
   const refreshProgress = useCallback(() => {
     let alive = true;
@@ -105,6 +108,17 @@ export default function LevelScreen() {
 
         const locked = !isUnlocked(partNumber);
         const done = isCompleted(part.id);
+
+        const key = `${topicId}_${subtopicId}_${levelId}_${part.id}`;
+        const isCompleted = completedParts.includes(key);
+
+        // Rule: first part always unlocked
+        const isFirstPart = part.id === "1";
+
+        // Unlock if first part OR previous part completed
+        const prevKey = `${topicId}_${subtopicId}_${levelId}_${String(Number(part.id) - 1)}`;
+        const isUnlocked =
+          isFirstPart || completedParts.includes(prevKey);
 
         return (
           <Pressable

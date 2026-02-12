@@ -1,32 +1,47 @@
 import { useRouter } from "expo-router";
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { CATALOG } from "../data/catalog";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+
+import { TOPICS } from "../data/catalog";
+import { useStreak } from "../src/state/useStreak";
+import { useTotalXp } from "../src/state/useTotalXp";
 
 
 export default function TopicsScreen() {
   const router = useRouter();
+  const streak = useStreak();
+  const totalXP = useTotalXp();
+
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Choose a Topic</Text>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+      <View style={styles.headerRow}>
+        <Pressable style={styles.backButton} onPress={() => router.back()}>
+          <Text style={styles.backText}>← Back</Text>
+        </Pressable>
 
-      {CATALOG.map((topic) => (
-  <Pressable
-    key={topic.id}
-    style={[styles.topicButton, { borderLeftColor: topic.color }]}
-    onPress={() => router.push(`/topic/${topic.id}`)}
-  >
-    <View style={styles.topicRow}>
-      <Text style={styles.emoji}>{topic.emoji}</Text>
-      <View style={styles.textBlock}>
-        <Text style={styles.topicText}>{topic.title}</Text>
-        <Text style={styles.topicDescription}>{topic.description}</Text>
+        <Text style={styles.headerTitle}>Choose a topic</Text>
+
+        <View style={styles.xpPill}>
+          <Text style={styles.xpText}>
+            🔥 {streak} • XP {totalXP}
+         </Text>
       </View>
-    </View>
-  </Pressable>
-))}
-    </View>
+
+      </View>
+
+      {TOPICS.map((t) => (
+        <Pressable
+          key={t.id}
+          style={[styles.card, { borderLeftColor: t.color }]}
+          onPress={() => router.push(`/topic/${t.id}` as any)}
+        >
+          <Text style={styles.cardTitle}>
+            {t.emoji} {t.title}
+          </Text>
+          <Text style={styles.cardMeta}>{t.subtopics.length} subtopics</Text>
+        </Pressable>
+      ))}
+    </ScrollView>
   );
 }
 
@@ -37,39 +52,49 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 60,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#E5F3FF",
-    marginBottom: 24,
-    textAlign: "center",
+  scrollContent: {
+    paddingBottom: 40,
   },
-  topicButton: {
+
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 18,
+  },
+  headerTitle: { color: "#E5F3FF", fontSize: 18, fontWeight: "900" },
+
+  backButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#3B82F6",
+  },
+  backText: { color: "#BFDBFE", fontSize: 14, fontWeight: "800" },
+
+  card: {
     backgroundColor: "#1F2937",
     padding: 16,
     borderRadius: 14,
     marginBottom: 12,
     borderLeftWidth: 4,
   },
-  topicText: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#E5F3FF",
-  },
-  topicDescription: {
-    marginTop: 4,
-    fontSize: 14,
-    color: "#B3C7E6",
-  },
-  topicRow: {
-  flexDirection: "row",
-  alignItems: "center",
+  cardTitle: { color: "#E5F3FF", fontSize: 18, fontWeight: "800" },
+  cardMeta: { color: "#B3C7E6", marginTop: 4, fontSize: 13 },
+
+  xpPill: {
+  paddingVertical: 6,
+  paddingHorizontal: 10,
+  borderRadius: 999,
+  borderWidth: 1,
+  borderColor: "#F97316",
 },
-emoji: {
-  fontSize: 28,
-  marginRight: 12,
+
+xpText: {
+  color: "#FDBA74",
+  fontSize: 13,
+  fontWeight: "800",
 },
-textBlock: {
-  flex: 1,
-},
+
 });

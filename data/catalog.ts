@@ -7,6 +7,7 @@ export type Catalog = {
 export type Topic = {
   id: string;
   title: string;
+  description: string;
   emoji: string;
   color: string;
   subtopics: Subtopic[];
@@ -104,6 +105,7 @@ export const TOPICS: Topic[] = [
   {
     id: "science",
     title: "Science",
+    description: "Explore how the world works.",
     emoji: "🔬",
     color: "#22C55E",
     subtopics: [
@@ -122,6 +124,7 @@ export const TOPICS: Topic[] = [
   {
     id: "art",
     title: "Art",
+    description: "Discover creativity, culture, and expression.",
     emoji: "🎨",
     color: "#A855F7",
     subtopics: [
@@ -139,6 +142,7 @@ export const TOPICS: Topic[] = [
   {
     id: "history",
     title: "History",
+    description: "Travel through time and major civilizations.",
     emoji: "🏛️",
     color: "#F59E0B",
     subtopics: [
@@ -169,6 +173,7 @@ export const TOPICS: Topic[] = [
   {
     id: "philosophy",
     title: "Philosophy",
+    description: "Think deeper about life, truth, and ethics.",
     emoji: "💭",
     color: "#3B82F6",
     subtopics: [
@@ -184,6 +189,7 @@ export const TOPICS: Topic[] = [
   {
     id: "sports",
     title: "Sports",
+    description: "Learn rules, records, and iconic moments.",
     emoji: "🏅",
     color: "#EF4444",
     subtopics: [

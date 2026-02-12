@@ -1,8 +1,7 @@
-import { masteryLevels } from "@/data/catalog";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { TOPIC_BY_ID } from "../../../../../data/catalog";
+import { masteryLevels, TOPIC_BY_ID } from "../../../../../data/catalog";
 import { isLevelCompleted, loadProgress } from "../../../../../src/state/progress";
 import { useStreak } from "../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../src/state/useTotalXp";
@@ -84,6 +83,15 @@ export default function SubtopicScreen() {
   };
 
   const isCompleted = (levelId: string) => completedLevelsMap[levelId] === true;
+
+  const isUnlocked = (levelNumber: number) => {
+  if (levelNumber <= 1) return true;
+  return completedLevelsMap[String(levelNumber - 1)] === true;
+};
+
+const isCompleted = (levelId: string) =>
+  completedLevelsMap[levelId] === true;
+
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>

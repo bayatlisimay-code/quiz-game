@@ -126,3 +126,35 @@ export function isPartCompleted(
   const completedPartIds = progress.completedParts?.[topicId]?.[subtopicId]?.[levelId] ?? [];
   return completedPartIds.includes(Number(partId));
 }
+
+export async function markPartCompleted(
+  topicId: string,
+  subtopicId: string,
+  levelId: string,
+  partId: string
+): Promise<void> {
+  const progress = await loadProgress();
+
+  const partNum = Number(partId);
+
+  const nextCompletedParts = {
+    ...progress.completedParts,
+    [topicId]: {
+      ...(progress.completedParts[topicId] ?? {}),
+      [subtopicId]: {
+        ...(progress.completedParts[topicId]?.[subtopicId] ?? {}),
+        [levelId]: Array.from(
+          new Set([
+            ...((progress.completedParts[topicId]?.[subtopicId]?.[levelId] ?? []) as number[]),
+            partNum,
+          ])
+        ).sort((a, b) => a - b),
+      },
+    },
+  };
+
+  await saveProgress({
+    ...progress,
+    completedParts: nextCompletedParts,
+  });
+}
