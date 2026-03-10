@@ -1,0 +1,6 @@
+const conceptSet = {
+  id: "history_middle-ages_late-middle-ages_l1",
+  concepts: [],
+};
+
+export default conceptSet;

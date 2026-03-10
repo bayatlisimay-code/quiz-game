@@ -7,6 +7,10 @@ export type Progress = {
   completedParts: Record<string, Record<string, Record<string, number[]>>>; // topicId -> subtopicId -> levelId -> partIds[]
   streakCount: number;
   lastPlayedDate: string | null; // YYYY-MM-DD
+  completedQuizVariants: Record<
+    string,
+    Record<string, Record<string, Record<string, string[]>>>
+  >;
 };
 
 const DEFAULT_PROGRESS: Progress = {
@@ -14,21 +18,42 @@ const DEFAULT_PROGRESS: Progress = {
   completedParts: {},
   streakCount: 0,
   lastPlayedDate: null,
+  completedQuizVariants: {},
 };
 
 let inMemory: Progress | null = null;
 
 function normalize(progress: Partial<Progress>): Progress {
   const completedParts: Progress["completedParts"] = {};
+  const completedQuizVariants: Progress["completedQuizVariants"] = {};
 
-  const src = progress.completedParts ?? {};
-  for (const topicId of Object.keys(src)) {
+  const partsSrc = progress.completedParts ?? {};
+  for (const topicId of Object.keys(partsSrc)) {
     completedParts[topicId] = {};
-    for (const subtopicId of Object.keys(src[topicId] ?? {})) {
+    for (const subtopicId of Object.keys(partsSrc[topicId] ?? {})) {
       completedParts[topicId][subtopicId] = {};
-      for (const levelId of Object.keys(src[topicId][subtopicId] ?? {})) {
-        const arr = src[topicId][subtopicId][levelId] ?? [];
-        completedParts[topicId][subtopicId][levelId] = Array.from(new Set(arr)).sort((a, b) => a - b);
+      for (const levelId of Object.keys(partsSrc[topicId][subtopicId] ?? {})) {
+        const arr = partsSrc[topicId][subtopicId][levelId] ?? [];
+        completedParts[topicId][subtopicId][levelId] = Array.from(new Set(arr)).sort(
+          (a, b) => a - b
+        );
+      }
+    }
+  }
+
+  const variantsSrc = progress.completedQuizVariants ?? {};
+  for (const topicId of Object.keys(variantsSrc)) {
+    completedQuizVariants[topicId] = {};
+    for (const subtopicId of Object.keys(variantsSrc[topicId] ?? {})) {
+      completedQuizVariants[topicId][subtopicId] = {};
+      for (const levelId of Object.keys(variantsSrc[topicId][subtopicId] ?? {})) {
+        completedQuizVariants[topicId][subtopicId][levelId] = {};
+        for (const partId of Object.keys(variantsSrc[topicId][subtopicId][levelId] ?? {})) {
+          const arr = variantsSrc[topicId][subtopicId][levelId][partId] ?? [];
+          completedQuizVariants[topicId][subtopicId][levelId][partId] = Array.from(
+            new Set(arr)
+          ).sort();
+        }
       }
     }
   }
@@ -38,6 +63,7 @@ function normalize(progress: Partial<Progress>): Progress {
     completedParts,
     streakCount: Number.isFinite(progress.streakCount) ? progress.streakCount! : 0,
     lastPlayedDate: typeof progress.lastPlayedDate === "string" ? progress.lastPlayedDate : null,
+    completedQuizVariants,
   };
 }
 
@@ -103,6 +129,7 @@ export async function updateStreak(): Promise<number> {
   });
   return streakCount;
 }
+
 // Helper function to check if a level is completed (all parts done)
 export function isLevelCompleted(
   progress: Progress,
@@ -157,4 +184,62 @@ export async function markPartCompleted(
     ...progress,
     completedParts: nextCompletedParts,
   });
+}
+
+export async function markQuizVariantCompleted(
+  topicId: string,
+  subtopicId: string,
+  levelId: string,
+  partId: string,
+  variant: string
+): Promise<boolean> {
+  const progress = await loadProgress();
+
+  const currentVariants =
+    progress.completedQuizVariants?.[topicId]?.[subtopicId]?.[levelId]?.[partId] ?? [];
+
+  const nextVariants = Array.from(new Set([...currentVariants, variant])).sort();
+
+  const nextCompletedQuizVariants = {
+    ...progress.completedQuizVariants,
+    [topicId]: {
+      ...(progress.completedQuizVariants?.[topicId] ?? {}),
+      [subtopicId]: {
+        ...(progress.completedQuizVariants?.[topicId]?.[subtopicId] ?? {}),
+        [levelId]: {
+          ...(progress.completedQuizVariants?.[topicId]?.[subtopicId]?.[levelId] ?? {}),
+          [partId]: nextVariants,
+        },
+      },
+    },
+  };
+
+  const allDone =
+    nextVariants.includes("A") &&
+    nextVariants.includes("B") &&
+    nextVariants.includes("C");
+
+  const nextProgress = {
+    ...progress,
+    completedQuizVariants: nextCompletedQuizVariants,
+  };
+
+  await saveProgress(nextProgress);
+
+  if (allDone) {
+    await markPartCompleted(topicId, subtopicId, levelId, partId);
+  }
+
+  return allDone;
+}
+
+export async function getCompletedQuizVariants(
+  topicId: string,
+  subtopicId: string,
+  levelId: string,
+  partId: string
+): Promise<string[]> {
+  const progress = await loadProgress();
+
+  return progress.completedQuizVariants?.[topicId]?.[subtopicId]?.[levelId]?.[partId] ?? [];
 }

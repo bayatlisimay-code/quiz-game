@@ -1,8 +1,8 @@
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { getLastLessonPath } from "../lib/progress";
+import { loadLastLocation } from "../src/state/lastLocation";
 import { useStreak } from "../src/state/useStreak";
 import { useTotalXp } from "../src/state/useTotalXp";
 
@@ -13,13 +13,27 @@ export default function HomeScreen() {
 
   const [lastLesson, setLastLesson] = useState<string | null>(null);
 
-  useEffect(() => {
-    const load = async () => {
-      const saved = await getLastLessonPath();
-      setLastLesson(saved);
-    };
-    load();
-  }, []);
+useFocusEffect(() => {
+  let cancelled = false;
+
+  (async () => {
+    const loc = await loadLastLocation();
+    if (cancelled) return;
+
+    if (!loc) {
+      setLastLesson(null);
+      return;
+    }
+
+    setLastLesson(
+      `/topic/${loc.topicId}/subtopic/${loc.subtopicId}/level/${loc.levelId}/${loc.partId}`
+    );
+  })();
+
+  return () => {
+    cancelled = true;
+  };
+});
 
   const onContinue = () => {
     if (lastLesson) {

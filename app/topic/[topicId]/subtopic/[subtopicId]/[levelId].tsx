@@ -5,7 +5,6 @@ import { TOPIC_BY_ID } from "../../../../../data/catalog";
 import { isPartCompleted, loadProgress } from "../../../../../src/state/progress";
 import { useStreak } from "../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../src/state/useTotalXp";
-import { markPartCompleted } from "../../../../../src/state/progress";
 
 export default function LevelScreen() {
   const router = useRouter();
@@ -106,9 +105,6 @@ export default function LevelScreen() {
         const n = Number(part.id);
         const partNumber = Number.isFinite(n) && n > 0 ? n : 1;
 
-        const locked = !isUnlocked(partNumber);
-        const done = isCompleted(part.id);
-
         const key = `${topicId}_${subtopicId}_${levelId}_${part.id}`;
         const isCompleted = completedParts.includes(key);
 
@@ -117,8 +113,11 @@ export default function LevelScreen() {
 
         // Unlock if first part OR previous part completed
         const prevKey = `${topicId}_${subtopicId}_${levelId}_${String(Number(part.id) - 1)}`;
-        const isUnlocked =
+        const partUnlocked =
           isFirstPart || completedParts.includes(prevKey);
+        
+        const locked = !partUnlocked;
+        const done = isCompleted;
 
         return (
           <Pressable
