@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -92,11 +93,22 @@ export default function SubtopicScreen() {
         </Pressable>
 
         <Text numberOfLines={1} style={styles.headerTitle}>
-          {topic.emoji} {topic.title} • {subtopic.title}
+          {subtopic.title}
         </Text>
 
         <View style={styles.xpPill}>
-          <Text style={styles.xpText}>🔥 {streak} • Lv {subtopicLevel} • XP {totalXP}</Text>
+          <View style={styles.xpContent}>
+            <MaterialCommunityIcons name="fire" size={14} color="#FDBA74" />
+            <Text style={styles.xpText}>{streak}</Text>
+
+            <Text style={styles.xpDot}>•</Text>
+
+            <Text style={styles.xpText}>Lv {subtopicLevel}</Text>
+
+            <Text style={styles.xpDot}>•</Text>
+
+            <Text style={styles.xpText}>XP {totalXP}</Text>
+          </View>
         </View>
       </View>
 
@@ -116,9 +128,17 @@ export default function SubtopicScreen() {
 
   return (
     <React.Fragment key={group.label}>
-      <Text style={styles.masteryHeading}>
-        {groupLocked ? "🔒 " : ""}{group.label}
-      </Text>
+      <View style={styles.masteryHeadingRow}>
+        {groupLocked ? (
+          <MaterialCommunityIcons
+            name="lock-outline"
+            size={18}
+            color="#7C8799"
+            style={styles.masteryIcon}
+          />
+        ) : null}
+        <Text style={styles.masteryHeading}>{group.label}</Text>
+      </View>
       <View style={styles.masteryDivider} />
 
       {levelsInGroup.map((lvl) => {
@@ -147,9 +167,15 @@ export default function SubtopicScreen() {
               })
             }
           >
-            <Text style={styles.cardTitle}>
-              {lvl.title} {done ? "✅" : locked ? "🔒" : ""}
-            </Text>
+            <View style={styles.cardTitleRow}>
+              <Text style={styles.cardTitle}>{lvl.title}</Text>
+
+              {done ? (
+                <MaterialCommunityIcons name="check-circle" size={20} color="#22C55E" />
+              ) : locked ? (
+                <MaterialCommunityIcons name="lock-outline" size={20} color="#7C8799" />
+              ) : null}
+            </View>
           </Pressable>
         );
       })}
@@ -183,7 +209,7 @@ const styles = StyleSheet.create({
   backText: { color: "#BFDBFE", fontSize: 14, fontWeight: "600" },
   headerTitle: {
     color: "#E5F3FF",
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "700",
     flex: 1,
     textAlign: "center",
@@ -219,16 +245,15 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   xpText: {
-    color: "#FDBA74",
-    fontSize: 13,
-    fontWeight: "800",
-  },
-  masteryHeading: {
-  fontSize: 20,
+  color: "#FDBA74",
+  fontSize: 13,
   fontWeight: "800",
-  marginTop: 18,
-  marginBottom: 10,
-  color: "#EAF2FF",
+  marginLeft: 6,
+},
+  masteryHeading: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#EAF2FF",
   },
   masteryDivider: {
   height: 1,
@@ -238,4 +263,33 @@ const styles = StyleSheet.create({
   scrollContent: {
   paddingBottom: 40,
   },
+  xpContent: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+},
+
+xpDot: {
+  color: "#FDBA74",
+  fontSize: 13,
+  fontWeight: "800",
+  marginHorizontal: 8,
+},
+
+masteryHeadingRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginTop: 18,
+  marginBottom: 10,
+},
+
+masteryIcon: {
+  marginRight: 8,
+},
+
+cardTitleRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+},
 });

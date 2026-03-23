@@ -33,6 +33,9 @@ export type Concept = {
 
   // Optional extra context (e.g. "at sea level")
   context?: string;
+
+    // Which quiz variant introduces this concept
+  introducedIn?: "A" | "B" | "C";
 };
 
 export type ExerciseType = "mcq" | "true_false" | "fill_blank";

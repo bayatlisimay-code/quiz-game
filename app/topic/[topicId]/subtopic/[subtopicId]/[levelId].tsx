@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -91,15 +92,28 @@ export default function LevelScreen() {
         </Pressable>
 
         <Text numberOfLines={1} style={styles.headerTitle}>
-          {topic.emoji} {subtopic.title} • {level.title}
+          {subtopic.title}
         </Text>
 
         <View style={styles.xpPill}>
-          <Text style={styles.xpText}>🔥 {streak} • XP {totalXP}</Text>
+          <View style={styles.xpContent}>
+            <MaterialCommunityIcons name="fire" size={14} color="#FDBA74" />
+            <Text style={styles.xpText}>{streak}</Text>
+
+            <Text style={styles.xpDot}>•</Text>
+
+            <Text style={styles.xpText}>Lv 0</Text>
+
+            <Text style={styles.xpDot}>•</Text>
+
+            <Text style={styles.xpText}>XP {totalXP}</Text>
+          </View>
         </View>
       </View>
 
-      <Text style={styles.subtitle}>Choose a part</Text>
+      <Text style={styles.subtitle}>
+        {level.title} • Choose a part
+      </Text>
 
       {level.parts.map((part) => {
         const n = Number(part.id);
@@ -140,9 +154,15 @@ export default function LevelScreen() {
               })
             }
           >
-            <Text style={styles.cardTitle}>
-              {part.title} {done ? "✅" : locked ? "🔒" : ""}
-            </Text>
+            <View style={styles.cardTitleRow}>
+              <Text style={styles.cardTitle}>{part.title}</Text>
+
+              {done ? (
+                <MaterialCommunityIcons name="check-circle" size={20} color="#22C55E" />
+              ) : locked ? (
+                <MaterialCommunityIcons name="lock-outline" size={20} color="#7C8799" />
+              ) : null}
+            </View>
           </Pressable>
         );
       })}
@@ -168,7 +188,7 @@ const styles = StyleSheet.create({
   backText: { color: "#BFDBFE", fontSize: 14, fontWeight: "600" },
   headerTitle: {
     color: "#E5F3FF",
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "700",
     flex: 1,
     textAlign: "center",
@@ -193,8 +213,29 @@ const styles = StyleSheet.create({
     borderColor: "#F97316",
     marginLeft: 10,
   },
-  xpText: { color: "#FDBA74", fontSize: 13, fontWeight: "800" },
+  xpText: {
+  color: "#FDBA74",
+  fontSize: 13,
+  fontWeight: "800",
+  marginLeft: 6,
+  },
+  xpContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  xpDot: {
+    color: "#FDBA74",
+    fontSize: 13,
+    fontWeight: "800",
+    marginHorizontal: 8,
+  },
+  cardTitleRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+  },
   scrollContent: {
-  paddingBottom: 40,
-},
+    paddingBottom: 40,
+  },
 });

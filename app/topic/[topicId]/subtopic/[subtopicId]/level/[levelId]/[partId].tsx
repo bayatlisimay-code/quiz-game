@@ -1,13 +1,14 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { TOPIC_BY_ID } from "../../../../../../../data/catalog";
+import { CONCEPT_SETS } from "../../../../../../../data/conceptSets";
 import { useStreak } from "../../../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../../../src/state/useTotalXp";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { buildExercise, Exercise } from "../../../../../../../src/quizEngine/exerciseFactory";
-import { loadConceptsByKey } from "../../../../../../../src/quizEngine/loadConcepts";
 import { saveLastLocation } from "../../../../../../../src/state/lastLocation";
 import { markQuizVariantCompleted } from "../../../../../../../src/state/progress";
 
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: "#E5F3FF",
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "700",
     flex: 1,
     textAlign: "center",
@@ -93,8 +94,23 @@ const styles = StyleSheet.create({
     borderColor: "#F97316",
     marginLeft: 10,
   },
-  xpText: { color: "#FDBA74", fontSize: 13, fontWeight: "800" },
-
+  xpContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  xpText: {
+    color: "#FDBA74",
+    fontSize: 13,
+    fontWeight: "800",
+    marginLeft: 6,
+  },
+  xpDot: {
+    color: "#FDBA74",
+    fontSize: 13,
+    fontWeight: "800",
+    marginHorizontal: 8,
+  },
   backText: { color: "#BFDBFE", fontSize: 14, fontWeight: "700" },
 
 });
@@ -113,6 +129,10 @@ export default function PartQuizScreen() {
 
   const totalXP = useTotalXp();
   const streak = useStreak();
+
+  const subtopicLevel = useMemo(() => {
+    return 0;
+  }, []);
 
   const topic = TOPIC_BY_ID[String(topicId)];
   const subtopic = topic?.subtopics.find((s) => s.id === String(subtopicId));
@@ -178,6 +198,14 @@ export default function PartQuizScreen() {
   const prt = `p${String(partId)}`;
   const key = `${topicId}_${subtopicId}_${lvl}_${prt}`;
 
+  const conceptSet = CONCEPT_SETS[key];
+
+  if (!conceptSet) {
+    setExercises([]);
+    setLoading(false);
+    return;
+  }
+
   const setValue = String(set ?? "");
   const variant = setValue.includes("quizC") ? "C" : setValue.includes("quizB") ? "B" : "A";
 
@@ -211,7 +239,47 @@ export default function PartQuizScreen() {
   const prt = `p${String(partId)}`;
   const key = `${topicId}_${subtopicId}_${lvl}_${prt}`;
 
-  const concepts = loadConceptsByKey(key);
+  const conceptSet = CONCEPT_SETS[key];
+
+  if (!conceptSet) {
+    setExercises([]);
+    setLoading(false);
+    return;
+  }
+
+  
+
+  function getSourcePartIds(partId: string): string[] {
+    if (partId === "p1") return ["p1"];
+    if (partId === "p2") return ["p2"];
+    if (partId === "p3") return ["p1", "p2"];
+    if (partId === "p4") return ["p4"];
+    if (partId === "p5") return ["p1", "p2", "p4"];
+    return [];
+  }
+
+  function getPartDifficultyRange(partId: string): [number, number] {
+    if (partId === "p1") return [1, 2];
+    if (partId === "p2") return [1, 3];
+    if (partId === "p3") return [1, 3];
+    if (partId === "p4") return [2, 4];
+    if (partId === "p5") return [2, 5];
+    return [1, 5];
+  }
+
+  const sourcePartIds = getSourcePartIds(prt);
+
+  const concepts = conceptSet.concepts.filter(
+    (c) =>
+      c.levelId === lvl &&
+      sourcePartIds.includes(c.partId)
+  );
+
+  const [minDifficulty, maxDifficulty] = getPartDifficultyRange(prt);
+
+  const filteredConcepts = concepts.filter(
+    (c) => c.difficulty >= minDifficulty && c.difficulty <= maxDifficulty
+  );
 
   // Decide quiz variant from query param: "quizA" | "quizB" | "quizC"
   const setValue = String(set ?? "");
@@ -221,13 +289,19 @@ export default function PartQuizScreen() {
     ? "B"
     : "A";
 
-  // Difficulty ramp: A easiest, B medium, C hardest/mixed
+  // Spaced repetition by introduction stage
   const filtered =
-    variant === "A"
-      ? concepts.filter((c) => c.difficulty <= 2)
-      : variant === "B"
-      ? concepts.filter((c) => c.difficulty <= 3)
-      : concepts;
+  variant === "A"
+    ? filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "A")
+    : variant === "B"
+    ? filteredConcepts.filter((c) => {
+        const intro = c.introducedIn ?? "A";
+        return intro === "A" || intro === "B";
+      })
+    : filteredConcepts.filter((c) => {
+        const intro = c.introducedIn ?? "A";
+        return intro === "A" || intro === "B" || intro === "C";
+      });
 
   // --- deterministic shuffle by seed (so A/B/C are stable) ---
   function hashString(s: string) {
@@ -270,7 +344,7 @@ export default function PartQuizScreen() {
   const typePlan = buildTypePlan(seed.length, picked.length);
 
   const built = picked.map((c, i) =>
-  buildExercise(c, concepts, 3, typePlan[i])
+    buildExercise(c, filtered, 3, typePlan[i])
   );
 
   setExercises(built);
@@ -383,11 +457,22 @@ if (!hasQuizVariant) {
         </Pressable>
 
         <Text numberOfLines={1} style={styles.headerTitle}>
-          {topic?.emoji ?? ""} {subtopic?.title ?? ""} • {level?.title ?? ""}
+          {subtopic.title}
         </Text>
 
         <View style={styles.xpPill}>
-          <Text style={styles.xpText}>🔥 {streak} • XP {totalXP}</Text>
+          <View style={styles.xpContent}>
+            <MaterialCommunityIcons name="fire" size={14} color="#FDBA74" />
+            <Text style={styles.xpText}>{streak}</Text>
+
+            <Text style={styles.xpDot}>•</Text>
+
+            <Text style={styles.xpText}>Lv {subtopicLevel}</Text>
+
+            <Text style={styles.xpDot}>•</Text>
+
+            <Text style={styles.xpText}>XP {totalXP}</Text>
+          </View>
         </View>
       </View>
 

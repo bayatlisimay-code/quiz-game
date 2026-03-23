@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -13,34 +14,34 @@ export default function HomeScreen() {
 
   const [lastLesson, setLastLesson] = useState<string | null>(null);
 
-useFocusEffect(() => {
-  let cancelled = false;
+  useFocusEffect(() => {
+    let cancelled = false;
 
-  (async () => {
-    const loc = await loadLastLocation();
-    if (cancelled) return;
+    (async () => {
+      const loc = await loadLastLocation();
+      if (cancelled) return;
 
-    if (!loc) {
-      setLastLesson(null);
-      return;
-    }
+      if (!loc) {
+        setLastLesson(null);
+        return;
+      }
 
-    setLastLesson(
-      `/topic/${loc.topicId}/subtopic/${loc.subtopicId}/level/${loc.levelId}/${loc.partId}`
-    );
-  })();
+      setLastLesson(
+        `/topic/${loc.topicId}/subtopic/${loc.subtopicId}/level/${loc.levelId}/${loc.partId}`
+      );
+    })();
 
-  return () => {
-    cancelled = true;
-  };
-});
+    return () => {
+      cancelled = true;
+    };
+  });
 
   const onContinue = () => {
     if (lastLesson) {
       router.push(lastLesson as any);
       return;
     }
-    // If we don't have anything saved yet, send user to choose a topic
+
     router.push("/topics" as any);
   };
 
@@ -53,28 +54,43 @@ useFocusEffect(() => {
 
       <View style={styles.progressCard}>
         <View style={styles.progressRow}>
-          <Text style={styles.progressLabel}>🔥 Streak</Text>
+          <View style={styles.labelWithIcon}>
+            <MaterialCommunityIcons name="fire" size={16} color="#B3C7E6" />
+            <Text style={styles.progressLabel}>Streak</Text>
+          </View>
           <Text style={styles.progressValue}>{streak}</Text>
         </View>
 
         <View style={styles.progressRow}>
-          <Text style={styles.progressLabel}>💎 Total XP</Text>
+          <View style={styles.labelWithIcon}>
+            <MaterialCommunityIcons name="diamond-stone" size={16} color="#B3C7E6" />
+            <Text style={styles.progressLabel}>Total XP</Text>
+          </View>
           <Text style={styles.progressValue}>{totalXP}</Text>
         </View>
 
         <View style={styles.goalHint}>
-          <Text style={styles.goalHintText}>🎯 Daily goal coming next</Text>
+          <View style={styles.labelWithIcon}>
+            <MaterialCommunityIcons name="target" size={14} color="#93C5FD" />
+            <Text style={styles.goalHintText}>Daily goal coming next</Text>
+          </View>
         </View>
       </View>
 
       <Pressable style={styles.primaryButton} onPress={onContinue}>
-        <Text style={styles.primaryText}>
-          {lastLesson ? "🚀 Continue where you left off" : "🚀 Start learning"}
-        </Text>
+        <View style={styles.buttonContent}>
+          <MaterialCommunityIcons name="rocket-launch" size={18} color="#E5F3FF" />
+          <Text style={styles.primaryText}>
+            {lastLesson ? "Continue where you left off" : "Start learning"}
+          </Text>
+        </View>
       </Pressable>
 
       <Pressable style={styles.secondaryButton} onPress={() => router.push("/topics" as any)}>
-        <Text style={styles.secondaryText}>📚 Choose a topic</Text>
+        <View style={styles.buttonContent}>
+          <MaterialCommunityIcons name="book-open-page-variant" size={18} color="#BFDBFE" />
+          <Text style={styles.secondaryText}>Choose a topic</Text>
+        </View>
       </Pressable>
     </ScrollView>
   );
@@ -120,10 +136,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 10,
   },
+  labelWithIcon: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   progressLabel: {
     color: "#B3C7E6",
     fontSize: 14,
     fontWeight: "800",
+    marginLeft: 6,
   },
   progressValue: {
     color: "#E5F3FF",
@@ -140,6 +161,7 @@ const styles = StyleSheet.create({
     color: "#93C5FD",
     fontSize: 13,
     fontWeight: "800",
+    marginLeft: 6,
   },
 
   primaryButton: {
@@ -147,18 +169,21 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: "center",
+    justifyContent: "center",
     marginBottom: 12,
   },
   primaryText: {
     color: "#E5F3FF",
     fontSize: 16,
     fontWeight: "900",
+    marginLeft: 8,
   },
 
   secondaryButton: {
     paddingVertical: 14,
     borderRadius: 16,
     alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
     borderColor: "#3B82F6",
   },
@@ -166,5 +191,12 @@ const styles = StyleSheet.create({
     color: "#BFDBFE",
     fontSize: 15,
     fontWeight: "900",
+    marginLeft: 8,
+  },
+
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

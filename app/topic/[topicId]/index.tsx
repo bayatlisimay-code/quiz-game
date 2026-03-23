@@ -1,5 +1,6 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TOPIC_BY_ID } from "../../../data/catalog";
 import { getXpLevel } from "../../../src/state/leveling";
@@ -35,13 +36,19 @@ export default function TopicScreen() {
         </Pressable>
 
         <Text numberOfLines={1} style={styles.headerTitle}>
-          {topic.emoji} {topic.title}
+          {topic.title}
         </Text>
 
         <View style={styles.xpPill}>
-          <Text style={styles.xpText}>
-              🔥 {streak} • XP {totalXP}
-          </Text>
+          <View style={styles.xpContent}>
+            <MaterialCommunityIcons name="fire" size={14} color="#FDBA74" />
+            <Text style={styles.xpText}>{streak}</Text>
+
+            <Text style={styles.xpDot}>•</Text>
+
+            <MaterialCommunityIcons name="diamond-stone" size={14} color="#FDBA74" />
+            <Text style={styles.xpText}>{totalXP}</Text>
+          </View>
         </View>
       </View>
 
@@ -52,12 +59,11 @@ export default function TopicScreen() {
           key={s.id}
           style={[styles.card, { borderLeftColor: topic.color }]}
           onPress={() =>
-          router.push({
-          pathname: "/topic/[topicId]/subtopic/[subtopicId]",
-          params: { topicId: String(topic.id), subtopicId: String(s.id) },
-          })
-      } 
-
+            router.push({
+              pathname: "/topic/[topicId]/subtopic/[subtopicId]",
+              params: { topicId: String(topic.id), subtopicId: String(s.id) },
+            })
+          }
         >
           <Text style={styles.cardTitle}>{s.title}</Text>
           <Text style={styles.cardMeta}>{s.levels.length} levels</Text>
@@ -74,6 +80,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 60,
   },
+  scrollContent: {
+    paddingBottom: 40,
+  },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -87,8 +96,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#3B82F6",
   },
-  backText: { color: "#BFDBFE", fontSize: 14, fontWeight: "600" },
-
+  backText: {
+    color: "#BFDBFE",
+    fontSize: 14,
+    fontWeight: "600",
+  },
   headerTitle: {
     color: "#E5F3FF",
     fontSize: 16,
@@ -97,7 +109,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginHorizontal: 12,
   },
-
   xpPill: {
     paddingVertical: 6,
     paddingHorizontal: 10,
@@ -106,12 +117,23 @@ const styles = StyleSheet.create({
     borderColor: "#F97316",
     marginLeft: 10,
   },
+  xpContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   xpText: {
     color: "#FDBA74",
     fontSize: 13,
     fontWeight: "800",
+    marginLeft: 6,
   },
-
+  xpDot: {
+    color: "#FDBA74",
+    fontSize: 13,
+    fontWeight: "800",
+    marginHorizontal: 8,
+  },
   subtitle: {
     color: "#B3C7E6",
     textAlign: "center",
@@ -125,9 +147,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderLeftWidth: 4,
   },
-  cardTitle: { color: "#E5F3FF", fontSize: 18, fontWeight: "700" },
-  cardMeta: { color: "#B3C7E6", marginTop: 4, fontSize: 13 },
-
+  cardTitle: {
+    color: "#E5F3FF",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  cardMeta: {
+    color: "#B3C7E6",
+    marginTop: 4,
+    fontSize: 13,
+  },
   title: {
     fontSize: 22,
     fontWeight: "700",
@@ -140,7 +169,4 @@ const styles = StyleSheet.create({
     color: "#B3C7E6",
     textAlign: "center",
   },
-  scrollContent: {
-  paddingBottom: 40,
-},
 });

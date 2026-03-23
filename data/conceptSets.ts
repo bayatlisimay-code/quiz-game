@@ -2875,6 +2875,7 @@ type RawConcept = {
   distractorGroup?: string;
   tags?: string[];
   context?: string;
+  introducedIn?: "A" | "B" | "C";
 };
 
 type RawConceptSet = {
@@ -2897,6 +2898,7 @@ function toConceptSet(raw: RawConceptSet): { id: string; concepts: Concept[] } {
     distractorGroup: c.distractorGroup ? String(c.distractorGroup) : undefined,
     tags: Array.isArray(c.tags) ? c.tags.map(String) : undefined,
     context: c.context ? String(c.context) : undefined,
+    introducedIn: c.introducedIn === "B" || c.introducedIn === "C" ? c.introducedIn : "A",
   }));
 
   return { id: String(raw.id), concepts };
