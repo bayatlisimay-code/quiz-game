@@ -36,6 +36,50 @@ export type Concept = {
 
     // Which quiz variant introduces this concept
   introducedIn?: "A" | "B" | "C";
+
+  entity?: string;
+  factType?: string;
 };
 
 export type ExerciseType = "mcq" | "true_false" | "fill_blank";
+
+export type MatchingPair = {
+  left: string;
+  right: string;
+};
+
+export type MatchingExercise = {
+  type: "matching";
+  pairs: MatchingPair[];
+  prompt: string;
+};
+
+  export type McqExercise = {
+    type: "mcq";
+    conceptId: string;
+    prompt: string;
+    options: string[];
+    correctIndex: number;
+    answerText: string;
+  };
+  
+  export type TrueFalseExercise = {
+    type: "true_false";
+    conceptId: string;
+    statement: string;
+    correctAnswer: boolean;
+    answerText: string;
+  };
+  
+  export type FillBlankExercise = {
+    type: "fill_blank";
+    conceptId: string;
+    prompt: string;
+    answerText: string;
+  };
+
+  export type Exercise =
+  | McqExercise
+  | TrueFalseExercise
+  | FillBlankExercise
+  | MatchingExercise;

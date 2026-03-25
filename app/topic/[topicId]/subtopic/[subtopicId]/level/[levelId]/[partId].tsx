@@ -8,9 +8,12 @@ import { useStreak } from "../../../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../../../src/state/useTotalXp";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { buildExercise, Exercise } from "../../../../../../../src/quizEngine/exerciseFactory";
+import type { Exercise } from "../../../../../../../src/quizEngine/conceptTypes";
+import { enrichConcepts } from "../../../../../../../src/quizEngine/enrichConcepts";
+import { buildExercise, buildMatchingExercise } from "../../../../../../../src/quizEngine/exerciseFactory";
 import { saveLastLocation } from "../../../../../../../src/state/lastLocation";
 import { markQuizVariantCompleted } from "../../../../../../../src/state/progress";
+
 
 const styles = StyleSheet.create({
   container: {
@@ -113,6 +116,47 @@ const styles = StyleSheet.create({
   },
   backText: { color: "#BFDBFE", fontSize: 14, fontWeight: "700" },
 
+  matchingWrap: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 12,
+    alignItems: "flex-start",
+  },
+  matchingColumn: {
+    flex: 1,
+    gap: 10,
+  },
+  matchingItem: {
+    minHeight: 56,
+    borderWidth: 2,
+    borderColor: "#334155",
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    justifyContent: "center",
+    backgroundColor: "#0B1220",
+  },
+  matchingItemSelected: {
+    borderColor: "#FFFFFF",
+  },
+  matchingItemCorrect: {
+    borderColor: "#22C55E",
+  },
+  matchingItemWrong: {
+    borderColor: "#EF4444",
+  },
+   matchingItemFaded: {
+    opacity: 0.45,
+  },
+  matchingItemTextFaded: {
+    opacity: 0.65,
+  },
+  matchingItemText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
 });
 
 export default function PartQuizScreen() {
@@ -154,6 +198,59 @@ export default function PartQuizScreen() {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
 
+  const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
+  const [selectedRight, setSelectedRight] = useState<number | null>(null);
+  const [matchedPairs, setMatchedPairs] = useState<Record<string, number>>({});
+  const [shuffledMatchingLefts, setShuffledMatchingLefts] = useState<string[]>([]);
+  const [shuffledMatchingRights, setShuffledMatchingRights] = useState<string[]>([]);
+
+  useEffect(() => {
+  const q = exercises[idx];
+  if (!q || q.type !== "matching") {
+    setShuffledMatchingLefts([]);
+    setShuffledMatchingRights([]);
+    return;
+  }
+
+  const lefts = (q as any).pairs.map((pair: any) => pair.left);
+  const rights = (q as any).pairs.map((pair: any) => pair.right);
+
+  setShuffledMatchingLefts(shuffleSeeded(lefts, idx + attempt + 1));
+  setShuffledMatchingRights(shuffleSeeded(rights, idx + attempt + 101));
+}, [exercises, idx, attempt]);
+
+  useEffect(() => {
+  if (!selectedLeft || selectedRight === null || checked) return;
+
+  const q = exercises[idx];
+  if (!q || q.type !== "matching") return;
+
+  const correctRight = (q as any).pairs.find(
+    (p: any) => p.left === selectedLeft
+  )?.right;
+  const isCorrect = shuffledMatchingRights[selectedRight] === correctRight;
+
+  setMatchedPairs((prev) => ({
+    ...prev,
+    [selectedLeft]: selectedRight,
+  }));
+
+  setSelectedLeft(null);
+  setSelectedRight(null);
+
+  if (!isCorrect) {
+    const left = selectedLeft;
+    setTimeout(() => {
+      setMatchedPairs((prev) => {
+        const next = { ...prev };
+        delete next[left];
+        return next;
+      });
+    }, 800);
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [selectedLeft, selectedRight, checked]);
+
   function shuffleSeeded<T>(arr: readonly T[], seed: number): T[] {
   const a = [...arr];
   let s = seed || 1;
@@ -173,22 +270,6 @@ export default function PartQuizScreen() {
   }
 
   return a;
-  }
-
-  function buildTypePlan(seed: number, count: number) {
-    if (count === 8) {
-      const plans = [
-        ["mcq","mcq","mcq","true_false","true_false","true_false","fill_blank","fill_blank"],
-        ["mcq","mcq","true_false","true_false","true_false","fill_blank","fill_blank","fill_blank"],
-        ["mcq","mcq","mcq","true_false","true_false","fill_blank","fill_blank","fill_blank"]
-      ] as const;
-
-      return shuffleSeeded(plans[seed % plans.length], seed);
-    }
-
-    // fallback: if count is not 8 for some reason
-    const fallback = Array(count).fill("mcq") as Array<"mcq" | "true_false" | "fill_blank">;
-    return shuffleSeeded(fallback, seed);
   }
 
   useEffect(() => {
@@ -247,7 +328,18 @@ export default function PartQuizScreen() {
     return;
   }
 
-  
+  setSelectedLeft(null);
+  setSelectedRight(null);
+  setMatchedPairs({});
+  setShuffledMatchingLefts([]);
+  setShuffledMatchingRights([]);
+
+  setIdx(0);
+  setSelectedAnswer(null);
+  setTypedAnswer("");
+  setChecked(false);
+  setIsCorrect(null);
+  setCorrectCount(0);
 
   function getSourcePartIds(partId: string): string[] {
     if (partId === "p1") return ["p1"];
@@ -277,9 +369,11 @@ export default function PartQuizScreen() {
 
   const [minDifficulty, maxDifficulty] = getPartDifficultyRange(prt);
 
-  const filteredConcepts = concepts.filter(
+  const filteredRaw = concepts.filter(
     (c) => c.difficulty >= minDifficulty && c.difficulty <= maxDifficulty
   );
+
+  const filteredConcepts = enrichConcepts(filteredRaw);
 
   // Decide quiz variant from query param: "quizA" | "quizB" | "quizC"
   const setValue = String(set ?? "");
@@ -291,17 +385,17 @@ export default function PartQuizScreen() {
 
   // Spaced repetition by introduction stage
   const filtered =
-  variant === "A"
-    ? filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "A")
-    : variant === "B"
-    ? filteredConcepts.filter((c) => {
-        const intro = c.introducedIn ?? "A";
-        return intro === "A" || intro === "B";
-      })
-    : filteredConcepts.filter((c) => {
-        const intro = c.introducedIn ?? "A";
-        return intro === "A" || intro === "B" || intro === "C";
-      });
+    variant === "A"
+      ? filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "A")
+      : variant === "B"
+      ? filteredConcepts.filter((c) => {
+          const intro = c.introducedIn ?? "A";
+          return intro === "A" || intro === "B";
+        })
+      : filteredConcepts.filter((c) => {
+          const intro = c.introducedIn ?? "A";
+          return intro === "A" || intro === "B" || intro === "C";
+        });
 
   // --- deterministic shuffle by seed (so A/B/C are stable) ---
   function hashString(s: string) {
@@ -312,6 +406,75 @@ export default function PartQuizScreen() {
     }
     return h >>> 0;
   }
+
+  const QUIZ_TYPE_ORDER = ["mcq", "true_false", "fill_blank"] as const;
+
+  function stageToNumber(stage: "A" | "B" | "C") {
+    return stage === "A" ? 0 : stage === "B" ? 1 : 2;
+  }
+
+  function getExerciseTypeForConcept(
+    concept: { id: string; introducedIn?: "A" | "B" | "C" },
+    variant: "A" | "B" | "C",
+    seed: string
+  ): (typeof QUIZ_TYPE_ORDER)[number] {
+    const intro = concept.introducedIn ?? "A";
+
+    const orderedTypes = seededShuffle(
+      [...QUIZ_TYPE_ORDER],
+      `${seed}_${concept.introducedIn ?? "A"}_type_order`
+    );
+
+    const shift = Math.max(0, stageToNumber(variant) - stageToNumber(intro));
+
+    return orderedTypes[Math.min(shift, orderedTypes.length - 1)];
+  }
+
+  function buildBalancedTypePlan(seed: string, count: number): Array<"mcq" | "true_false" | "fill_blank"> {
+    if (count === 7) {
+      const plans: Array<Array<"mcq" | "true_false" | "fill_blank">> = [
+        ["mcq","mcq","mcq","true_false","true_false","fill_blank","fill_blank"], // 3 mcq
+        ["mcq","mcq","true_false","true_false","true_false","fill_blank","fill_blank"], // 3 tf
+        ["mcq","mcq","true_false","true_false","fill_blank","fill_blank","fill_blank"], // 3 fill
+      ];
+
+      return seededShuffle(plans[hashString(seed) % plans.length], `${seed}_type_plan`);
+    }
+
+    // fallback
+    const fallback: Array<"mcq" | "true_false" | "fill_blank"> = [];
+    const base = ["mcq", "true_false", "fill_blank"] as const;
+
+    for (let i = 0; i < count; i++) {
+      fallback.push(base[i % base.length]);
+    }
+
+    return seededShuffle(fallback, `${seed}_type_plan_fallback`);
+  }
+
+function assignBalancedTypes(
+  picked: Array<{ id: string; introducedIn?: "A" | "B" | "C" }>,
+  variant: "A" | "B" | "C",
+  seed: string
+): Array<"mcq" | "true_false" | "fill_blank"> {
+  const plan = buildBalancedTypePlan(seed, picked.length);
+  const remaining = [...plan];
+  const assigned: Array<"mcq" | "true_false" | "fill_blank"> = [];
+
+  for (const concept of picked) {
+    const preferred = getExerciseTypeForConcept(concept, variant, seed);
+    const preferredIndex = remaining.indexOf(preferred);
+
+    if (preferredIndex !== -1) {
+      assigned.push(preferred);
+      remaining.splice(preferredIndex, 1);
+    } else {
+      assigned.push(remaining.shift() ?? "mcq");
+    }
+  }
+
+  return assigned;
+}
 
   function seededShuffle<T>(arr: T[], seedStr: string): T[] {
     let seed = hashString(seedStr) || 1;
@@ -335,41 +498,102 @@ export default function PartQuizScreen() {
   }
 
   const seed = `${key}_quiz${variant}_attempt${attempt}`;
-  const shuffled = seededShuffle(filtered, seed);
 
-  // Pick how many questions per quiz (change this number anytime)
-  const QUIZ_LEN = 8;
-  const picked = shuffled.slice(0, Math.min(QUIZ_LEN, shuffled.length));
+  // Split by introduction stage
+  const aConcepts = filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "A");
+  const bConcepts = filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "B");
+  const cConcepts = filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "C");
 
-  const typePlan = buildTypePlan(seed.length, picked.length);
+  // Pick how many questions per quiz
+  const QUIZ_LEN = 7; // normal questions only (matching will be added separately)
 
-  const built = picked.map((c, i) =>
-    buildExercise(c, filtered, 3, typePlan[i])
+  const pickFrom = <T,>(items: T[], count: number, seedPart: string) =>
+    seededShuffle(items, `${seed}_${seedPart}`).slice(0, Math.min(count, items.length));
+
+  let picked =
+    variant === "A"
+      ? pickFrom(aConcepts, QUIZ_LEN, "A_only")
+      : variant === "B"
+      ? [
+          ...pickFrom(bConcepts, 5, "B_main"),
+          ...pickFrom(aConcepts, 2, "B_repeat_A"),
+        ]
+      : [
+          ...pickFrom(cConcepts, 5, "C_main"),
+          ...pickFrom([...aConcepts, ...bConcepts], 2, "C_repeat_AB"),
+        ];
+
+  // If there are not enough concepts, fill from the allowed pool
+  if (picked.length < QUIZ_LEN) {
+    const pickedIds = new Set(picked.map((c) => c.id));
+
+    const allowedPool =
+      variant === "A"
+        ? aConcepts
+        : variant === "B"
+        ? [...bConcepts, ...aConcepts]
+        : [...cConcepts, ...aConcepts, ...bConcepts];
+
+    const filler = seededShuffle(
+      allowedPool.filter((c) => !pickedIds.has(c.id)),
+      `${seed}_filler`
+    ).slice(0, QUIZ_LEN - picked.length);
+
+    picked = [...picked, ...filler];
+  }
+
+  // Final shuffle so repeated/new questions are mixed visually
+  picked = seededShuffle(picked, `${seed}_final`);
+
+  const assignedTypes = assignBalancedTypes(picked, variant, seed);
+
+  // Build normal exercises first
+  let built = picked.map((c, i) =>
+    buildExercise(c, filteredConcepts, 3, assignedTypes[i])
   );
+
+  // Add 1 matching question on top of the 7 normal questions
+  const matching = buildMatchingExercise(filtered, `${seed}_matching`);
+
+  if (matching) {
+    built = [...built, matching];
+  }
+
+  built = seededShuffle(built, `${seed}_exercise_order`);
+
+  // temporary: inspect grouped facts
+  console.log("picked concepts", picked);
 
   setExercises(built);
   setLoading(false);
-}, [topicId, subtopicId, levelId, partId, set]);
+}, [topicId, subtopicId, levelId, partId, set, attempt]);
 
   const q = exercises[idx];
   const total = exercises.length;
   const progress = total > 0 ? (idx + 1) / total : 0;
 
   const correct =
-  !!q &&
-  (q.type === "mcq"
-    ? selectedAnswer === q.options[q.correctIndex]
-    : q.type === "true_false"
-    ? selectedAnswer === (q.correctAnswer ? "true" : "false")
-    : typedAnswer.trim().toLowerCase() === q.answerText.trim().toLowerCase());
-
-  const canCheck = useMemo(() => {
-    if (!q || checked) return false;
-    if (q.type === "mcq") return selectedAnswer !== null;
-    if (q.type === "true_false") return selectedAnswer !== null;
-    if (q.type === "fill_blank") return typedAnswer.trim().length > 0;
-    return false;
-  }, [q, checked, selectedAnswer, typedAnswer]);
+    !!q &&
+    (q.type === "mcq"
+      ? selectedAnswer === q.options[q.correctIndex]
+      : q.type === "true_false"
+      ? selectedAnswer === (q.correctAnswer ? "true" : "false")
+      : q.type === "fill_blank"
+      ? typedAnswer.trim().toLowerCase() === q.answerText.trim().toLowerCase()
+      : q.type === "matching"
+      ? (q as any).pairs.every((pair: any) => {
+          const rightIdx = matchedPairs[pair.left];
+          return rightIdx !== undefined && shuffledMatchingRights[rightIdx] === pair.right;
+        })
+      : false);
+    const canCheck = useMemo(() => {
+      if (!q || checked) return false;
+      if (q.type === "mcq") return selectedAnswer !== null;
+      if (q.type === "true_false") return selectedAnswer !== null;
+      if (q.type === "fill_blank") return typedAnswer.trim().length > 0;
+      if (q.type === "matching") return Object.keys(matchedPairs).length === (q as any).pairs.length;
+      return false;
+    }, [q, checked, selectedAnswer, typedAnswer, matchedPairs]);
 
   const onCheck = () => {
     if (!q) return;
@@ -384,6 +608,11 @@ export default function PartQuizScreen() {
       ok =
         typedAnswer.trim().toLowerCase() ===
         q.answerText.trim().toLowerCase();
+    } else if (q.type === "matching") {
+      ok = (q as any).pairs.every((pair: any) => {
+        const rightIdx = matchedPairs[pair.left];
+        return rightIdx !== undefined && shuffledMatchingRights[rightIdx] === pair.right;
+      });
     }
 
     setChecked(true);
@@ -442,6 +671,9 @@ export default function PartQuizScreen() {
     setTypedAnswer("");
     setChecked(false);
     setIsCorrect(null);
+    setSelectedLeft(null);
+    setSelectedRight(null);
+    setMatchedPairs({});
   };
 
 if (!hasQuizVariant) {
@@ -457,7 +689,7 @@ if (!hasQuizVariant) {
         </Pressable>
 
         <Text numberOfLines={1} style={styles.headerTitle}>
-          {subtopic.title}
+          {subtopic?.title ?? ""}
         </Text>
 
         <View style={styles.xpPill}>
@@ -564,60 +796,135 @@ if (exercises.length === 0) {
               <Text style={styles.optionText}>{opt}</Text>
             </Pressable>
           );
-      })}
+        })}
 
       {q.type === "true_false" &&
-        ["true", "false"].map((v) => {
-          const isSelected = selectedAnswer === v;
-
-          const correctV = q.correctAnswer ? "true" : "false";
-          const isCorrectOpt = checked && v === correctV;
-          const isWrongSelected = checked && isSelected && v !== correctV;
+        ["true", "false"].map((opt) => {
+          const isSelected = selectedAnswer === opt;
+          const correctOpt = q.correctAnswer ? "true" : "false";
+          const isCorrectOpt = checked && opt === correctOpt;
+          const isWrongSelected = checked && isSelected && opt !== correctOpt;
 
           return (
             <Pressable
-              key={v}
+              key={opt}
               style={[
                 styles.option,
                 !checked && isSelected && styles.optionSelected,
                 isCorrectOpt && styles.optionCorrect,
                 isWrongSelected && styles.optionWrong,
               ]}
-              onPress={() => !checked && setSelectedAnswer(v)}
+              onPress={() => !checked && setSelectedAnswer(opt)}
             >
-              <Text style={styles.optionText}>{v.toUpperCase()}</Text>
+              <Text style={styles.optionText}>{opt === "true" ? "True" : "False"}</Text>
             </Pressable>
           );
-      })}
+        })}
 
       {q.type === "fill_blank" && (
         <TextInput
-            style={[
-              styles.input,
-              typedAnswer.length > 0 && !checked && styles.optionSelected,
-              checked && correct && styles.optionCorrect,
-              checked && !correct && styles.optionWrong,
-            ]}
-          placeholder="Type your answer"
-          placeholderTextColor="#6B7280"
           value={typedAnswer}
           onChangeText={setTypedAnswer}
-          />
+          editable={!checked}
+          placeholder="Type your answer"
+          placeholderTextColor="#94A3B8"
+          style={[
+            styles.input,
+            typedAnswer.trim().length > 0 && !checked && styles.optionSelected,
+            checked && isCorrect === true && styles.optionCorrect,
+            checked && isCorrect === false && styles.optionWrong,
+          ]}
+        />
       )}
 
-      {!checked ? (
-        <Pressable
-          style={[styles.primaryButton, !canCheck && { opacity: 0.5 }]}
-          disabled={!canCheck}
-          onPress={onCheck}
-        >
-          <Text style={styles.primaryText}>Check</Text>
-        </Pressable>
-      ) : (
-        <Pressable style={styles.primaryButton} onPress={onNext}>
-          <Text style={styles.primaryText}>Next</Text>
-        </Pressable>
+      {q.type === "matching" && (
+        <View style={styles.matchingWrap}>
+          <View style={styles.matchingColumn}>
+            {shuffledMatchingLefts.map((left) => {
+              const isSelected = selectedLeft === left;
+              const isMatched = matchedPairs[left] !== undefined;
+              const matchedRightText = isMatched ? shuffledMatchingRights[matchedPairs[left]] : null;
+              const correctRightText = isMatched ? (q as any).pairs.find((p: any) => p.left === left)?.right : null;
+              const isMatchCorrect = isMatched && matchedRightText === correctRightText;          
+              
+
+              return (
+                <Pressable
+                  key={left}
+                  onPress={() => {
+                    if (checked || isMatched) return;
+                    setSelectedLeft(left);
+                  }}
+                  style={[
+                    styles.matchingItem,
+                    isSelected && styles.matchingItemSelected,
+                    isMatched && (isMatchCorrect ? styles.matchingItemCorrect : styles.matchingItemWrong),
+                    isMatchCorrect && styles.matchingItemFaded,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.matchingItemText,
+                      isMatchCorrect && styles.matchingItemTextFaded,
+                    ]}
+                  >
+                    {left}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <View style={styles.matchingColumn}>
+            {shuffledMatchingRights.map((right, index) => {
+              const isSelected = selectedRight === index;
+              const matchEntry = Object.entries(matchedPairs).find(([_, rIdx]) => rIdx === index);
+              const alreadyUsed = !!matchEntry;
+              const isMatchCorrect = alreadyUsed && matchEntry
+                ? (q as any).pairs.find((p: any) => p.left === matchEntry[0])?.right === right
+                : false;
+
+              return (
+                <Pressable
+                  key={index}
+                  onPress={() => {
+                    if (checked || alreadyUsed) return;
+                    setSelectedRight(index);
+                  }}
+                  style={[
+                    styles.matchingItem,
+                    isSelected && styles.matchingItemSelected,
+                    alreadyUsed && (isMatchCorrect ? styles.matchingItemCorrect : styles.matchingItemWrong),
+                    isMatchCorrect && styles.matchingItemFaded,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.matchingItemText,
+                      isMatchCorrect && styles.matchingItemTextFaded,
+                    ]}
+                  >
+                    {right}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
       )}
-    </ScrollView>
-  );
+        {!checked ? (
+          <Pressable
+            style={[styles.primaryButton, !canCheck && { opacity: 0.5 }]}
+            disabled={!canCheck}
+            onPress={onCheck}
+          >
+            <Text style={styles.primaryText}>Check</Text>
+          </Pressable>
+        ) : (
+          <Pressable style={styles.primaryButton} onPress={onNext}>
+            <Text style={styles.primaryText}>Next</Text>
+          </Pressable>
+        )}
+      </ScrollView>
+    );
 }

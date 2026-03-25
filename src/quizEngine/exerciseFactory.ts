@@ -1,33 +1,76 @@
 // src/quizEngine/exerciseFactory.ts
 
-import type { Concept, ExerciseType } from "./conceptTypes";
+import type {
+  Concept,
+  Exercise,
+  ExerciseType,
+  MatchingExercise
+} from "./conceptTypes";
+import { enrichConcepts } from "./enrichConcepts";
+import { createFactTracker } from "./factTracker";
 import { renderPrompt } from "./templates";
 
-export type McqExercise = {
-  type: "mcq";
-  conceptId: string;
-  prompt: string;
-  options: string[];
-  correctIndex: number;
-  answerText: string;
-};
+function hashString(s: string) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
 
-export type TrueFalseExercise = {
-  type: "true_false";
-  conceptId: string;
-  statement: string;
-  correctAnswer: boolean;
-  answerText: string;
-};
+function seededShuffle<T>(array: T[], seed: string): T[] {
+  const result = [...array];
+  let h = hashString(seed);
 
-export type FillBlankExercise = {
-  type: "fill_blank";
-  conceptId: string;
-  prompt: string;
-  answerText: string;
-};
+  for (let i = result.length - 1; i > 0; i--) {
+    h = Math.imul(h ^ (h >>> 15), 1 | h);
+    const j = h % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]];
+  }
 
-export type Exercise = McqExercise | TrueFalseExercise | FillBlankExercise;
+  return result;
+}
+
+export function buildMatchingExercise(
+  concepts: any[], // we will type later
+  seed: string
+): MatchingExercise | null {
+  if (concepts.length < 4) return null;
+
+  // group by relation (same type only)
+  const byRelation: Record<string, any[]> = {};
+
+  for (const c of concepts) {
+    if (!byRelation[c.relation]) {
+      byRelation[c.relation] = [];
+    }
+    byRelation[c.relation].push(c);
+  }
+
+  // pick a relation that has at least 4 items
+  const validGroups = Object.values(byRelation).filter((g) => g.length >= 4);
+
+  if (validGroups.length === 0) return null;
+
+  const group = seededShuffle(validGroups, `${seed}_matching_group`)[0];
+
+  // pick 4 concepts from that group
+  const selected = seededShuffle(group, `${seed}_matching_select`).slice(0, 4);
+
+  const validSelected = selected.filter(Boolean);
+
+  const pairs = validSelected.map((c) => ({
+    left: c.subject,
+    right: c.object,
+  }));
+
+  return {
+    type: "matching",
+    prompt: "Match the pairs",
+    pairs,
+  };
+}
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -88,6 +131,11 @@ function buildMcq(concept: Concept, pool: Concept[], optionCount: number): Exerc
   const options = shuffle(optionsUnshuffled);
   const correctIndex = options.indexOf(correct);
 
+  const tracker = createFactTracker();
+
+  // TEMP: assume variant A for now (we will fix later)
+  const variant = "A";
+
   return {
     type: "mcq",
     conceptId: concept.id,
@@ -105,7 +153,8 @@ function buildTrueFalse(concept: Concept, pool: Concept[]): Exercise {
   const trueStatement = (rendered.sentence ?? `${rendered.prompt} ${rendered.answerText}`).trim();
 
   // 50/50 whether we show a true or false statement
-  const makeTrue = Math.random() < 0.5;
+  const makeTrue = Math.random() < 0.5
+
 
   if (makeTrue) {
     return {
@@ -161,16 +210,6 @@ function buildFillBlank(concept: Concept): Exercise {
   };
 }
 
-// Put this above buildExercise if you don't already have it
-function hashString(s: string) {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-
 function pickFrom<T>(arr: T[], seed: number, count: number): T[] {
   const a = [...arr];
   let s = seed || 1;
@@ -189,7 +228,7 @@ function pickFrom<T>(arr: T[], seed: number, count: number): T[] {
     a[i] = a[j];
     a[j] = tmp;
   }
-
+  
   return a.slice(0, Math.min(count, a.length));
 }
 
@@ -199,6 +238,9 @@ export function buildExercise(
   optionCount = 4,
   preferredType?: Exercise["type"]
 ): Exercise {
+
+  allConcepts = enrichConcepts(allConcepts);
+  
   const seed = hashString(`${concept.id}:${concept.subject}:${concept.object}:${concept.relation}`);
 
   // We try MCQ first, but only if we can find enough distractors.
