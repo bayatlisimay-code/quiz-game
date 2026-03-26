@@ -10,6 +10,7 @@ import { enrichConcepts } from "./enrichConcepts";
 import { createFactTracker } from "./factTracker";
 import { renderPrompt } from "./templates";
 
+
 function hashString(s: string) {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) {
@@ -36,6 +37,11 @@ export function buildMatchingExercise(
   concepts: any[], // we will type later
   seed: string
 ): MatchingExercise | null {
+  
+  if (!concepts || concepts.length === 0) {
+      return null;
+    }
+
   if (concepts.length < 4) return null;
 
   // group by relation (same type only)
@@ -233,15 +239,27 @@ function pickFrom<T>(arr: T[], seed: number, count: number): T[] {
 }
 
 export function buildExercise(
+  
   concept: any,
   allConcepts: any[],
   optionCount = 4,
   preferredType?: Exercise["type"]
 ): Exercise {
 
+  if (!concept || !allConcepts || allConcepts.length === 0) {
+    return {
+      type: "fill_blank",
+      conceptId: String(concept?.id ?? "missing"),
+      prompt: "Question unavailable.",
+      answerText: "",
+    };
+  }
+
   allConcepts = enrichConcepts(allConcepts);
   
-  const seed = hashString(`${concept.id}:${concept.subject}:${concept.object}:${concept.relation}`);
+  const seed = hashString(
+    `${concept.id}:${concept.subject}:${concept.object}:${concept.relation}:${preferredType}`
+  );
 
   // We try MCQ first, but only if we can find enough distractors.
   const correct = String(concept.object);

@@ -14,7 +14,6 @@ import { buildExercise, buildMatchingExercise } from "../../../../../../../src/q
 import { saveLastLocation } from "../../../../../../../src/state/lastLocation";
 import { markQuizVariantCompleted } from "../../../../../../../src/state/progress";
 
-
 const styles = StyleSheet.create({
   container: {
   flex: 1,
@@ -158,6 +157,33 @@ const styles = StyleSheet.create({
   },
 
 });
+
+function getDeterministicType(
+  concept: any,
+  variant: "A" | "B" | "C"
+): "mcq" | "true_false" | "fill_blank" {
+  const types: ("mcq" | "true_false" | "fill_blank")[] = [
+    "mcq",
+    "true_false",
+    "fill_blank",
+  ];
+
+  const base =
+    (concept.id.length +
+      concept.subject.length +
+      concept.object.length) %
+    3;
+
+  if (variant === "A") {
+    return types[base];
+  }
+
+  if (variant === "B") {
+    return types[(base + 1) % 3];
+  }
+
+  return types[(base + 2) % 3];
+}
 
 export default function PartQuizScreen() {
   const router = useRouter();
@@ -510,18 +536,21 @@ function assignBalancedTypes(
   const pickFrom = <T,>(items: T[], count: number, seedPart: string) =>
     seededShuffle(items, `${seed}_${seedPart}`).slice(0, Math.min(count, items.length));
 
-  let picked =
+  const BASE_COUNT = 5;
+  const NEW_COUNT = 3;
+
+  const baseConcepts = seededShuffle(aConcepts, `${seed}_base`).slice(0, BASE_COUNT);
+
+  const newPool =
     variant === "A"
-      ? pickFrom(aConcepts, QUIZ_LEN, "A_only")
+      ? []
       : variant === "B"
-      ? [
-          ...pickFrom(bConcepts, 5, "B_main"),
-          ...pickFrom(aConcepts, 2, "B_repeat_A"),
-        ]
-      : [
-          ...pickFrom(cConcepts, 5, "C_main"),
-          ...pickFrom([...aConcepts, ...bConcepts], 2, "C_repeat_AB"),
-        ];
+      ? bConcepts
+      : cConcepts;
+
+  const newConcepts = seededShuffle(newPool, `${seed}_new`).slice(0, NEW_COUNT);
+
+  let picked = [...baseConcepts, ...newConcepts];
 
   // If there are not enough concepts, fill from the allowed pool
   if (picked.length < QUIZ_LEN) {
@@ -547,16 +576,33 @@ function assignBalancedTypes(
 
   const assignedTypes = assignBalancedTypes(picked, variant, seed);
 
-  // Build normal exercises first
-  let built = picked.map((c, i) =>
-    buildExercise(c, filteredConcepts, 3, assignedTypes[i])
-  );
+  function getBalancedRandomType(
+    counts: { mcq: number; true_false: number; fill_blank: number }
+  ): "mcq" | "true_false" | "fill_blank" {
+    const options: ("mcq" | "true_false" | "fill_blank")[] = [];
 
-  // Add 1 matching question on top of the 7 normal questions
-  const matching = buildMatchingExercise(filtered, `${seed}_matching`);
+    if (counts.mcq < 3) options.push("mcq");
+    if (counts.true_false < 3) options.push("true_false");
+    if (counts.fill_blank < 3) options.push("fill_blank");
+
+    return options[Math.floor(Math.random() * options.length)];
+  }
+
+  const counts = { mcq: 0, true_false: 0, fill_blank: 0 };
+
+  let built = picked
+    .map((c) => {
+      const type = getBalancedRandomType(counts);
+      counts[type]++;
+
+      return buildExercise(c, filteredConcepts, 3, type);
+    })
+    .filter(Boolean);
+
+  const matching = buildMatchingExercise(picked, `${seed}_matching`);
 
   if (matching) {
-    built = [...built, matching];
+    built = [...built.slice(0, 7), matching];
   }
 
   built = seededShuffle(built, `${seed}_exercise_order`);
