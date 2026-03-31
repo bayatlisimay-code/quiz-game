@@ -691,4 +691,241 @@ it("buildQuiz keeps Quiz C dominated by C concepts with only limited A/B repeats
   expect(cCount).toBeGreaterThan(earlierCount);
   expect(earlierCount).toBeLessThanOrEqual(3);
 });
+it("buildQuiz still returns matching by reshaping the 7 selected facts when initial picks do not support it", () => {
+  const concepts = enrichConcepts([
+    // A pool
+    {
+      id: "a1",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "A1",
+      object: "Artist A1",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "a2",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "A2",
+      object: "Artist A2",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "a3",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "A3",
+      object: "Artist A3",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+
+    // B pool with many mixed relations first
+    {
+      id: "b1",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "movement",
+      subject: "B1",
+      object: "Movement B1",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "movements",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+    {
+      id: "b2",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "museum",
+      subject: "B2",
+      object: "Museum B2",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "museums",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+
+    // Enough same-relation B concepts exist in the total pool,
+    // but buildQuiz may need to reshape selection to make matching possible
+    {
+      id: "b3",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B3",
+      object: "Artist B3",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+    {
+      id: "b4",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B4",
+      object: "Artist B4",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+    {
+      id: "b5",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B5",
+      object: "Artist B5",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+    {
+      id: "b6",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B6",
+      object: "Artist B6",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+  ]);
+
+  const quiz = buildQuiz({
+    concepts,
+    variant: "B",
+    seed: "matching-fallback-test",
+  });
+
+  const normal = quiz.filter((q) => q.type !== "matching");
+  const matching = quiz.find((q) => q.type === "matching");
+
+  expect(normal).toHaveLength(7);
+  expect(matching).toBeTruthy();
+  expect(quiz).toHaveLength(8);
+  expect(matching?.pairs).toHaveLength(4);
+});
+it("buildQuiz still returns a full quiz when the concept pool is thin", () => {
+  const concepts = enrichConcepts([
+    {
+      id: "a1",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "A1",
+      object: "Artist A1",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "a2",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "A2",
+      object: "Artist A2",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "a3",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "A3",
+      object: "Artist A3",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "a4",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "A4",
+      object: "Artist A4",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+  ]);
+
+  const quiz = buildQuiz({
+    concepts,
+    variant: "A",
+    seed: "thin-pool-test",
+  });
+
+  const normal = quiz.filter((q) => q.type !== "matching");
+  const matching = quiz.find((q) => q.type === "matching");
+
+  expect(normal).toHaveLength(7);
+  expect(matching).toBeTruthy();
+  expect(matching?.pairs).toHaveLength(4);
+  expect(quiz).toHaveLength(8);
+});
 });
