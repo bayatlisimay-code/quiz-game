@@ -153,9 +153,16 @@ export function buildQuiz({
 
   picked = seededShuffle(picked, `${seed}_final`);
 
-  
 
-  const baseNormal = seededShuffle(picked, `${seed}_normal_base`).slice(0, 5);
+  let baseNormal = seededShuffle(picked, `${seed}_normal_base`).slice(0, 5);
+
+  if (baseNormal.length < 5) {
+    const filler = seededShuffle(picked, `${seed}_base_fallback`).slice(
+      0,
+      5 - baseNormal.length
+    );
+    baseNormal = [...baseNormal, ...filler];
+  }
 
   const repeatPool =
     variant === "B"
@@ -164,12 +171,28 @@ export function buildQuiz({
 
   const sortedByDifficulty = [...repeatPool].sort((a, b) => b.difficulty - a.difficulty);
 
-  const repeatedFacts = seededShuffle(
+  let repeatedFacts = seededShuffle(
     sortedByDifficulty.slice(0, 3),
     `${seed}_repeat_facts`
   ).slice(0, 2);
 
-  const normalQuestionConcepts = [...baseNormal, ...repeatedFacts];
+  if (repeatedFacts.length < 2) {
+    const fallback = seededShuffle(baseNormal, `${seed}_repeat_fallback`).slice(
+      0,
+      2 - repeatedFacts.length
+    );
+    repeatedFacts = [...repeatedFacts, ...fallback];
+  }
+
+  let normalQuestionConcepts = [...baseNormal, ...repeatedFacts];
+
+  if (normalQuestionConcepts.length < 7) {
+    const fallback = seededShuffle(picked, `${seed}_normal_fill`).slice(
+      0,
+      7 - normalQuestionConcepts.length
+    );
+    normalQuestionConcepts = [...normalQuestionConcepts, ...fallback];
+  }
   const selectedConcepts = normalQuestionConcepts;
   const assignedTypes = assignBalancedTypes(normalQuestionConcepts, variant, seed);
 
