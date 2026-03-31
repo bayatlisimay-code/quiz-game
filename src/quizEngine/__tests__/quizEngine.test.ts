@@ -1,3 +1,4 @@
+import { buildQuiz } from "../buildQuiz";
 import { enrichConcepts } from "../enrichConcepts";
 import { buildExercise, buildMatchingExercise } from "../exerciseFactory";
 
@@ -129,4 +130,170 @@ describe("Quiz Engine", () => {
       expect(concepts.map((c) => c.subject)).toContain(left);
    });
   });
+it("buildQuiz matching uses only facts already selected in that quiz", () => {
+  const concepts = enrichConcepts([
+    {
+      id: "c1",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "Mona Lisa",
+      object: "Leonardo da Vinci",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c2",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "The Starry Night",
+      object: "Vincent van Gogh",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c3",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "The Persistence of Memory",
+      object: "Salvador Dalí",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c4",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "Girl with a Pearl Earring",
+      object: "Johannes Vermeer",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c5",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "Guernica",
+      object: "Pablo Picasso",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c6",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "The Scream",
+      object: "Edvard Munch",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c7",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "The Night Watch",
+      object: "Rembrandt",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "outside",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "American Gothic",
+      object: "Grant Wood",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+  ]);
+
+  const quiz = buildQuiz({
+    concepts,
+    variant: "A",
+    seed: "matching-same-facts-test",
+  });
+
+  const nonMatching = quiz.filter((q) => q.type !== "matching");
+  const matching = quiz.find((q) => q.type === "matching");
+
+  expect(matching).toBeTruthy();
+  expect(nonMatching).toHaveLength(7);
+
+  const allowedTexts = new Set<string>();
+
+  for (const q of nonMatching) {
+    if (q.type === "mcq") {
+      allowedTexts.add(q.prompt);
+      q.options.forEach((opt) => allowedTexts.add(opt));
+    }
+
+    if (q.type === "true_false") {
+      allowedTexts.add(q.statement);
+    }
+
+    if (q.type === "fill_blank") {
+      allowedTexts.add(q.prompt);
+    }
+  }
+
+  expect(matching?.pairs).toHaveLength(4);
+
+  for (const pair of matching?.pairs ?? []) {
+    expect(allowedTexts.has(pair.left) || allowedTexts.has(pair.right)).toBe(true);
+  }
+
+  const outsidePairUsed = matching?.pairs.some(
+    (pair) =>
+      pair.left === "American Gothic" || pair.right === "Grant Wood"
+  );
+
+  expect(outsidePairUsed).toBe(false);
+});
 });

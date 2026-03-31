@@ -153,20 +153,7 @@ export function buildQuiz({
 
   picked = seededShuffle(picked, `${seed}_final`);
 
-  const counts = { mcq: 0, true_false: 0, fill_blank: 0 };
-  const usedTypesByConcept: Record<string, ("mcq" | "true_false" | "fill_blank")[]> = {};
-
-  function getBalancedRandomType(
-    currentCounts: { mcq: number; true_false: number; fill_blank: number }
-  ): "mcq" | "true_false" | "fill_blank" {
-    const options: ("mcq" | "true_false" | "fill_blank")[] = [];
-
-    if (currentCounts.mcq < 3) options.push("mcq");
-    if (currentCounts.true_false < 3) options.push("true_false");
-    if (currentCounts.fill_blank < 3) options.push("fill_blank");
-
-    return options[Math.floor(Math.random() * options.length)];
-  }
+  
 
   const baseNormal = seededShuffle(picked, `${seed}_normal_base`).slice(0, 5);
 
@@ -183,31 +170,18 @@ export function buildQuiz({
   ).slice(0, 2);
 
   const normalQuestionConcepts = [...baseNormal, ...repeatedFacts];
+  const selectedConcepts = normalQuestionConcepts;
   const assignedTypes = assignBalancedTypes(normalQuestionConcepts, variant, seed);
 
   let built = normalQuestionConcepts
-    .map((c, index) => {
-      const alreadyUsed = usedTypesByConcept[c.id] ?? [];
-      const plannedType = assignedTypes[index];
+  .map((c, index) => {
+    const type = assignedTypes[index];
+    return buildExercise(c, concepts, 3, type);
+  })
+  .filter(Boolean) as Exercise[];
+ 
 
-      const fallbackType =
-        (["mcq", "true_false", "fill_blank"] as const).find(
-          (t) => !alreadyUsed.includes(t) && counts[t] < 3
-        ) ?? getBalancedRandomType(counts);
-
-      const type =
-        plannedType && !alreadyUsed.includes(plannedType) && counts[plannedType] < 3
-          ? plannedType
-          : fallbackType;
-
-      counts[type]++;
-      usedTypesByConcept[c.id] = [...alreadyUsed, type];
-
-      return buildExercise(c, concepts, 3, type);
-    })
-    .filter(Boolean) as Exercise[];
-
-  const matching = buildMatchingExercise(picked, `${seed}_matching`);
+  const matching = buildMatchingExercise(selectedConcepts, seed);
 
   if (matching) {
     built = [...built.slice(0, 7), matching];

@@ -176,4 +176,519 @@ describe("buildQuiz", () => {
     expect(repeatCount).toBeGreaterThanOrEqual(2);
     expect(repeatCount).toBeLessThanOrEqual(3);
     });
+    it("buildQuiz always returns a 2-2-3 normal question distribution", () => {
+  const concepts = enrichConcepts([
+    {
+      id: "c1",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "Mona Lisa",
+      object: "Leonardo da Vinci",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c2",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "The Starry Night",
+      object: "Vincent van Gogh",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c3",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "The Persistence of Memory",
+      object: "Salvador Dalí",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c4",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "Girl with a Pearl Earring",
+      object: "Johannes Vermeer",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c5",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "Guernica",
+      object: "Pablo Picasso",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c6",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "The Scream",
+      object: "Edvard Munch",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c7",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "The Night Watch",
+      object: "Rembrandt",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "c8",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "American Gothic",
+      object: "Grant Wood",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+  ]);
+
+  const quiz = buildQuiz({
+    concepts,
+    variant: "A",
+    seed: "distribution-test",
+  });
+
+  const normal = quiz.filter((q) => q.type !== "matching");
+
+  expect(normal).toHaveLength(7);
+
+  const counts = {
+    mcq: normal.filter((q) => q.type === "mcq").length,
+    true_false: normal.filter((q) => q.type === "true_false").length,
+    fill_blank: normal.filter((q) => q.type === "fill_blank").length,
+  };
+
+  const sortedCounts = Object.values(counts).sort((a, b) => a - b);
+
+  expect(sortedCounts).toEqual([2, 2, 3]);
+});
+it("buildQuiz keeps Quiz B dominated by B concepts with only limited A repeats", () => {
+  const concepts = enrichConcepts([
+    {
+      id: "a1",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "A1",
+      object: "Artist A1",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "a2",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "A2",
+      object: "Artist A2",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "a3",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "A3",
+      object: "Artist A3",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "b1",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B1",
+      object: "Artist B1",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+    {
+      id: "b2",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B2",
+      object: "Artist B2",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+    {
+      id: "b3",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B3",
+      object: "Artist B3",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+    {
+      id: "b4",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B4",
+      object: "Artist B4",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+    {
+      id: "b5",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B5",
+      object: "Artist B5",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+    {
+      id: "b6",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B6",
+      object: "Artist B6",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+  ]);
+
+  const quiz = buildQuiz({
+    concepts,
+    variant: "B",
+    seed: "b-dominance-test",
+  });
+
+  const normal = quiz.filter((q) => q.type !== "matching");
+
+  expect(normal).toHaveLength(7);
+
+  const introByLabel: Record<string, "A" | "B" | "C"> = {};
+  for (const c of concepts) {
+    introByLabel[c.subject] = c.introducedIn ?? "A";
+  }
+
+  let aCount = 0;
+  let bCount = 0;
+
+  for (const q of normal) {
+    let matchedSubject: string | null = null;
+
+    if (q.type === "mcq" || q.type === "fill_blank") {
+      matchedSubject = q.prompt;
+    } else if (q.type === "true_false") {
+      matchedSubject = q.statement;
+    }
+
+    for (const subject of Object.keys(introByLabel)) {
+      if (matchedSubject?.includes(subject)) {
+        if (introByLabel[subject] === "A") aCount++;
+        if (introByLabel[subject] === "B") bCount++;
+        break;
+      }
+    }
+  }
+
+  expect(bCount).toBeGreaterThan(aCount);
+  expect(aCount).toBeLessThanOrEqual(2);
+});
+it("buildQuiz keeps Quiz C dominated by C concepts with only limited A/B repeats", () => {
+  const concepts = enrichConcepts([
+    {
+      id: "a1",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "A1",
+      object: "Artist A1",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "a2",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "A2",
+      object: "Artist A2",
+      answerKind: "short",
+      difficulty: 1,
+      distractorGroup: "artists",
+      tags: ["A"],
+      introducedIn: "A",
+    },
+    {
+      id: "b1",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B1",
+      object: "Artist B1",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+    {
+      id: "b2",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B2",
+      object: "Artist B2",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+    {
+      id: "b3",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "B3",
+      object: "Artist B3",
+      answerKind: "short",
+      difficulty: 2,
+      distractorGroup: "artists",
+      tags: ["B"],
+      introducedIn: "B",
+    },
+    {
+      id: "c1",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "C1",
+      object: "Artist C1",
+      answerKind: "short",
+      difficulty: 3,
+      distractorGroup: "artists",
+      tags: ["C"],
+      introducedIn: "C",
+    },
+    {
+      id: "c2",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "C2",
+      object: "Artist C2",
+      answerKind: "short",
+      difficulty: 3,
+      distractorGroup: "artists",
+      tags: ["C"],
+      introducedIn: "C",
+    },
+    {
+      id: "c3",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "C3",
+      object: "Artist C3",
+      answerKind: "short",
+      difficulty: 3,
+      distractorGroup: "artists",
+      tags: ["C"],
+      introducedIn: "C",
+    },
+    {
+      id: "c4",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "C4",
+      object: "Artist C4",
+      answerKind: "short",
+      difficulty: 3,
+      distractorGroup: "artists",
+      tags: ["C"],
+      introducedIn: "C",
+    },
+    {
+      id: "c5",
+      topicId: "art",
+      subtopicId: "painting",
+      levelId: "l1",
+      partId: "p1",
+      relation: "painted_by",
+      subject: "C5",
+      object: "Artist C5",
+      answerKind: "short",
+      difficulty: 3,
+      distractorGroup: "artists",
+      tags: ["C"],
+      introducedIn: "C",
+    },
+  ]);
+
+  const quiz = buildQuiz({
+    concepts,
+    variant: "C",
+    seed: "c-dominance-test",
+  });
+
+  const normal = quiz.filter((q) => q.type !== "matching");
+
+  expect(normal).toHaveLength(7);
+
+  const introByLabel: Record<string, "A" | "B" | "C"> = {};
+  for (const c of concepts) {
+    introByLabel[c.subject] = c.introducedIn ?? "A";
+  }
+
+  let earlierCount = 0;
+  let cCount = 0;
+
+  for (const q of normal) {
+    let matchedSubject: string | null = null;
+
+    if (q.type === "mcq" || q.type === "fill_blank") {
+      matchedSubject = q.prompt;
+    } else if (q.type === "true_false") {
+      matchedSubject = q.statement;
+    }
+
+    for (const subject of Object.keys(introByLabel)) {
+      if (matchedSubject?.includes(subject)) {
+        if (introByLabel[subject] === "C") cCount++;
+        else earlierCount++;
+        break;
+      }
+    }
+  }
+
+  expect(cCount).toBeGreaterThan(earlierCount);
+  expect(earlierCount).toBeLessThanOrEqual(3);
+});
 });
