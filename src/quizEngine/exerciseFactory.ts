@@ -26,7 +26,7 @@ function seededShuffle<T>(array: T[], seed: string): T[] {
 
   for (let i = result.length - 1; i > 0; i--) {
     h = Math.imul(h ^ (h >>> 15), 1 | h);
-    const j = h % (i + 1);
+    const j = (h >>> 0) % (i + 1);
     [result[i], result[j]] = [result[j], result[i]];
   }
 
@@ -34,41 +34,43 @@ function seededShuffle<T>(array: T[], seed: string): T[] {
 }
 
 export function buildMatchingExercise(
-  concepts: any[], // we will type later
+  concepts: any[],
   seed: string
 ): MatchingExercise | null {
-  
-  if (!concepts || concepts.length === 0) {
-      return null;
-    }
+  if (!concepts || concepts.length < 4) return null;
 
-  if (concepts.length < 4) return null;
-
-  // group by relation (same type only)
   const byRelation: Record<string, any[]> = {};
 
   for (const c of concepts) {
+    if (!c?.relation) continue;
+
     if (!byRelation[c.relation]) {
       byRelation[c.relation] = [];
     }
+
     byRelation[c.relation].push(c);
   }
 
-  // pick a relation that has at least 4 items
-  const validGroups = Object.values(byRelation).filter((g) => g.length >= 4);
+  const validGroups = Object.values(byRelation).filter((group) => {
+    const usable = group.filter((c) => c && c.subject && c.object);
+    return usable.length >= 4;
+  });
 
   if (validGroups.length === 0) return null;
 
   const group = seededShuffle(validGroups, `${seed}_matching_group`)[0];
+  if (!group) return null;
 
-  // pick 4 concepts from that group
-  const selected = seededShuffle(group, `${seed}_matching_select`).slice(0, 4);
+  const selected = seededShuffle(
+    group.filter((c) => c && c.subject && c.object),
+    `${seed}_matching_select`
+  ).slice(0, 4);
 
-  const validSelected = selected.filter(Boolean);
+  if (selected.length < 4) return null;
 
-  const pairs = validSelected.map((c) => ({
-    left: c.subject,
-    right: c.object,
+  const pairs = selected.map((c) => ({
+    left: String(c.subject),
+    right: String(c.object),
   }));
 
   return {
@@ -295,10 +297,21 @@ export function buildExercise(
   const buildMcq = (): Exercise => {
     const options = pickFrom([correct, ...distractors], seed + 99, optionCount);
     const correctIndex = options.findIndex((o) => o === correct);
+
+    const relation = String(concept.relation);
+
+    let prompt = "";
+
+    if (relation === "painted_by") {
+      prompt = `Who painted ${String(concept.subject)}?`;
+    } else {
+      prompt = `Who ${relation.replace(/_/g, " ")} ${String(concept.subject)}?`;
+    }
+
     return {
       type: "mcq",
       conceptId: String(concept.id),
-      prompt: `Who ${String(concept.relation).replace(/_/g, " ")} ${String(concept.subject)}?`,
+      prompt,
       options,
       correctIndex,
       answerText: correct,
@@ -310,10 +323,21 @@ export function buildExercise(
     const wrong = distractors[0] ?? (anyPool[0] ? String(anyPool[0].object) : "Unknown");
     const truth = (seed % 2) === 0;
     const shown = truth ? correct : wrong;
+
+    const relation = String(concept.relation);
+
+    let statement = "";
+
+    if (relation === "painted_by") {
+      statement = `${String(concept.subject)} was painted by ${shown}.`;
+    } else {
+      statement = `${String(concept.subject)} was ${relation.replace(/_/g, " ")} by ${shown}.`;
+    }
+
     return {
       type: "true_false",
       conceptId: String(concept.id),
-      statement: `${String(concept.subject)} was ${String(concept.relation).replace(/_/g, " ")} by ${shown}.`,
+      statement,
       correctAnswer: truth,
       answerText: correct,
     };
@@ -321,10 +345,20 @@ export function buildExercise(
 
   // Helper: build Fill-in-the-blank (THIS WILL SHOW A BLANK)
   const buildBlank = (): Exercise => {
+    const relation = String(concept.relation);
+
+    let prompt = "";
+
+    if (relation === "painted_by") {
+      prompt = `${String(concept.subject)} was painted by _____.`;
+    } else {
+      prompt = `${String(concept.subject)} was ${relation.replace(/_/g, " ")} by _____.`;
+    }
+
     return {
       type: "fill_blank",
       conceptId: String(concept.id),
-      prompt: `${String(concept.subject)} was ${String(concept.relation).replace(/_/g, " ")} by _____.`,
+      prompt,
       answerText: correct,
     };
   };

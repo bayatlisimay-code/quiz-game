@@ -1,0 +1,7 @@
+bde791554e7c9946f4c83447cce3d759bb00c786 fa4f0aceb7f1fccbf843d26979b0beca074b6eb9 Simay Bayatli <simaybayatli@yahoo.com> 1770906423 +0400	commit: Fix progress system duplication, repair PartQuizScreen structure, fix unlock logic
+fa4f0aceb7f1fccbf843d26979b0beca074b6eb9 27e0bda7a898f80af1823eaeb408419cf607c8e1 Simay Bayatli <simaybayatli@yahoo.com> 1771326673 +0400	commit: Fix metro issues, remove duplicate isUnlocked, update gitignore
+27e0bda7a898f80af1823eaeb408419cf607c8e1 df5acaa4019a78c0cbe78cdede179ef9fb9b607a Simay Bayatli <simaybayatli@yahoo.com> 1773140920 +0400	commit: major architecture update: concept-based quiz system, migration from quiz JSONs, dynamic concept loading
+df5acaa4019a78c0cbe78cdede179ef9fb9b607a 70101087bda052ed2366f25775648d323cb48e88 Simay Bayatli <simaybayatli@yahoo.com> 1773141472 +0400	commit: cleanup: remove old question system files
+70101087bda052ed2366f25775648d323cb48e88 390f47f4fed36b67039dce4018730442d79325d4 Simay Bayatli <simaybayatli@yahoo.com> 1774271921 +0400	commit: Refactor quiz engine: part-based concept loading, difficulty progression, UI header + XP pill consistency fixes
+390f47f4fed36b67039dce4018730442d79325d4 e2c1763ef1244da31ae90d7b3283fb3cceaecc88 Simay Bayatli <simaybayatli@yahoo.com> 1774440462 +0400	commit: Finish matching question flow and quiz shuffle fixes
+e2c1763ef1244da31ae90d7b3283fb3cceaecc88 18bbed43bd46fe02431753ec860fdc07aec311bc Simay Bayatli <simaybayatli@yahoo.com> 1774523545 +0400	commit: Improve quiz coherence: matching uses picked concepts, full spaced repetition alignment

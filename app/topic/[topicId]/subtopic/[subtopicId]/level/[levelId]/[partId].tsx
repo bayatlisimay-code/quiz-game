@@ -8,9 +8,9 @@ import { useStreak } from "../../../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../../../src/state/useTotalXp";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { buildQuiz } from "../../../../../../../src/quizEngine/buildQuiz";
 import type { Exercise } from "../../../../../../../src/quizEngine/conceptTypes";
 import { enrichConcepts } from "../../../../../../../src/quizEngine/enrichConcepts";
-import { buildExercise, buildMatchingExercise } from "../../../../../../../src/quizEngine/exerciseFactory";
 import { saveLastLocation } from "../../../../../../../src/state/lastLocation";
 import { markQuizVariantCompleted } from "../../../../../../../src/state/progress";
 
@@ -35,6 +35,13 @@ const styles = StyleSheet.create({
   optionSelected: { borderColor: "#FFFFFF" },
   optionCorrect: { borderColor: "#22C55E" },
   optionWrong: { borderColor: "#EF4444" },
+
+  correctAnswerText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    marginTop: 10,
+    lineHeight: 22,
+  },
 
   optionText: { color: "#E5F3FF", fontSize: 16 },
   input: {
@@ -183,6 +190,37 @@ function getDeterministicType(
   }
 
   return types[(base + 2) % 3];
+}
+
+function normalizeText(text: string) {
+  return text
+    .toLowerCase()
+    .normalize("NFD") // splits accents
+    .replace(/[\u0300-\u036f]/g, "") // removes accents
+    .trim();
+}
+
+function levenshtein(a: string, b: string) {
+  const matrix = [];
+
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b[i - 1] === a[j - 1]) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
 }
 
 export default function PartQuizScreen() {
@@ -377,11 +415,11 @@ export default function PartQuizScreen() {
   }
 
   function getPartDifficultyRange(partId: string): [number, number] {
-    if (partId === "p1") return [1, 2];
-    if (partId === "p2") return [1, 3];
-    if (partId === "p3") return [1, 3];
-    if (partId === "p4") return [2, 4];
-    if (partId === "p5") return [2, 5];
+    if (partId === "p1") return [1, 2]; // very easy
+    if (partId === "p2") return [2, 3]; // introduce slightly harder
+    if (partId === "p3") return [2, 4]; // review + stretch
+    if (partId === "p4") return [3, 5]; // new + harder
+    if (partId === "p5") return [3, 5]; // final mix (hardest)
     return [1, 5];
   }
 
@@ -424,104 +462,8 @@ export default function PartQuizScreen() {
         });
 
   // --- deterministic shuffle by seed (so A/B/C are stable) ---
-  function hashString(s: string) {
-    let h = 2166136261;
-    for (let i = 0; i < s.length; i++) {
-      h ^= s.charCodeAt(i);
-      h = Math.imul(h, 16777619);
-    }
-    return h >>> 0;
-  }
 
   const QUIZ_TYPE_ORDER = ["mcq", "true_false", "fill_blank"] as const;
-
-  function stageToNumber(stage: "A" | "B" | "C") {
-    return stage === "A" ? 0 : stage === "B" ? 1 : 2;
-  }
-
-  function getExerciseTypeForConcept(
-    concept: { id: string; introducedIn?: "A" | "B" | "C" },
-    variant: "A" | "B" | "C",
-    seed: string
-  ): (typeof QUIZ_TYPE_ORDER)[number] {
-    const intro = concept.introducedIn ?? "A";
-
-    const orderedTypes = seededShuffle(
-      [...QUIZ_TYPE_ORDER],
-      `${seed}_${concept.introducedIn ?? "A"}_type_order`
-    );
-
-    const shift = Math.max(0, stageToNumber(variant) - stageToNumber(intro));
-
-    return orderedTypes[Math.min(shift, orderedTypes.length - 1)];
-  }
-
-  function buildBalancedTypePlan(seed: string, count: number): Array<"mcq" | "true_false" | "fill_blank"> {
-    if (count === 7) {
-      const plans: Array<Array<"mcq" | "true_false" | "fill_blank">> = [
-        ["mcq","mcq","mcq","true_false","true_false","fill_blank","fill_blank"], // 3 mcq
-        ["mcq","mcq","true_false","true_false","true_false","fill_blank","fill_blank"], // 3 tf
-        ["mcq","mcq","true_false","true_false","fill_blank","fill_blank","fill_blank"], // 3 fill
-      ];
-
-      return seededShuffle(plans[hashString(seed) % plans.length], `${seed}_type_plan`);
-    }
-
-    // fallback
-    const fallback: Array<"mcq" | "true_false" | "fill_blank"> = [];
-    const base = ["mcq", "true_false", "fill_blank"] as const;
-
-    for (let i = 0; i < count; i++) {
-      fallback.push(base[i % base.length]);
-    }
-
-    return seededShuffle(fallback, `${seed}_type_plan_fallback`);
-  }
-
-function assignBalancedTypes(
-  picked: Array<{ id: string; introducedIn?: "A" | "B" | "C" }>,
-  variant: "A" | "B" | "C",
-  seed: string
-): Array<"mcq" | "true_false" | "fill_blank"> {
-  const plan = buildBalancedTypePlan(seed, picked.length);
-  const remaining = [...plan];
-  const assigned: Array<"mcq" | "true_false" | "fill_blank"> = [];
-
-  for (const concept of picked) {
-    const preferred = getExerciseTypeForConcept(concept, variant, seed);
-    const preferredIndex = remaining.indexOf(preferred);
-
-    if (preferredIndex !== -1) {
-      assigned.push(preferred);
-      remaining.splice(preferredIndex, 1);
-    } else {
-      assigned.push(remaining.shift() ?? "mcq");
-    }
-  }
-
-  return assigned;
-}
-
-  function seededShuffle<T>(arr: T[], seedStr: string): T[] {
-    let seed = hashString(seedStr) || 1;
-    const a = [...arr];
-
-    function next() {
-      // xorshift32
-      seed ^= seed << 13;
-      seed ^= seed >>> 17;
-      seed ^= seed << 5;
-      return (seed >>> 0) / 4294967296;
-    }
-
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(next() * (i + 1));
-      const tmp = a[i];
-      a[i] = a[j];
-      a[j] = tmp;
-    }
-    return a;
-  }
 
   const seed = `${key}_quiz${variant}_attempt${attempt}`;
 
@@ -530,85 +472,11 @@ function assignBalancedTypes(
   const bConcepts = filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "B");
   const cConcepts = filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "C");
 
-  // Pick how many questions per quiz
-  const QUIZ_LEN = 7; // normal questions only (matching will be added separately)
-
-  const pickFrom = <T,>(items: T[], count: number, seedPart: string) =>
-    seededShuffle(items, `${seed}_${seedPart}`).slice(0, Math.min(count, items.length));
-
-  const BASE_COUNT = 5;
-  const NEW_COUNT = 3;
-
-  const baseConcepts = seededShuffle(aConcepts, `${seed}_base`).slice(0, BASE_COUNT);
-
-  const newPool =
-    variant === "A"
-      ? []
-      : variant === "B"
-      ? bConcepts
-      : cConcepts;
-
-  const newConcepts = seededShuffle(newPool, `${seed}_new`).slice(0, NEW_COUNT);
-
-  let picked = [...baseConcepts, ...newConcepts];
-
-  // If there are not enough concepts, fill from the allowed pool
-  if (picked.length < QUIZ_LEN) {
-    const pickedIds = new Set(picked.map((c) => c.id));
-
-    const allowedPool =
-      variant === "A"
-        ? aConcepts
-        : variant === "B"
-        ? [...bConcepts, ...aConcepts]
-        : [...cConcepts, ...aConcepts, ...bConcepts];
-
-    const filler = seededShuffle(
-      allowedPool.filter((c) => !pickedIds.has(c.id)),
-      `${seed}_filler`
-    ).slice(0, QUIZ_LEN - picked.length);
-
-    picked = [...picked, ...filler];
-  }
-
-  // Final shuffle so repeated/new questions are mixed visually
-  picked = seededShuffle(picked, `${seed}_final`);
-
-  const assignedTypes = assignBalancedTypes(picked, variant, seed);
-
-  function getBalancedRandomType(
-    counts: { mcq: number; true_false: number; fill_blank: number }
-  ): "mcq" | "true_false" | "fill_blank" {
-    const options: ("mcq" | "true_false" | "fill_blank")[] = [];
-
-    if (counts.mcq < 3) options.push("mcq");
-    if (counts.true_false < 3) options.push("true_false");
-    if (counts.fill_blank < 3) options.push("fill_blank");
-
-    return options[Math.floor(Math.random() * options.length)];
-  }
-
-  const counts = { mcq: 0, true_false: 0, fill_blank: 0 };
-
-  let built = picked
-    .map((c) => {
-      const type = getBalancedRandomType(counts);
-      counts[type]++;
-
-      return buildExercise(c, filteredConcepts, 3, type);
-    })
-    .filter(Boolean);
-
-  const matching = buildMatchingExercise(picked, `${seed}_matching`);
-
-  if (matching) {
-    built = [...built.slice(0, 7), matching];
-  }
-
-  built = seededShuffle(built, `${seed}_exercise_order`);
-
-  // temporary: inspect grouped facts
-  console.log("picked concepts", picked);
+  const built = buildQuiz({
+    concepts: filteredConcepts,
+    variant,
+    seed,
+  });
 
   setExercises(built);
   setLoading(false);
@@ -650,11 +518,18 @@ function assignBalancedTypes(
       ok = q.options[q.correctIndex] === selectedAnswer;
     } else if (q.type === "true_false") {
       ok = (selectedAnswer === "true") === q.correctAnswer;
-    } else if (q.type === "fill_blank") {
-      ok =
-        typedAnswer.trim().toLowerCase() ===
-        q.answerText.trim().toLowerCase();
-    } else if (q.type === "matching") {
+    } if (q.type === "fill_blank") {
+        const user = normalizeText(typedAnswer);
+
+        const acceptedAnswers = q.answerText
+          .split("|")
+          .map((answer) => normalizeText(answer));
+
+        ok = acceptedAnswers.some((answer) => {
+          const distance = levenshtein(user, answer);
+          return distance <= 2;
+        });
+      } else if (q.type === "matching") {
       ok = (q as any).pairs.every((pair: any) => {
         const rightIdx = matchedPairs[pair.left];
         return rightIdx !== undefined && shuffledMatchingRights[rightIdx] === pair.right;
@@ -868,20 +743,28 @@ if (exercises.length === 0) {
         })}
 
       {q.type === "fill_blank" && (
-        <TextInput
-          value={typedAnswer}
-          onChangeText={setTypedAnswer}
-          editable={!checked}
-          placeholder="Type your answer"
-          placeholderTextColor="#94A3B8"
-          style={[
-            styles.input,
-            typedAnswer.trim().length > 0 && !checked && styles.optionSelected,
-            checked && isCorrect === true && styles.optionCorrect,
-            checked && isCorrect === false && styles.optionWrong,
-          ]}
-        />
-      )}
+        <>
+          <TextInput
+            value={typedAnswer}
+            onChangeText={setTypedAnswer}
+            editable={!checked}
+            placeholder="Type your answer"
+            placeholderTextColor="#94A3B8"
+            style={[
+              styles.input,
+              typedAnswer.trim().length > 0 && !checked && styles.optionSelected,
+              checked && isCorrect === true && styles.optionCorrect,
+              checked && isCorrect === false && styles.optionWrong,
+            ]}
+          />
+
+          {checked && isCorrect === false && (
+            <Text style={styles.correctAnswerText}>
+              {q.prompt.replace("_____", q.answerText.split("|")[0])}
+            </Text>
+          )}
+        </>
+)}
 
       {q.type === "matching" && (
         <View style={styles.matchingWrap}>
