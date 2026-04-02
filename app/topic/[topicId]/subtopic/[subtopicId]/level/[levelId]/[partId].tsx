@@ -14,6 +14,9 @@ import { enrichConcepts } from "../../../../../../../src/quizEngine/enrichConcep
 import { saveLastLocation } from "../../../../../../../src/state/lastLocation";
 import { markQuizVariantCompleted } from "../../../../../../../src/state/progress";
 
+//Hello Utkuş 
+
+
 const styles = StyleSheet.create({
   container: {
   flex: 1,
