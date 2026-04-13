@@ -3,7 +3,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { TOPIC_BY_ID } from "../../../../../../../data/catalog";
-import { CONCEPT_SETS } from "../../../../../../../data/conceptSets";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { buildQuiz } from "../../../../../../../src/quizEngine/buildQuiz";
@@ -11,8 +10,8 @@ import type { Exercise } from "../../../../../../../src/quizEngine/conceptTypes"
 import { enrichConcepts } from "../../../../../../../src/quizEngine/enrichConcepts";
 import { saveLastLocation } from "../../../../../../../src/state/lastLocation";
 import { markQuizVariantCompleted } from "../../../../../../../src/state/progress";
-import { useStreak } from "../../../../../../../src/state/useStreak";
-import { useTotalXp } from "../../../../../../../src/state/useTotalXp";
+
+const CONCEPT_SETS: any = {}; 
 
 const styles = StyleSheet.create({
   container: {
@@ -235,8 +234,8 @@ export default function PartQuizScreen() {
       set?: string;
     }>();
 
-  const totalXP = useTotalXp();
-  const streak = useStreak();
+  const totalXP = 0;
+  const streak = 0;
 
   const subtopicLevel = useMemo(() => {
     return 0;
@@ -426,7 +425,7 @@ export default function PartQuizScreen() {
   const sourcePartIds = getSourcePartIds(prt);
 
   const concepts = conceptSet.concepts.filter(
-    (c: any) =>
+    (c) =>
       c.levelId === lvl &&
       sourcePartIds.includes(c.partId)
   );
@@ -434,7 +433,7 @@ export default function PartQuizScreen() {
   const [minDifficulty, maxDifficulty] = getPartDifficultyRange(prt);
 
   const filteredRaw = concepts.filter(
-    (c: any) => c.difficulty >= minDifficulty && c.difficulty <= maxDifficulty
+    (c) => c.difficulty >= minDifficulty && c.difficulty <= maxDifficulty
   );
 
   const filteredConcepts = enrichConcepts(filteredRaw);

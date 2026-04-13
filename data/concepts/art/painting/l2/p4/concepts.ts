@@ -1,4 +1,26 @@
-const concepts = [
+type LocalConcept = {
+  id: string;
+  topicId: string;
+  subtopicId: string;
+  levelId: string;
+  partId: string;
+  relation: string;
+  subject: string;
+  object: string;
+  answerKind: "short" | "long";
+  difficulty: number;
+  distractorGroup: string;
+  tags: string[];
+  introducedIn?: "A" | "B" | "C";
+  factPriority?: "core" | "secondary";
+};
+
+type LocalConceptSet = {
+  id: string;
+  concepts: LocalConcept[];
+};
+
+const concepts: LocalConcept[] = [
   {
 "id": "art_painting_l2_p4_movement_of_artist_001",
 "topicId": "art",
@@ -289,7 +311,9 @@ const concepts = [
 }
 ];
 
-export default {
-  id: "art/painting/l2/p4",
+const conceptSet: LocalConceptSet = {
+  id: "your_correct_id_here",
   concepts,
 };
+
+export default conceptSet;
