@@ -34,51 +34,69 @@ function seededShuffle<T>(array: T[], seed: string): T[] {
 }
 
 export function buildMatchingExercise(
-  concepts: any[],
-  seed: string
-): MatchingExercise | null {
-  if (!concepts || concepts.length < 4) return null;
+    concepts: any[],
+    seed: string
+  ): MatchingExercise | null {
+    if (!concepts || concepts.length < 4) return null;
 
-  const byRelation: Record<string, any[]> = {};
+    const byRelation: Record<string, any[]> = {};
 
-  for (const c of concepts) {
-    if (!c?.relation) continue;
+    for (const c of concepts) {
+      if (!c?.relation || !c?.subject || !c?.object) continue;
 
-    if (!byRelation[c.relation]) {
-      byRelation[c.relation] = [];
+      if (!byRelation[c.relation]) {
+        byRelation[c.relation] = [];
+      }
+
+      byRelation[c.relation].push(c);
     }
 
-    byRelation[c.relation].push(c);
+    const validGroups = Object.values(byRelation)
+      .map((group) => {
+        const seenFactIds = new Set<string>();
+        const seenLeftItems = new Set<string>();
+
+        const uniqueGroup = group.filter((c) => {
+          const factId = String(c.id ?? "");
+          const left = String(c.subject).trim();
+
+          if (!left) return false;
+          if (factId && seenFactIds.has(factId)) return false;
+          if (seenLeftItems.has(left)) return false;
+
+          if (factId) {
+            seenFactIds.add(factId);
+          }
+          seenLeftItems.add(left);
+
+          return true;
+        });
+
+        return uniqueGroup;
+      })
+      .filter((group) => group.length >= 4);
+
+    if (validGroups.length === 0) return null;
+
+    const group = seededShuffle(validGroups, `${seed}_matching_group`)[0];
+    if (!group) return null;
+
+    const selected = seededShuffle(group, `${seed}_matching_select`).slice(0, 4);
+
+    if (selected.length < 4) return null;
+
+    const pairs = selected.map((c, index) => ({
+      id: String(c.id ?? `match_${index}`),
+      left: String(c.subject),
+      right: String(c.object),
+    }));
+
+    return {
+      type: "matching",
+      prompt: "Match the pairs",
+      pairs,
+    };
   }
-
-  const validGroups = Object.values(byRelation).filter((group) => {
-    const usable = group.filter((c) => c && c.subject && c.object);
-    return usable.length >= 4;
-  });
-
-  if (validGroups.length === 0) return null;
-
-  const group = seededShuffle(validGroups, `${seed}_matching_group`)[0];
-  if (!group) return null;
-
-  const selected = seededShuffle(
-    group.filter((c) => c && c.subject && c.object),
-    `${seed}_matching_select`
-  ).slice(0, 4);
-
-  if (selected.length < 4) return null;
-
-  const pairs = selected.map((c) => ({
-    left: String(c.subject),
-    right: String(c.object),
-  }));
-
-  return {
-    type: "matching",
-    prompt: "Match the pairs",
-    pairs,
-  };
-}
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];

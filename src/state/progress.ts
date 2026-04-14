@@ -4,7 +4,7 @@ const STORAGE_KEY = "quizgame_progress_v2"; // Changed version to avoid conflict
 
 export type Progress = {
   totalXP: number;
-  completedParts: Record<string, Record<string, Record<string, number[]>>>; // topicId -> subtopicId -> levelId -> partIds[]
+  completedParts: Record<string, Record<string, Record<string, string[]>>>; // topicId -> subtopicId -> levelId -> partIds[]
   streakCount: number;
   lastPlayedDate: string | null; // YYYY-MM-DD
   completedQuizVariants: Record<
@@ -34,9 +34,7 @@ function normalize(progress: Partial<Progress>): Progress {
       completedParts[topicId][subtopicId] = {};
       for (const levelId of Object.keys(partsSrc[topicId][subtopicId] ?? {})) {
         const arr = partsSrc[topicId][subtopicId][levelId] ?? [];
-        completedParts[topicId][subtopicId][levelId] = Array.from(new Set(arr)).sort(
-          (a, b) => a - b
-        );
+        completedParts[topicId][subtopicId][levelId] = Array.from(new Set(arr)).sort();
       }
     }
   }
@@ -151,18 +149,16 @@ export function isPartCompleted(
   partId: string
 ): boolean {
   const completedPartIds = progress.completedParts?.[topicId]?.[subtopicId]?.[levelId] ?? [];
-  return completedPartIds.includes(Number(partId));
+  return completedPartIds.includes(partId);
 }
 
-export async function markPartCompleted(
+  export async function markPartCompleted(
   topicId: string,
   subtopicId: string,
   levelId: string,
   partId: string
 ): Promise<void> {
   const progress = await loadProgress();
-
-  const partNum = Number(partId);
 
   const nextCompletedParts = {
     ...progress.completedParts,
@@ -172,10 +168,10 @@ export async function markPartCompleted(
         ...(progress.completedParts[topicId]?.[subtopicId] ?? {}),
         [levelId]: Array.from(
           new Set([
-            ...((progress.completedParts[topicId]?.[subtopicId]?.[levelId] ?? []) as number[]),
-            partNum,
+            ...((progress.completedParts[topicId]?.[subtopicId]?.[levelId] ?? []) as string[]),
+            partId,
           ])
-        ).sort((a, b) => a - b),
+        ).sort(),
       },
     },
   };

@@ -116,23 +116,15 @@ export default function LevelScreen() {
       </Text>
 
       {level.parts.map((part) => {
-        const n = Number(part.id);
-        const partNumber = Number.isFinite(n) && n > 0 ? n : 1;
+        const partNumber = Number(part.id);
+        const prevPartId = String(partNumber - 1);
 
-        const key = `${topicId}_${subtopicId}_${levelId}_${part.id}`;
-        const isCompleted = completedParts.includes(key);
-
-        // Rule: first part always unlocked
-        const isFirstPart = part.id === "1";
-
-        // Unlock if first part OR previous part completed
-        const prevKey = `${topicId}_${subtopicId}_${levelId}_${String(Number(part.id) - 1)}`;
+        const done = completedPartsMap[part.id] === true;
         const partUnlocked =
-          isFirstPart || completedParts.includes(prevKey);
-        
-        const locked = !partUnlocked;
-        const done = isCompleted;
+          part.id === "1" || completedPartsMap[prevPartId] === true;
 
+        const locked = !partUnlocked;
+        
         return (
           <Pressable
             key={part.id}

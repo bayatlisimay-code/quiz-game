@@ -10,7 +10,7 @@ import { buildQuiz } from "../../../../../../../src/quizEngine/buildQuiz";
 import type { Exercise } from "../../../../../../../src/quizEngine/conceptTypes";
 import { enrichConcepts } from "../../../../../../../src/quizEngine/enrichConcepts";
 import { saveLastLocation } from "../../../../../../../src/state/lastLocation";
-import { markQuizVariantCompleted } from "../../../../../../../src/state/progress";
+import { getCompletedQuizVariants, markQuizVariantCompleted } from "../../../../../../../src/state/progress";
 import { useStreak } from "../../../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../../../src/state/useTotalXp";
 
@@ -255,6 +255,10 @@ export default function PartQuizScreen() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [quizAUnlocked, setQuizAUnlocked] = useState(true);
+  const [quizBUnlocked, setQuizBUnlocked] = useState(false);
+  const [quizCUnlocked, setQuizCUnlocked] = useState(false);
+
   const [idx, setIdx] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [typedAnswer, setTypedAnswer] = useState("");
@@ -262,58 +266,99 @@ export default function PartQuizScreen() {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
 
-  const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
+  const [selectedLeft, setSelectedLeft] = useState<number | null>(null);
   const [selectedRight, setSelectedRight] = useState<number | null>(null);
-  const [matchedPairs, setMatchedPairs] = useState<Record<string, number>>({});
-  const [shuffledMatchingLefts, setShuffledMatchingLefts] = useState<string[]>([]);
-  const [shuffledMatchingRights, setShuffledMatchingRights] = useState<string[]>([]);
+  const [matchedPairs, setMatchedPairs] = useState<Record<number, number>>({});
+  const [shuffledMatchingLefts, setShuffledMatchingLefts] = useState<any[]>([]);
+  const [shuffledMatchingRights, setShuffledMatchingRights] = useState<any[]>([]);
 
   useEffect(() => {
-  const q = exercises[idx];
-  if (!q || q.type !== "matching") {
-    setShuffledMatchingLefts([]);
-    setShuffledMatchingRights([]);
-    return;
-  }
+    if (!topicId || !subtopicId || !levelId || !partId) return;
 
-  const lefts = (q as any).pairs.map((pair: any) => pair.left);
-  const rights = (q as any).pairs.map((pair: any) => pair.right);
+    (async () => {
+      const completed = await getCompletedQuizVariants(
+        String(topicId),
+        String(subtopicId),
+        String(levelId),
+        String(partId)
+      );
 
-  setShuffledMatchingLefts(shuffleSeeded(lefts, idx + attempt + 1));
-  setShuffledMatchingRights(shuffleSeeded(rights, idx + attempt + 101));
-}, [exercises, idx, attempt]);
+      console.log("completed variants for this part:", completed);
+
+      const hasA = completed.includes("A");
+      const hasB = completed.includes("B");
+
+      setQuizAUnlocked(true);
+      setQuizBUnlocked(hasA);
+      setQuizCUnlocked(hasB);
+    })();
+  }, [topicId, subtopicId, levelId, partId]);
 
   useEffect(() => {
-  if (!selectedLeft || selectedRight === null || checked) return;
+    const q = exercises[idx];
+    if (!q || q.type !== "matching") {
+      setShuffledMatchingLefts([]);
+      setShuffledMatchingRights([]);
+      return;
+    }
 
-  const q = exercises[idx];
-  if (!q || q.type !== "matching") return;
+    const lefts = (q as any).pairs.map((pair: any, pairIndex: number) => ({
+      pairIndex,
+      id: String(pair.id ?? `left-${pairIndex}`),
+      text: pair.left,
+    }));
 
-  const correctRight = (q as any).pairs.find(
-    (p: any) => p.left === selectedLeft
-  )?.right;
-  const isCorrect = shuffledMatchingRights[selectedRight] === correctRight;
+    const rights = (q as any).pairs.map((pair: any, pairIndex: number) => ({
+      pairIndex,
+      id: String(pair.id ?? `right-${pairIndex}`),
+      text: pair.right,
+    }));
 
-  setMatchedPairs((prev) => ({
-    ...prev,
-    [selectedLeft]: selectedRight,
-  }));
+    setShuffledMatchingLefts(shuffleSeeded(lefts, idx + attempt + 1));
+    setShuffledMatchingRights(shuffleSeeded(rights, idx + attempt + 101));
+  }, [exercises, idx, attempt]);
 
-  setSelectedLeft(null);
-  setSelectedRight(null);
+  useEffect(() => {
+    if (selectedLeft === null || selectedRight === null || checked) return;
 
-  if (!isCorrect) {
-    const left = selectedLeft;
-    setTimeout(() => {
-      setMatchedPairs((prev) => {
-        const next = { ...prev };
-        delete next[left];
-        return next;
-      });
-    }, 800);
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [selectedLeft, selectedRight, checked]);
+    const q = exercises[idx];
+    if (!q || q.type !== "matching") return;
+
+    const leftItem = shuffledMatchingLefts[selectedLeft];
+    const rightItem = shuffledMatchingRights[selectedRight];
+
+    if (!leftItem || !rightItem) return;
+
+    const isCorrect = leftItem.pairIndex === rightItem.pairIndex;
+
+    setMatchedPairs((prev) => ({
+      ...prev,
+      [selectedLeft]: selectedRight,
+    }));
+
+    setSelectedLeft(null);
+    setSelectedRight(null);
+
+    if (!isCorrect) {
+      const leftIndex = selectedLeft;
+
+      setTimeout(() => {
+        setMatchedPairs((prev) => {
+          const next = { ...prev };
+          delete next[leftIndex];
+          return next;
+        });
+      }, 800);
+    }
+  }, [
+    selectedLeft,
+    selectedRight,
+    checked,
+    exercises,
+    idx,
+    shuffledMatchingLefts,
+    shuffledMatchingRights,
+  ]);
 
   function shuffleSeeded<T>(arr: readonly T[], seed: number): T[] {
   const a = [...arr];
@@ -631,29 +676,47 @@ if (!hasQuizVariant) {
 
       <View style={{ height: 16 }} />
 
-      <Text style={styles.title}>Choose a quiz</Text>
-      <Text style={styles.body}>Pick one:</Text>
+    <Text style={styles.title}>Choose a quiz</Text>
+    <Text style={styles.body}>Pick one:</Text>
 
-      <Pressable
-        style={styles.primaryButton}
-        onPress={() => router.push({ pathname: basePath as any, params: { set: "quizA" } } as any)}
-      >
-        <Text style={styles.primaryText}>Quiz A</Text>
-      </Pressable>
+    <Pressable
+      style={styles.primaryButton}
+      onPress={() =>
+        router.push({ pathname: basePath as any, params: { set: "quizA" } } as any)
+      }
+    >
+      <Text style={styles.primaryText}>Quiz A</Text>
+    </Pressable>
 
-      <Pressable
-        style={styles.primaryButton}
-        onPress={() => router.push({ pathname: basePath as any, params: { set: "quizB" } } as any)}
-      >
-        <Text style={styles.primaryText}>Quiz B</Text>
-      </Pressable>
+    <Pressable
+      style={[
+        styles.primaryButton,
+        !quizBUnlocked && { opacity: 0.5 },
+      ]}
+      disabled={!quizBUnlocked}
+      onPress={() =>
+        router.push({ pathname: basePath as any, params: { set: "quizB" } } as any)
+      }
+    >
+      <Text style={styles.primaryText}>
+        {quizBUnlocked ? "Quiz B" : "Quiz B 🔒 Complete Quiz A first"}
+      </Text>
+    </Pressable>
 
-      <Pressable
-        style={styles.primaryButton}
-        onPress={() => router.push({ pathname: basePath as any, params: { set: "quizC" } } as any)}
-      >
-        <Text style={styles.primaryText}>Quiz C</Text>
-      </Pressable>
+    <Pressable
+      style={[
+        styles.primaryButton,
+        !quizCUnlocked && { opacity: 0.5 },
+      ]}
+      disabled={!quizCUnlocked}
+      onPress={() =>
+        router.push({ pathname: basePath as any, params: { set: "quizC" } } as any)
+      }
+    >
+      <Text style={styles.primaryText}>
+        {quizCUnlocked ? "Quiz C" : "Quiz C 🔒 Complete Quiz B first"}
+      </Text>
+    </Pressable>
     </ScrollView>
   );
 }
@@ -769,25 +832,33 @@ if (exercises.length === 0) {
       {q.type === "matching" && (
         <View style={styles.matchingWrap}>
           <View style={styles.matchingColumn}>
-            {shuffledMatchingLefts.map((left) => {
-              const isSelected = selectedLeft === left;
-              const isMatched = matchedPairs[left] !== undefined;
-              const matchedRightText = isMatched ? shuffledMatchingRights[matchedPairs[left]] : null;
-              const correctRightText = isMatched ? (q as any).pairs.find((p: any) => p.left === left)?.right : null;
-              const isMatchCorrect = isMatched && matchedRightText === correctRightText;          
-              
+            {shuffledMatchingLefts.map((leftItem, leftIndex) => {
+              const isSelected = selectedLeft === leftIndex;
+              const isMatched = matchedPairs[leftIndex] !== undefined;
+
+              const matchedRightIndex = isMatched ? matchedPairs[leftIndex] : null;
+              const matchedRightItem =
+                matchedRightIndex !== null ? shuffledMatchingRights[matchedRightIndex] : null;
+
+              const isMatchCorrect =
+                isMatched &&
+                matchedRightItem &&
+                matchedRightItem.pairIndex === leftItem.pairIndex;
 
               return (
                 <Pressable
-                  key={left}
+                  key={`left-${leftItem.id}-${leftIndex}`}
                   onPress={() => {
                     if (checked || isMatched) return;
-                    setSelectedLeft(left);
+                    setSelectedLeft(leftIndex);
                   }}
                   style={[
                     styles.matchingItem,
                     isSelected && styles.matchingItemSelected,
-                    isMatched && (isMatchCorrect ? styles.matchingItemCorrect : styles.matchingItemWrong),
+                    isMatched &&
+                      (isMatchCorrect
+                        ? styles.matchingItemCorrect
+                        : styles.matchingItemWrong),
                     isMatchCorrect && styles.matchingItemFaded,
                   ]}
                 >
@@ -797,7 +868,7 @@ if (exercises.length === 0) {
                       isMatchCorrect && styles.matchingItemTextFaded,
                     ]}
                   >
-                    {left}
+                    {leftItem.text}
                   </Text>
                 </Pressable>
               );
@@ -805,25 +876,37 @@ if (exercises.length === 0) {
           </View>
 
           <View style={styles.matchingColumn}>
-            {shuffledMatchingRights.map((right, index) => {
-              const isSelected = selectedRight === index;
-              const matchEntry = Object.entries(matchedPairs).find(([_, rIdx]) => rIdx === index);
+            {shuffledMatchingRights.map((rightItem, rightIndex) => {
+              const isSelected = selectedRight === rightIndex;
+
+              const matchEntry = Object.entries(matchedPairs).find(
+                ([_, matchedRightIndex]) => matchedRightIndex === rightIndex
+              );
               const alreadyUsed = !!matchEntry;
-              const isMatchCorrect = alreadyUsed && matchEntry
-                ? (q as any).pairs.find((p: any) => p.left === matchEntry[0])?.right === right
-                : false;
+
+              const matchedLeftIndex = matchEntry ? Number(matchEntry[0]) : null;
+              const matchedLeftItem =
+                matchedLeftIndex !== null ? shuffledMatchingLefts[matchedLeftIndex] : null;
+
+              const isMatchCorrect =
+                alreadyUsed &&
+                matchedLeftItem &&
+                matchedLeftItem.pairIndex === rightItem.pairIndex;
 
               return (
                 <Pressable
-                  key={index}
+                  key={`right-${rightItem.id}-${rightIndex}`}
                   onPress={() => {
                     if (checked || alreadyUsed) return;
-                    setSelectedRight(index);
+                    setSelectedRight(rightIndex);
                   }}
                   style={[
                     styles.matchingItem,
                     isSelected && styles.matchingItemSelected,
-                    alreadyUsed && (isMatchCorrect ? styles.matchingItemCorrect : styles.matchingItemWrong),
+                    alreadyUsed &&
+                      (isMatchCorrect
+                        ? styles.matchingItemCorrect
+                        : styles.matchingItemWrong),
                     isMatchCorrect && styles.matchingItemFaded,
                   ]}
                 >
@@ -833,7 +916,7 @@ if (exercises.length === 0) {
                       isMatchCorrect && styles.matchingItemTextFaded,
                     ]}
                   >
-                    {right}
+                    {rightItem.text}
                   </Text>
                 </Pressable>
               );
