@@ -60,7 +60,9 @@ export default function LevelScreen() {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Unknown level</Text>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
+        <Pressable style={styles.backButton} onPress={() =>
+          router.replace(`/topic/${topicId}/subtopic/${subtopicId}` as any)
+        }>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
       </ScrollView>
@@ -72,7 +74,9 @@ export default function LevelScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>No parts yet</Text>
         <Text style={styles.value}>This level has no parts in data/catalog.</Text>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
+        <Pressable style={styles.backButton} onPress={() =>
+          router.replace(`/topic/${topicId}/subtopic/${subtopicId}` as any)
+        }>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
       </ScrollView>

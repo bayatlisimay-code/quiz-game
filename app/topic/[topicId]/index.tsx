@@ -21,7 +21,7 @@ export default function TopicScreen() {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Unknown topic</Text>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
+        <Pressable style={styles.backButton} onPress={() => router.replace("/topics" as any)}>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
       </ScrollView>

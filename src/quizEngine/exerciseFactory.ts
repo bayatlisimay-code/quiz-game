@@ -10,7 +10,6 @@ import { enrichConcepts } from "./enrichConcepts";
 import { createFactTracker } from "./factTracker";
 import { renderPrompt } from "./templates";
 
-
 function hashString(s: string) {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) {

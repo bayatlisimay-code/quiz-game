@@ -653,7 +653,11 @@ if (!hasQuizVariant) {
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={styles.headerRow}>
       <Pressable
-        onPress={() => router.replace(levelPath as any)}
+        onPress={() =>
+          router.replace(
+            `/topic/${topicId}/subtopic/${subtopicId}/${levelId}` as any
+          )
+        }
         style={styles.backButton}
       >
         <Text style={styles.backText}>← Back</Text>
@@ -663,7 +667,7 @@ if (!hasQuizVariant) {
         {subtopic?.title ?? ""}
       </Text>
 
-      <Pressable onPress={() => router.push(homePath as any)} style={styles.backButton}>
+      <Pressable onPress={() => router.replace(homePath as any)} style={styles.backButton}>
         <Text style={styles.backText}>Home</Text>
       </Pressable>
     </View>
@@ -757,10 +761,10 @@ if (!hasQuizVariant) {
 
 if (exercises.length === 0) {
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView style={styles.container}>
       <View style={styles.headerRow}>
         <Pressable
-          onPress={() => router.replace(levelPath as any)}
+          onPress={() => router.replace(basePath as any)}
           style={styles.backButton}
         >
           <Text style={styles.backText}>← Back</Text>
@@ -770,7 +774,7 @@ if (exercises.length === 0) {
           {subtopic?.title ?? ""}
         </Text>
 
-        <Pressable onPress={() => router.push(homePath as any)} style={styles.backButton}>
+        <Pressable onPress={() => router.replace(homePath as any)} style={styles.backButton}>
           <Text style={styles.backText}>Home</Text>
         </Pressable>
       </View>

@@ -71,7 +71,9 @@ export default function SubtopicScreen() {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Unknown subtopic</Text>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
+        <Pressable style={styles.backButton} onPress={() =>
+          router.replace(`/topic/${topicId}` as any)
+          }>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
       </ScrollView>

@@ -12,42 +12,42 @@ export default function TopicsScreen() {
   const totalXP = useTotalXp();
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      <View style={styles.headerRow}>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backText}>← Back</Text>
-        </Pressable>
+  <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <View style={styles.headerRow}>
+      <Pressable style={styles.backButton} onPress={() => router.replace("/" as any)}>
+        <Text style={styles.backText}>← Back</Text>
+      </Pressable>
 
-        <Text style={styles.headerTitle}>Choose a topic</Text>
+      <Text style={styles.headerTitle}>Choose a topic</Text>
 
-        <View style={styles.xpPill}>
-          <View style={styles.xpContent}>
-            <MaterialCommunityIcons name="fire" size={14} color="#FDBA74" />
-            <Text style={styles.xpText}>{streak}</Text>
+      <View style={styles.xpPill}>
+        <View style={styles.xpContent}>
+          <MaterialCommunityIcons name="fire" size={14} color="#FDBA74" />
+          <Text style={styles.xpText}>{streak}</Text>
 
-            <Text style={styles.xpDot}>•</Text>
+          <Text style={styles.xpDot}>•</Text>
 
-            <MaterialCommunityIcons name="diamond-stone" size={14} color="#FDBA74" />
-            <Text style={styles.xpText}>{totalXP}</Text>
-          </View>
+          <MaterialCommunityIcons name="diamond-stone" size={14} color="#FDBA74" />
+          <Text style={styles.xpText}>{totalXP}</Text>
         </View>
       </View>
+    </View>
 
-      {TOPICS.map((t) => (
-        <Pressable
-          key={t.id}
-          style={[styles.card, { borderLeftColor: t.color }]}
-          onPress={() => router.push(`/topic/${t.id}` as any)}
-        >
-          <View style={styles.cardTitleRow}>
-            <MaterialCommunityIcons name="shape" size={18} color="#E5F3FF" />
-            <Text style={styles.cardTitle}>{t.title}</Text>
-          </View>
-          <Text style={styles.cardMeta}>{t.subtopics.length} subtopics</Text>
-        </Pressable>
-      ))}
-    </ScrollView>
-  );
+    {TOPICS.map((t) => (
+      <Pressable
+        key={t.id}
+        style={[styles.card, { borderLeftColor: t.color }]}
+        onPress={() => router.push(`/topic/${t.id}` as any)}
+      >
+        <View style={styles.cardTitleRow}>
+          <MaterialCommunityIcons name="shape" size={18} color="#E5F3FF" />
+          <Text style={styles.cardTitle}>{t.title}</Text>
+        </View>
+        <Text style={styles.cardMeta}>{t.subtopics.length} subtopics</Text>
+      </Pressable>
+    ))}
+  </ScrollView>
+);
 }
 
 const styles = StyleSheet.create({
