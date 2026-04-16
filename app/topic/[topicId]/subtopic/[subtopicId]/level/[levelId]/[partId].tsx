@@ -249,6 +249,12 @@ export default function PartQuizScreen() {
   const setValue = String(set ?? "");
   const hasQuizVariant =
     setValue.includes("quizA") || setValue.includes("quizB") || setValue.includes("quizC");
+  
+  const basePath = `/topic/${String(topicId)}/subtopic/${String(subtopicId)}/level/${String(
+    levelId
+  )}/${String(partId)}`;
+  const homePath = "/";
+  const levelPath = `/topic/${String(topicId)}/subtopic/${String(subtopicId)}/${String(levelId)}`;
 
   const [attempt, setAttempt] = useState(0);
 
@@ -643,36 +649,41 @@ export default function PartQuizScreen() {
   };
 
 if (!hasQuizVariant) {
-  const basePath = `/topic/${String(topicId)}/subtopic/${String(subtopicId)}/level/${String(
-    levelId
-  )}/${String(partId)}`;
-
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
-      <View style={styles.headerRow}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>← Back</Text>
-        </Pressable>
+        <View style={styles.headerRow}>
+      <Pressable
+        onPress={() => router.replace(levelPath as any)}
+        style={styles.backButton}
+      >
+        <Text style={styles.backText}>← Back</Text>
+      </Pressable>
 
-        <Text numberOfLines={1} style={styles.headerTitle}>
-          {subtopic?.title ?? ""}
-        </Text>
+      <Text numberOfLines={1} style={styles.headerTitle}>
+        {subtopic?.title ?? ""}
+      </Text>
 
-        <View style={styles.xpPill}>
-          <View style={styles.xpContent}>
-            <MaterialCommunityIcons name="fire" size={14} color="#FDBA74" />
-            <Text style={styles.xpText}>{streak}</Text>
+      <Pressable onPress={() => router.push(homePath as any)} style={styles.backButton}>
+        <Text style={styles.backText}>Home</Text>
+      </Pressable>
+    </View>
 
-            <Text style={styles.xpDot}>•</Text>
+    <View style={{ alignItems: "flex-end", marginBottom: 12 }}>
+      <View style={styles.xpPill}>
+        <View style={styles.xpContent}>
+          <MaterialCommunityIcons name="fire" size={14} color="#FDBA74" />
+          <Text style={styles.xpText}>{streak}</Text>
 
-            <Text style={styles.xpText}>Lv {subtopicLevel}</Text>
+          <Text style={styles.xpDot}>•</Text>
 
-            <Text style={styles.xpDot}>•</Text>
+          <Text style={styles.xpText}>Lv {subtopicLevel}</Text>
 
-            <Text style={styles.xpText}>XP {totalXP}</Text>
-          </View>
+          <Text style={styles.xpDot}>•</Text>
+
+          <Text style={styles.xpText}>XP {totalXP}</Text>
         </View>
       </View>
+    </View>
 
       <View style={{ height: 16 }} />
 
@@ -682,7 +693,12 @@ if (!hasQuizVariant) {
     <Pressable
       style={styles.primaryButton}
       onPress={() =>
-        router.push({ pathname: basePath as any, params: { set: "quizA" } } as any)
+        router.push({
+          pathname: basePath as any,
+          params: {
+            set: "quizA",
+          },
+        } as any)
       }
     >
       <Text style={styles.primaryText}>Quiz A</Text>
@@ -695,7 +711,12 @@ if (!hasQuizVariant) {
       ]}
       disabled={!quizBUnlocked}
       onPress={() =>
-        router.push({ pathname: basePath as any, params: { set: "quizB" } } as any)
+        router.push({
+          pathname: basePath as any,
+          params: {
+            set: "quizB",
+          },
+        } as any)
       }
     >
       <Text style={styles.primaryText}>
@@ -710,7 +731,12 @@ if (!hasQuizVariant) {
       ]}
       disabled={!quizCUnlocked}
       onPress={() =>
-        router.push({ pathname: basePath as any, params: { set: "quizC" } } as any)
+        router.push({
+          pathname: basePath as any,
+          params: {
+            set: "quizC",
+          },
+        } as any)
       }
     >
       <Text style={styles.primaryText}>
@@ -733,8 +759,19 @@ if (exercises.length === 0) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
       <View style={styles.headerRow}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
+        <Pressable
+          onPress={() => router.replace(levelPath as any)}
+          style={styles.backButton}
+        >
           <Text style={styles.backText}>← Back</Text>
+        </Pressable>
+
+        <Text numberOfLines={1} style={styles.headerTitle}>
+          {subtopic?.title ?? ""}
+        </Text>
+
+        <Pressable onPress={() => router.push(homePath as any)} style={styles.backButton}>
+          <Text style={styles.backText}>Home</Text>
         </Pressable>
       </View>
 
@@ -746,10 +783,22 @@ if (exercises.length === 0) {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.headerRow}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
+       <Pressable
+          onPress={() => router.replace(basePath as any)}
+          style={styles.backButton}
+        >
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
+
+        <Text numberOfLines={1} style={styles.headerTitle}>
+          {subtopic?.title ?? ""}
+        </Text>
+
+        <Pressable onPress={() => router.push(homePath as any)} style={styles.backButton}>
+          <Text style={styles.backText}>Home</Text>
+        </Pressable>
       </View>
+
       <View style={styles.progressBackground}>
         <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
       </View>

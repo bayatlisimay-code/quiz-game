@@ -9,11 +9,13 @@ import { useTotalXp } from "../../../../../src/state/useTotalXp";
 
 export default function LevelScreen() {
   const router = useRouter();
-  const { topicId, subtopicId, levelId } = useLocalSearchParams<{
+  const { topicId, subtopicId, levelId, } = useLocalSearchParams<{
     topicId: string;
     subtopicId: string;
     levelId: string;
   }>();
+
+  const subtopicPath = `/topic/${String(topicId)}/subtopic/${String(subtopicId)}`;
 
   const totalXP = useTotalXp();
   const streak = useStreak();
@@ -87,7 +89,10 @@ export default function LevelScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.headerRow}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
+        <Pressable
+          onPress={() => router.replace(subtopicPath as any)}
+          style={styles.backButton}
+        >
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
 
@@ -124,7 +129,7 @@ export default function LevelScreen() {
           part.id === "1" || completedPartsMap[prevPartId] === true;
 
         const locked = !partUnlocked;
-        
+
         return (
           <Pressable
             key={part.id}
