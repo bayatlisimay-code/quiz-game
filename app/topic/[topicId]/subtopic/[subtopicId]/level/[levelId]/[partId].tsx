@@ -798,7 +798,7 @@ if (exercises.length === 0) {
           {subtopic?.title ?? ""}
         </Text>
 
-        <Pressable onPress={() => router.push(homePath as any)} style={styles.backButton}>
+        <Pressable onPress={() => router.replace(homePath as any)} style={styles.backButton}>
           <Text style={styles.backText}>Home</Text>
         </Pressable>
       </View>
