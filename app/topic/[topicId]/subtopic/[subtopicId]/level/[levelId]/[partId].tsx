@@ -13,6 +13,11 @@ import { saveLastLocation } from "../../../../../../../src/state/lastLocation";
 import { getCompletedQuizVariants, markQuizVariantCompleted } from "../../../../../../../src/state/progress";
 import { useStreak } from "../../../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../../../src/state/useTotalXp";
+import {
+  getHomePath,
+  getLevelPath,
+  getPartPath,
+} from "../../../../../../../lib/routes";
 
 const styles = StyleSheet.create({
   container: {
@@ -250,11 +255,18 @@ export default function PartQuizScreen() {
   const hasQuizVariant =
     setValue.includes("quizA") || setValue.includes("quizB") || setValue.includes("quizC");
   
-  const basePath = `/topic/${String(topicId)}/subtopic/${String(subtopicId)}/level/${String(
-    levelId
-  )}/${String(partId)}`;
-  const homePath = "/";
-  const levelPath = `/topic/${String(topicId)}/subtopic/${String(subtopicId)}/${String(levelId)}`;
+  const basePath = getPartPath(
+    String(topicId),
+    String(subtopicId),
+    String(levelId),
+    String(partId)
+  );
+  const homePath = getHomePath();
+  const levelPath = getLevelPath(
+    String(topicId),
+    String(subtopicId),
+    String(levelId)
+  );
 
   const [attempt, setAttempt] = useState(0);
 

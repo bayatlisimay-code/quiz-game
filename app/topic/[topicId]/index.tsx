@@ -6,6 +6,7 @@ import { TOPIC_BY_ID } from "../../../data/catalog";
 import { getXpLevel } from "../../../src/state/leveling";
 import { useStreak } from "../../../src/state/useStreak";
 import { useTotalXp } from "../../../src/state/useTotalXp";
+import { getHomePath, getTopicsPath } from "../../../lib/routes";
 
 export default function TopicScreen() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function TopicScreen() {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Unknown topic</Text>
-        <Pressable style={styles.backButton} onPress={() => router.replace("/topics" as any)}>
+        <Pressable style={styles.backButton} onPress={() => router.replace(getTopicsPath())}>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
       </ScrollView>
@@ -32,7 +33,7 @@ export default function TopicScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.headerRow}>
         <Pressable
-          onPress={() => router.replace("/topics" as any)}
+          onPress={() => router.replace(getTopicsPath())}
           style={styles.backButton}
         >
           <Text style={styles.backText}>← Back</Text>
@@ -41,6 +42,13 @@ export default function TopicScreen() {
         <Text numberOfLines={1} style={styles.headerTitle}>
           {topic.title}
         </Text>
+
+        <Pressable
+          onPress={() => router.replace(getHomePath())}
+          style={styles.backButton}
+        >
+          <Text style={styles.backText}>Home</Text>
+        </Pressable>
 
         <View style={styles.xpPill}>
           <View style={styles.xpContent}>

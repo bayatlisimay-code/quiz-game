@@ -6,6 +6,7 @@ import { masteryLevels, TOPIC_BY_ID } from "../../../../../data/catalog";
 import { isLevelCompleted, loadProgress } from "../../../../../src/state/progress";
 import { useStreak } from "../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../src/state/useTotalXp";
+import { getHomePath, getTopicPath } from "../../../../../lib/routes";
 
 
 export default function SubtopicScreen() {
@@ -91,7 +92,7 @@ export default function SubtopicScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
      <View style={styles.headerRow}>
         <Pressable
-          onPress={() => router.replace(`/topic/${String(topicId)}` as any)}
+          onPress={() => router.replace(getTopicPath(String(topicId)))}
           style={styles.backButton}
         >
           <Text style={styles.backText}>← Back</Text>
@@ -115,6 +116,15 @@ export default function SubtopicScreen() {
             <Text style={styles.xpText}>XP {totalXP}</Text>
           </View>
         </View>
+      </View>
+
+      <View style={styles.homeRow}>
+        <Pressable
+          onPress={() => router.replace(getHomePath())}
+          style={styles.backButton}
+        >
+          <Text style={styles.backText}>Home</Text>
+        </Pressable>
       </View>
 
       <Text style={styles.subtitle}>Choose a level</Text>
@@ -296,5 +306,10 @@ cardTitleRow: {
   flexDirection: "row",
   alignItems: "center",
   justifyContent: "space-between",
+},
+homeRow: {
+  marginTop: 8,
+  marginBottom: 4,
+  alignItems: "flex-end",
 },
 });

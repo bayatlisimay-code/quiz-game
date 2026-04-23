@@ -6,6 +6,7 @@ import { TOPIC_BY_ID } from "../../../../../data/catalog";
 import { isPartCompleted, loadProgress } from "../../../../../src/state/progress";
 import { useStreak } from "../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../src/state/useTotalXp";
+import { getHomePath, getSubtopicPath } from "../../../../../lib/routes";
 
 export default function LevelScreen() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function LevelScreen() {
     levelId: string;
   }>();
 
-  const subtopicPath = `/topic/${String(topicId)}/subtopic/${String(subtopicId)}`;
+  const subtopicPath = getSubtopicPath(String(topicId), String(subtopicId));
 
   const totalXP = useTotalXp();
   const streak = useStreak();
@@ -118,6 +119,15 @@ export default function LevelScreen() {
             <Text style={styles.xpText}>XP {totalXP}</Text>
           </View>
         </View>
+      </View>
+
+      <View style={styles.homeRow}>
+        <Pressable
+          onPress={() => router.replace(getHomePath())}
+          style={styles.backButton}
+        >
+          <Text style={styles.backText}>Home</Text>
+        </Pressable>
       </View>
 
       <Text style={styles.subtitle}>
@@ -239,4 +249,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 40,
   },
+  homeRow: {
+  marginTop: 8,
+  marginBottom: 4,
+  alignItems: "flex-end",
+},
 });
