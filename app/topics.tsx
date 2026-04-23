@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TOPICS } from "../data/catalog";
 import { useStreak } from "../src/state/useStreak";
 import { useTotalXp } from "../src/state/useTotalXp";
+import { getHomePath } from "../lib/routes";
 
 export default function TopicsScreen() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function TopicsScreen() {
   return (
   <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
     <View style={styles.headerRow}>
-      <Pressable style={styles.backButton} onPress={() => router.replace("/" as any)}>
+      <Pressable style={styles.backButton} onPress={() => router.replace(getHomePath())}>
         <Text style={styles.backText}>← Back</Text>
       </Pressable>
 

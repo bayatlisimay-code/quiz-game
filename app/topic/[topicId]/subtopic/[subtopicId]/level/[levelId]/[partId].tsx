@@ -665,11 +665,7 @@ if (!hasQuizVariant) {
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={styles.headerRow}>
       <Pressable
-        onPress={() =>
-          router.replace(
-            `/topic/${topicId}/subtopic/${subtopicId}/${levelId}` as any
-          )
-        }
+        onPress={() => router.replace(levelPath as any)}
         style={styles.backButton}
       >
         <Text style={styles.backText}>← Back</Text>
