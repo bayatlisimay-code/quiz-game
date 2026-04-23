@@ -6,6 +6,11 @@ import { TOPIC_BY_ID } from "../../../../../../../data/catalog";
 import { CONCEPT_SETS } from "../../../../../../../data/conceptSets";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  getHomePath,
+  getLevelPath,
+  getPartPath,
+} from "../../../../../../../lib/routes";
 import { buildQuiz } from "../../../../../../../src/quizEngine/buildQuiz";
 import type { Exercise } from "../../../../../../../src/quizEngine/conceptTypes";
 import { enrichConcepts } from "../../../../../../../src/quizEngine/enrichConcepts";
@@ -13,11 +18,6 @@ import { saveLastLocation } from "../../../../../../../src/state/lastLocation";
 import { getCompletedQuizVariants, markQuizVariantCompleted } from "../../../../../../../src/state/progress";
 import { useStreak } from "../../../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../../../src/state/useTotalXp";
-import {
-  getHomePath,
-  getLevelPath,
-  getPartPath,
-} from "../../../../../../../lib/routes";
 
 const styles = StyleSheet.create({
   container: {
@@ -665,7 +665,7 @@ if (!hasQuizVariant) {
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={styles.headerRow}>
       <Pressable
-        onPress={() => router.replace(levelPath as any)}
+        onPress={() => router.replace(levelPath)}
         style={styles.backButton}
       >
         <Text style={styles.backText}>← Back</Text>
@@ -675,7 +675,7 @@ if (!hasQuizVariant) {
         {subtopic?.title ?? ""}
       </Text>
 
-      <Pressable onPress={() => router.replace(homePath as any)} style={styles.backButton}>
+      <Pressable onPress={() => router.replace(homePath)} style={styles.backButton}>
         <Text style={styles.backText}>Home</Text>
       </Pressable>
     </View>
@@ -706,7 +706,7 @@ if (!hasQuizVariant) {
       style={styles.primaryButton}
       onPress={() =>
         router.push({
-          pathname: basePath as any,
+          pathname: basePath,
           params: {
             set: "quizA",
           },
@@ -724,7 +724,7 @@ if (!hasQuizVariant) {
       disabled={!quizBUnlocked}
       onPress={() =>
         router.push({
-          pathname: basePath as any,
+          pathname: basePath,
           params: {
             set: "quizB",
           },
@@ -744,7 +744,7 @@ if (!hasQuizVariant) {
       disabled={!quizCUnlocked}
       onPress={() =>
         router.push({
-          pathname: basePath as any,
+          pathname: basePath,
           params: {
             set: "quizC",
           },
@@ -772,7 +772,7 @@ if (exercises.length === 0) {
     <ScrollView style={styles.container}>
       <View style={styles.headerRow}>
         <Pressable
-          onPress={() => router.replace(basePath as any)}
+          onPress={() => router.replace(basePath)}
           style={styles.backButton}
         >
           <Text style={styles.backText}>← Back</Text>
@@ -782,7 +782,7 @@ if (exercises.length === 0) {
           {subtopic?.title ?? ""}
         </Text>
 
-        <Pressable onPress={() => router.replace(homePath as any)} style={styles.backButton}>
+        <Pressable onPress={() => router.replace(homePath)} style={styles.backButton}>
           <Text style={styles.backText}>Home</Text>
         </Pressable>
       </View>
@@ -796,7 +796,7 @@ if (exercises.length === 0) {
     <ScrollView style={styles.container}>
       <View style={styles.headerRow}>
        <Pressable
-          onPress={() => router.replace(basePath as any)}
+          onPress={() => router.replace(basePath)}
           style={styles.backButton}
         >
           <Text style={styles.backText}>← Back</Text>
@@ -806,7 +806,7 @@ if (exercises.length === 0) {
           {subtopic?.title ?? ""}
         </Text>
 
-        <Pressable onPress={() => router.replace(homePath as any)} style={styles.backButton}>
+        <Pressable onPress={() => router.replace(homePath)} style={styles.backButton}>
           <Text style={styles.backText}>Home</Text>
         </Pressable>
       </View>

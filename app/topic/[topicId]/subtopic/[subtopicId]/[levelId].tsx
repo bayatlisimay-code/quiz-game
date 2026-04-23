@@ -3,10 +3,10 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TOPIC_BY_ID } from "../../../../../data/catalog";
+import { getHomePath, getSubtopicPath } from "../../../../../lib/routes";
 import { isPartCompleted, loadProgress } from "../../../../../src/state/progress";
 import { useStreak } from "../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../src/state/useTotalXp";
-import { getHomePath, getSubtopicPath } from "../../../../../lib/routes";
 
 export default function LevelScreen() {
   const router = useRouter();
@@ -62,7 +62,7 @@ export default function LevelScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Unknown level</Text>
         <Pressable style={styles.backButton} onPress={() =>
-          router.replace(`/topic/${topicId}/subtopic/${subtopicId}` as any)
+          router.replace(getSubtopicPath(String(topicId), String(subtopicId)))
         }>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
@@ -76,7 +76,7 @@ export default function LevelScreen() {
         <Text style={styles.title}>No parts yet</Text>
         <Text style={styles.value}>This level has no parts in data/catalog.</Text>
         <Pressable style={styles.backButton} onPress={() =>
-          router.replace(`/topic/${topicId}/subtopic/${subtopicId}` as any)
+          router.replace(getSubtopicPath(String(topicId), String(subtopicId)))
         }>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
@@ -95,7 +95,7 @@ export default function LevelScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.headerRow}>
         <Pressable
-          onPress={() => router.replace(subtopicPath as any)}
+          onPress={() => router.replace(subtopicPath)}
           style={styles.backButton}
         >
           <Text style={styles.backText}>← Back</Text>

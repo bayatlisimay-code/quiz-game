@@ -3,9 +3,9 @@ import { useRouter } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { TOPICS } from "../data/catalog";
+import { getHomePath } from "../lib/routes";
 import { useStreak } from "../src/state/useStreak";
 import { useTotalXp } from "../src/state/useTotalXp";
-import { getHomePath } from "../lib/routes";
 
 export default function TopicsScreen() {
   const router = useRouter();
@@ -38,7 +38,12 @@ export default function TopicsScreen() {
       <Pressable
         key={t.id}
         style={[styles.card, { borderLeftColor: t.color }]}
-        onPress={() => router.push(`/topic/${t.id}` as any)}
+        onPress={() =>
+          router.push({
+            pathname: "/topic/[topicId]",
+            params: { topicId: String(t.id) },
+          })
+        }
       >
         <View style={styles.cardTitleRow}>
           <MaterialCommunityIcons name="shape" size={18} color="#E5F3FF" />
