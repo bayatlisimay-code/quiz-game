@@ -19,6 +19,17 @@ import { getCompletedQuizVariants, markQuizVariantCompleted } from "../../../../
 import { useStreak } from "../../../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../../../src/state/useTotalXp";
 
+type MatchingPair = {
+  id?: string | number;
+  left: string;
+  right: string;
+};
+
+type MatchingQuestion = {
+  type: "matching";
+  pairs: MatchingPair[];
+};
+
 const styles = StyleSheet.create({
   container: {
   flex: 1,
@@ -286,7 +297,7 @@ export default function PartQuizScreen() {
 
   const [selectedLeft, setSelectedLeft] = useState<number | null>(null);
   const [selectedRight, setSelectedRight] = useState<number | null>(null);
-  const [matchedPairs, setMatchedPairs] = useState<Record<number, number>>({});
+  const [matchedPairs, setMatchedPairs] = useState<Record<string, number>>({});
   const [shuffledMatchingLefts, setShuffledMatchingLefts] = useState<any[]>([]);
   const [shuffledMatchingRights, setShuffledMatchingRights] = useState<any[]>([]);
 
@@ -320,17 +331,21 @@ export default function PartQuizScreen() {
       return;
     }
 
-    const lefts = (q as any).pairs.map((pair: any, pairIndex: number) => ({
-      pairIndex,
-      id: String(pair.id ?? `left-${pairIndex}`),
-      text: pair.left,
-    }));
+    const lefts = matchingQ
+      ? matchingQ.pairs.map((pair: MatchingPair, pairIndex: number) => ({
+          pairIndex,
+          id: String(pair.id ?? `left-${pairIndex}`),
+          text: pair.left,
+        }))
+      : [];
 
-    const rights = (q as any).pairs.map((pair: any, pairIndex: number) => ({
-      pairIndex,
-      id: String(pair.id ?? `right-${pairIndex}`),
-      text: pair.right,
-    }));
+    const rights = matchingQ
+      ? matchingQ.pairs.map((pair: MatchingPair, pairIndex: number) => ({
+          pairIndex,
+          id: String(pair.id ?? `right-${pairIndex}`),
+          text: pair.right,
+        }))
+      : [];
 
     setShuffledMatchingLefts(shuffleSeeded(lefts, idx + attempt + 1));
     setShuffledMatchingRights(shuffleSeeded(rights, idx + attempt + 101));
@@ -546,6 +561,8 @@ export default function PartQuizScreen() {
 }, [topicId, subtopicId, levelId, partId, set, attempt]);
 
   const q = exercises[idx];
+  const matchingQ =
+    q?.type === "matching" ? (q as MatchingQuestion) : null;
   const total = exercises.length;
   const progress = total > 0 ? (idx + 1) / total : 0;
 
@@ -558,17 +575,18 @@ export default function PartQuizScreen() {
       : q.type === "fill_blank"
       ? typedAnswer.trim().toLowerCase() === q.answerText.trim().toLowerCase()
       : q.type === "matching"
-      ? (q as any).pairs.every((pair: any) => {
-          const rightIdx = matchedPairs[pair.left];
-          return rightIdx !== undefined && shuffledMatchingRights[rightIdx] === pair.right;
-        })
+        ? !!matchingQ &&
+          matchingQ.pairs.every((pair: MatchingPair) => {
+            const rightIdx = matchedPairs[pair.left];
+            return rightIdx !== undefined && shuffledMatchingRights[rightIdx] === pair.right;
+          })
       : false);
     const canCheck = useMemo(() => {
       if (!q || checked) return false;
       if (q.type === "mcq") return selectedAnswer !== null;
       if (q.type === "true_false") return selectedAnswer !== null;
       if (q.type === "fill_blank") return typedAnswer.trim().length > 0;
-      if (q.type === "matching") return Object.keys(matchedPairs).length === (q as any).pairs.length;
+      if (q.type === "matching") return !!matchingQ && Object.keys(matchedPairs).length === matchingQ.pairs.length;
       return false;
     }, [q, checked, selectedAnswer, typedAnswer, matchedPairs]);
 
