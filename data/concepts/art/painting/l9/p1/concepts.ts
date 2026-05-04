@@ -1,6 +1,350 @@
-const conceptSet = {
+type LocalConcept = {
+  id: string;
+  topicId: string;
+  subtopicId: string;
+  levelId: string;
+  partId: string;
+  relation: string;
+  subject: string;
+  object: string;
+  answerKind: "short" | "long";
+  difficulty: number;
+  distractorGroup: string;
+  tags: string[];
+  introducedIn?: "A" | "B" | "C";
+  factPriority?: "core" | "secondary";
+};
+
+type LocalConceptSet = {
+  id: string;
+  concepts: LocalConcept[];
+};
+
+const concepts: LocalConcept[] = [
+  {
+"id": "art_painting_l9_p1_associated_with_artist_001",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Pablo Picasso",
+"object": "Georges Braque",
+"answerKind": "short",
+"difficulty": 1,
+"distractorGroup": "artists",
+"tags": ["cubism", "braque", "modern art"],
+"introducedIn": "A",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_002",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Vincent van Gogh",
+"object": "Paul Gauguin",
+"answerKind": "short",
+"difficulty": 1,
+"distractorGroup": "artists",
+"tags": ["post-impressionism", "gauguin", "arles"],
+"introducedIn": "A",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_003",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Claude Monet",
+"object": "Pierre-Auguste Renoir",
+"answerKind": "short",
+"difficulty": 1,
+"distractorGroup": "artists",
+"tags": ["impressionism", "renoir", "paris"],
+"introducedIn": "A",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_004",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Salvador Dali",
+"object": "Rene Magritte",
+"answerKind": "short",
+"difficulty": 1,
+"distractorGroup": "artists",
+"tags": ["surrealism", "magritte", "dreams"],
+"introducedIn": "A",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_005",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Henri Matisse",
+"object": "Andre Derain",
+"answerKind": "short",
+"difficulty": 2,
+"distractorGroup": "artists",
+"tags": ["fauvism", "derain", "color"],
+"introducedIn": "A",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_006",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Wassily Kandinsky",
+"object": "Franz Marc",
+"answerKind": "short",
+"difficulty": 2,
+"distractorGroup": "artists",
+"tags": ["expressionism", "blue rider", "abstract"],
+"introducedIn": "A",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_007",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Andy Warhol",
+"object": "Roy Lichtenstein",
+"answerKind": "short",
+"difficulty": 2,
+"distractorGroup": "artists",
+"tags": ["pop art", "lichtenstein", "new york"],
+"introducedIn": "A",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_008",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Paul Cezanne",
+"object": "Camille Pissarro",
+"answerKind": "short",
+"difficulty": 2,
+"distractorGroup": "artists",
+"tags": ["post-impressionism", "pissarro", "mentor"],
+"introducedIn": "B",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_009",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Georges Seurat",
+"object": "Paul Signac",
+"answerKind": "short",
+"difficulty": 2,
+"distractorGroup": "artists",
+"tags": ["neo-impressionism", "pointillism", "signac"],
+"introducedIn": "B",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_010",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Kazimir Malevich",
+"object": "El Lissitzky",
+"answerKind": "short",
+"difficulty": 3,
+"distractorGroup": "artists",
+"tags": ["suprematism", "lissitzky", "russia"],
+"introducedIn": "B",
+"factPriority": "secondary"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_011",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Jackson Pollock",
+"object": "Lee Krasner",
+"answerKind": "short",
+"difficulty": 3,
+"distractorGroup": "artists",
+"tags": ["abstract expressionism", "krasner", "new york"],
+"introducedIn": "B",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_012",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Mark Rothko",
+"object": "Barnett Newman",
+"answerKind": "short",
+"difficulty": 3,
+"distractorGroup": "artists",
+"tags": ["color field", "newman", "abstract expressionism"],
+"introducedIn": "B",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_013",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Edward Hopper",
+"object": "Robert Henri",
+"answerKind": "short",
+"difficulty": 3,
+"distractorGroup": "artists",
+"tags": ["american realism", "henri", "new york"],
+"introducedIn": "B",
+"factPriority": "secondary"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_014",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Piet Mondrian",
+"object": "Theo van Doesburg",
+"answerKind": "short",
+"difficulty": 4,
+"distractorGroup": "artists",
+"tags": ["de stijl", "doesburg", "geometry"],
+"introducedIn": "C",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_015",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Georgia O'Keeffe",
+"object": "Alfred Stieglitz",
+"answerKind": "short",
+"difficulty": 4,
+"distractorGroup": "artists",
+"tags": ["american modernism", "stieglitz", "new york"],
+"introducedIn": "C",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_016",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Frida Kahlo",
+"object": "Diego Rivera",
+"answerKind": "short",
+"difficulty": 4,
+"distractorGroup": "artists",
+"tags": ["mexico", "rivera", "self-portrait"],
+"introducedIn": "C",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_017",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Paul Klee",
+"object": "Wassily Kandinsky",
+"answerKind": "short",
+"difficulty": 5,
+"distractorGroup": "artists",
+"tags": ["bauhaus", "kandinsky", "abstract"],
+"introducedIn": "C",
+"factPriority": "secondary"
+},
+{
+"id": "art_painting_l9_p1_associated_with_artist_018",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p1",
+"relation": "associated_with_artist",
+"subject": "Marc Chagall",
+"object": "Fernand Leger",
+"answerKind": "short",
+"difficulty": 5,
+"distractorGroup": "artists",
+"tags": ["paris", "school of paris", "leger"],
+"introducedIn": "C",
+"factPriority": "secondary"
+},
+{
+"id": "art_painting_l9_p2_lived_in_001",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p2",
+"relation": "lived_in",
+"subject": "Pablo Picasso",
+"object": "Paris",
+"answerKind": "short",
+"difficulty": 1,
+"distractorGroup": "cities",
+"tags": ["cubism", "france", "modern art"],
+"introducedIn": "A",
+"factPriority": "core"
+},
+{
+"id": "art_painting_l9_p2_lived_in_002",
+"topicId": "art",
+"subtopicId": "painting",
+"levelId": "l9",
+"partId": "p2",
+"relation": "lived_in",
+"subject": "Vincent van Gogh",
+"object": "Arles",
+"answerKind": "short",
+"difficulty": 1,
+"distractorGroup": "cities",
+"tags": ["post-impressionism", "france", "sunflowers"],
+"introducedIn": "A",
+"factPriority": "core"
+}
+]
+const conceptSet: LocalConceptSet = {
   id: "art_painting_l9_p1",
-  concepts: [],
+  concepts,
 };
 
 export default conceptSet;
