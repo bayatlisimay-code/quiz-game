@@ -5,6 +5,7 @@ import Animated, {
   useAnimatedRef,
   useAnimatedStyle,
   useScrollOffset,
+  type AnimatedStyle,
 } from 'react-native-reanimated';
 
 import { useColorScheme } from "../hooks/use-color-scheme";
@@ -27,7 +28,7 @@ export default function ParallaxScrollView({
   const colorScheme = useColorScheme() ?? 'light';
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollOffset(scrollRef);
-  const headerAnimatedStyle = useAnimatedStyle(() => {
+  const headerAnimatedStyle = useAnimatedStyle<AnimatedStyle<any>>(() => {
     return {
       transform: [
         {

@@ -421,14 +421,6 @@ export default function PartQuizScreen() {
   const prt = `p${String(partId)}`;
   const key = `${topicId}_${subtopicId}_${lvl}_${prt}`;
 
-  const conceptSet = CONCEPT_SETS[key];
-
-  if (!conceptSet) {
-    setExercises([]);
-    setLoading(false);
-    return;
-  }
-
   const setValue = String(set ?? "");
   const variant = setValue.includes("quizC") ? "C" : setValue.includes("quizB") ? "B" : "A";
 
@@ -462,9 +454,22 @@ export default function PartQuizScreen() {
   const prt = `p${String(partId)}`;
   const key = `${topicId}_${subtopicId}_${lvl}_${prt}`;
 
-  const conceptSet = CONCEPT_SETS[key];
+  const conceptSetsToUse: any[] =
+  lvl === "l10"
+    ? ["l1", "l2", "l3", "l4", "l5", "l6", "l7", "l8", "l9"]
+        .flatMap((reviewLevelId) => {
+          const sourcePartIds = getSourcePartIds(prt);
 
-  if (!conceptSet) {
+          return sourcePartIds
+            .map((sourcePartId) => {
+              const reviewKey = `${topicId}_${subtopicId}_${reviewLevelId}_${sourcePartId}`;
+              return CONCEPT_SETS[reviewKey];
+            })
+            .filter(Boolean);
+        })
+    : [CONCEPT_SETS[key]].filter(Boolean);
+
+  if (conceptSetsToUse.length === 0) {
     setExercises([]);
     setLoading(false);
     return;
@@ -503,11 +508,13 @@ export default function PartQuizScreen() {
 
   const sourcePartIds = getSourcePartIds(prt);
 
-  const concepts = conceptSet.concepts.filter(
-    (c: any) =>
-      c.levelId === lvl &&
-      sourcePartIds.includes(c.partId)
-  );
+  const concepts = conceptSetsToUse
+    .flatMap((cs) => cs.concepts)
+    .filter(
+      (c: any) =>
+        (lvl === "l10" || c.levelId === lvl) &&
+        sourcePartIds.includes(c.partId)
+    );
 
   const [minDifficulty, maxDifficulty] = getPartDifficultyRange(prt);
 
@@ -551,7 +558,7 @@ export default function PartQuizScreen() {
   const cConcepts = filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "C");
 
   const built = buildQuiz({
-    concepts: filteredConcepts,
+    concepts: filtered,
     variant,
     seed,
   });
