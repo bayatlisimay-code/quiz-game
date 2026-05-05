@@ -179,6 +179,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
+  switchText: {
+  color: "#888",
+  textAlign: "center",
+  marginTop: 8,
+  },
 });
 
 function getDeterministicType(
@@ -290,6 +295,7 @@ export default function PartQuizScreen() {
 
   const [idx, setIdx] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [fillMode, setFillMode] = useState<"input" | "options">("input");
   const [typedAnswer, setTypedAnswer] = useState("");
   const [checked, setChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
@@ -300,6 +306,7 @@ export default function PartQuizScreen() {
   const [matchedPairs, setMatchedPairs] = useState<Record<string, number>>({});
   const [shuffledMatchingLefts, setShuffledMatchingLefts] = useState<any[]>([]);
   const [shuffledMatchingRights, setShuffledMatchingRights] = useState<any[]>([]);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (!topicId || !subtopicId || !levelId || !partId) return;
@@ -576,7 +583,7 @@ export default function PartQuizScreen() {
   const correct =
     !!q &&
     (q.type === "mcq"
-      ? selectedAnswer === q.options[q.correctIndex]
+      ? selectedAnswer === (q as any).options[(q as any).correctIndex]
       : q.type === "true_false"
       ? selectedAnswer === (q.correctAnswer ? "true" : "false")
       : q.type === "fill_blank"
@@ -603,20 +610,25 @@ export default function PartQuizScreen() {
     let ok = false;
 
     if (q.type === "mcq") {
-      ok = q.options[q.correctIndex] === selectedAnswer;
+      ok = (q as any).options[(q as any).correctIndex] === selectedAnswer;
     } else if (q.type === "true_false") {
       ok = (selectedAnswer === "true") === q.correctAnswer;
     } if (q.type === "fill_blank") {
-        const user = normalizeText(typedAnswer);
+        if (fillMode === "input") {
+          const user = normalizeText(typedAnswer);
 
-        const acceptedAnswers = q.answerText
-          .split("|")
-          .map((answer) => normalizeText(answer));
+          const acceptedAnswers = q.answerText
+            .split("|")
+            .map((answer) => normalizeText(answer));
 
-        ok = acceptedAnswers.some((answer) => {
-          const distance = levenshtein(user, answer);
-          return distance <= 2;
-        });
+          ok = acceptedAnswers.some((answer) => {
+            const distance = levenshtein(user, answer);
+            return distance <= 2;
+          });
+        } else {
+          // options mode → use existing MCQ logic
+          ok = selectedOptionIndex === (q as any).correctIndex;
+        }
       } else if (q.type === "matching") {
       ok = (q as any).pairs.every((pair: any) => {
         const rightIdx = matchedPairs[pair.left];
@@ -683,6 +695,8 @@ export default function PartQuizScreen() {
     setSelectedLeft(null);
     setSelectedRight(null);
     setMatchedPairs({});
+    setFillMode("input");
+    setTypedAnswer("");
   };
 
 if (!hasQuizVariant) {
@@ -845,10 +859,10 @@ if (exercises.length === 0) {
       </Text>
 
       {q.type === "mcq" &&
-        q.options.map((opt) => {
+       (q as any).options.map((opt: string) => {
           const isSelected = selectedAnswer === opt;
 
-          const correctOpt = q.options[q.correctIndex];
+          const correctOpt = (q as any).options[(q as any).correctIndex];
           const isCorrectOpt = checked && opt === correctOpt;
           const isWrongSelected = checked && isSelected && opt !== correctOpt;
 
@@ -892,28 +906,57 @@ if (exercises.length === 0) {
         })}
 
       {q.type === "fill_blank" && (
-        <>
-          <TextInput
-            value={typedAnswer}
-            onChangeText={setTypedAnswer}
-            editable={!checked}
-            placeholder="Type your answer"
-            placeholderTextColor="#94A3B8"
-            style={[
-              styles.input,
-              typedAnswer.trim().length > 0 && !checked && styles.optionSelected,
-              checked && isCorrect === true && styles.optionCorrect,
-              checked && isCorrect === false && styles.optionWrong,
-            ]}
-          />
+        <View>
+          {fillMode === "input" ? (
+            <>
+              <TextInput
+                value={typedAnswer}
+                onChangeText={setTypedAnswer}
+                editable={!checked}
+                placeholder="Type your answer"
+                placeholderTextColor="#94A3B8"
+                style={[
+                  styles.input,
+                  typedAnswer.trim().length > 0 && !checked && styles.optionSelected,
+                  checked && isCorrect === true && styles.optionCorrect,
+                  checked && isCorrect === false && styles.optionWrong,
+                ]}
+              />
 
-          {checked && isCorrect === false && (
-            <Text style={styles.correctAnswerText}>
-              {q.prompt.replace("_____", q.answerText.split("|")[0])}
-            </Text>
+              <Pressable onPress={() => !checked && setFillMode("options")}>
+                <Text style={styles.switchText}>Use options instead</Text>
+              </Pressable>
+
+              {checked && isCorrect === false && (
+                <Text style={styles.correctAnswerText}>
+                  {q.prompt.replace("_____", q.answerText.split("|")[0])}
+                </Text>
+              )}
+            </>
+          ) : (
+            <>
+              {(q as any).options.map((opt: string, i: number) => (
+                <Pressable
+                  key={i}
+                  onPress={() => !checked && setSelectedOptionIndex(i)}
+                  style={[
+                    styles.option,
+                    selectedOptionIndex === i && styles.optionSelected,
+                    checked && i === (q as any).correctIndex && styles.optionCorrect,
+                    checked && selectedOptionIndex === i && i !== (q as any).correctIndex && styles.optionWrong,
+                  ]}
+                >
+                  <Text style={styles.optionText}>{opt}</Text>
+                </Pressable>
+              ))}
+
+              <Pressable onPress={() => !checked && setFillMode("input")}>
+                <Text style={styles.switchText}>Type instead</Text>
+              </Pressable>
+            </>
           )}
-        </>
-)}
+        </View>
+      )}
 
       {q.type === "matching" && (
         <View style={styles.matchingWrap}>
@@ -1013,7 +1056,12 @@ if (exercises.length === 0) {
         {!checked ? (
           <Pressable
             style={[styles.primaryButton, !canCheck && { opacity: 0.5 }]}
-            disabled={!canCheck}
+            disabled={
+              !canCheck ||
+              (q.type === "fill_blank" &&
+                fillMode === "input" &&
+                typedAnswer.trim().length === 0)
+            }
             onPress={onCheck}
           >
             <Text style={styles.primaryText}>Check</Text>
