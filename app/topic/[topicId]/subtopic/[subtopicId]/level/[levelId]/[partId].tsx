@@ -297,6 +297,7 @@ export default function PartQuizScreen() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [fillMode, setFillMode] = useState<"input" | "options">("input");
   const [typedAnswer, setTypedAnswer] = useState("");
+  const [fillAnswerPool, setFillAnswerPool] = useState<string[]>([]);
   const [checked, setChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
@@ -531,6 +532,10 @@ export default function PartQuizScreen() {
 
   const filteredConcepts = enrichConcepts(filteredRaw);
 
+  const fillAnswerPool = Array.from(
+    new Set(filteredConcepts.map((c: any) => String(c.object)))
+  );
+
   // Decide quiz variant from query param: "quizA" | "quizB" | "quizC"
   const setValue = String(set ?? "");
   const variant = setValue.includes("quizC")
@@ -575,6 +580,20 @@ export default function PartQuizScreen() {
 }, [topicId, subtopicId, levelId, partId, set, attempt]);
 
   const q = exercises[idx];
+
+  const fillAnswerOptions =
+    q?.type === "fill_blank"
+      ? shuffleSeeded(
+          [
+            q.answerText.split("|")[0],
+            ...fillAnswerPool
+              .filter((answer) => answer !== q.answerText.split("|")[0])
+              .slice(0, 3),
+          ],
+          idx + attempt + 303
+        )
+      : [];
+
   const matchingQ =
     q?.type === "matching" ? (q as MatchingQuestion) : null;
   const total = exercises.length;
@@ -599,10 +618,14 @@ export default function PartQuizScreen() {
       if (!q || checked) return false;
       if (q.type === "mcq") return selectedAnswer !== null;
       if (q.type === "true_false") return selectedAnswer !== null;
-      if (q.type === "fill_blank") return typedAnswer.trim().length > 0;
+      if (q.type === "fill_blank") {
+        return fillMode === "input"
+          ? typedAnswer.trim().length > 0
+          : selectedOptionIndex !== null;
+      }
       if (q.type === "matching") return !!matchingQ && Object.keys(matchedPairs).length === matchingQ.pairs.length;
       return false;
-    }, [q, checked, selectedAnswer, typedAnswer, matchedPairs]);
+    }, [q, checked, selectedAnswer, typedAnswer, fillMode, selectedOptionIndex, matchedPairs]);
 
   const onCheck = () => {
     if (!q) return;
@@ -613,7 +636,7 @@ export default function PartQuizScreen() {
       ok = (q as any).options[(q as any).correctIndex] === selectedAnswer;
     } else if (q.type === "true_false") {
       ok = (selectedAnswer === "true") === q.correctAnswer;
-    } if (q.type === "fill_blank") {
+    } else if (q.type === "fill_blank") {
         if (fillMode === "input") {
           const user = normalizeText(typedAnswer);
 
@@ -627,7 +650,9 @@ export default function PartQuizScreen() {
           });
         } else {
           // options mode → use existing MCQ logic
-          ok = selectedOptionIndex === (q as any).correctIndex;
+          ok =
+          selectedOptionIndex !== null &&
+          fillAnswerOptions[selectedOptionIndex] === q.answerText.split("|")[0];
         }
       } else if (q.type === "matching") {
       ok = (q as any).pairs.every((pair: any) => {
@@ -935,20 +960,42 @@ if (exercises.length === 0) {
             </>
           ) : (
             <>
-              {(q as any).options.map((opt: string, i: number) => (
-                <Pressable
-                  key={i}
-                  onPress={() => !checked && setSelectedOptionIndex(i)}
-                  style={[
-                    styles.option,
-                    selectedOptionIndex === i && styles.optionSelected,
-                    checked && i === (q as any).correctIndex && styles.optionCorrect,
-                    checked && selectedOptionIndex === i && i !== (q as any).correctIndex && styles.optionWrong,
-                  ]}
-                >
-                  <Text style={styles.optionText}>{opt}</Text>
-                </Pressable>
-              ))}
+              {fillAnswerOptions.map((opt: string, i: number) => {
+                const correctAnswer = q.answerText.split("|")[0];
+                const isSelected = selectedOptionIndex === i;
+                const isCorrectOption = checked && opt === correctAnswer;
+                const isWrongSelected = checked && isSelected && opt !== correctAnswer;
+
+                const fillAnswerOptions =
+                  q?.type === "fill_blank"
+                    ? shuffleSeeded(
+                        [
+                          q.answerText.split("|")[0],
+                          ...exercises
+                            .filter((exercise) => exercise.type === "fill_blank")
+                            .map((exercise) => exercise.answerText.split("|")[0])
+                            .filter((answer) => answer !== q.answerText.split("|")[0])
+                            .slice(0, 3),
+                        ],
+                        idx + attempt + 303
+                      )
+                    : [];
+
+                return (
+                  <Pressable
+                    key={`${opt}-${i}`}
+                    onPress={() => !checked && setSelectedOptionIndex(i)}
+                    style={[
+                      styles.option,
+                      !checked && isSelected && styles.optionSelected,
+                      isCorrectOption && styles.optionCorrect,
+                      isWrongSelected && styles.optionWrong,
+                    ]}
+                  >
+                    <Text style={styles.optionText}>{opt}</Text>
+                  </Pressable>
+                );
+              })}
 
               <Pressable onPress={() => !checked && setFillMode("input")}>
                 <Text style={styles.switchText}>Type instead</Text>
