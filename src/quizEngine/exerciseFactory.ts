@@ -372,11 +372,16 @@ export function buildExercise(
       prompt = `${String(concept.subject)} was ${relation.replace(/_/g, " ")} by _____.`;
     }
 
+    const options = pickFrom([correct, ...distractors], seed + 77, optionCount);
+    const correctIndex = options.findIndex((o) => o === correct);
+
     return {
       type: "fill_blank",
       conceptId: String(concept.id),
       prompt,
       answerText: correct,
+      options,
+      correctIndex,
     };
   };
 

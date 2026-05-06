@@ -297,7 +297,6 @@ export default function PartQuizScreen() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [fillMode, setFillMode] = useState<"input" | "options">("input");
   const [typedAnswer, setTypedAnswer] = useState("");
-  const [fillAnswerPool, setFillAnswerPool] = useState<string[]>([]);
   const [checked, setChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
@@ -491,6 +490,7 @@ export default function PartQuizScreen() {
 
   setIdx(0);
   setSelectedAnswer(null);
+  setSelectedOptionIndex(null);
   setTypedAnswer("");
   setChecked(false);
   setIsCorrect(null);
@@ -531,10 +531,6 @@ export default function PartQuizScreen() {
   );
 
   const filteredConcepts = enrichConcepts(filteredRaw);
-
-  const fillAnswerPool = Array.from(
-    new Set(filteredConcepts.map((c: any) => String(c.object)))
-  );
 
   // Decide quiz variant from query param: "quizA" | "quizB" | "quizC"
   const setValue = String(set ?? "");
@@ -582,16 +578,8 @@ export default function PartQuizScreen() {
   const q = exercises[idx];
 
   const fillAnswerOptions =
-    q?.type === "fill_blank"
-      ? shuffleSeeded(
-          [
-            q.answerText.split("|")[0],
-            ...fillAnswerPool
-              .filter((answer) => answer !== q.answerText.split("|")[0])
-              .slice(0, 3),
-          ],
-          idx + attempt + 303
-        )
+    q?.type === "fill_blank" && (q as any).options
+      ? (q as any).options
       : [];
 
   const matchingQ =
@@ -655,11 +643,13 @@ export default function PartQuizScreen() {
           fillAnswerOptions[selectedOptionIndex] === q.answerText.split("|")[0];
         }
       } else if (q.type === "matching") {
-      ok = (q as any).pairs.every((pair: any) => {
-        const rightIdx = matchedPairs[pair.left];
-        return rightIdx !== undefined && shuffledMatchingRights[rightIdx] === pair.right;
-      });
-    }
+        ok = shuffledMatchingLefts.every((leftItem, leftIndex) => {
+          const rightIdx = matchedPairs[leftIndex];
+          if (rightIdx === undefined) return false;
+          const rightItem = shuffledMatchingRights[rightIdx];
+          return rightItem && rightItem.pairIndex === leftItem.pairIndex;
+        });
+      }
 
     setChecked(true);
     setIsCorrect(ok);
@@ -722,6 +712,7 @@ export default function PartQuizScreen() {
     setMatchedPairs({});
     setFillMode("input");
     setTypedAnswer("");
+    setSelectedOptionIndex(null);
   };
 
 if (!hasQuizVariant) {
@@ -965,21 +956,6 @@ if (exercises.length === 0) {
                 const isSelected = selectedOptionIndex === i;
                 const isCorrectOption = checked && opt === correctAnswer;
                 const isWrongSelected = checked && isSelected && opt !== correctAnswer;
-
-                const fillAnswerOptions =
-                  q?.type === "fill_blank"
-                    ? shuffleSeeded(
-                        [
-                          q.answerText.split("|")[0],
-                          ...exercises
-                            .filter((exercise) => exercise.type === "fill_blank")
-                            .map((exercise) => exercise.answerText.split("|")[0])
-                            .filter((answer) => answer !== q.answerText.split("|")[0])
-                            .slice(0, 3),
-                        ],
-                        idx + attempt + 303
-                      )
-                    : [];
 
                 return (
                   <Pressable

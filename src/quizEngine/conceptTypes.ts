@@ -76,6 +76,8 @@ export type MatchingExercise = {
     conceptId: string;
     prompt: string;
     answerText: string;
+    options?: string[];
+    correctIndex?: number;
   };
 
   export type Exercise =
