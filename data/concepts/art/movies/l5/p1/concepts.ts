@@ -21,7 +21,7 @@ type LocalConceptSet = {
 };
 
 const concepts: LocalConcept[] = [
-  {
+{
 "id": "art_movies_l5_p1_role_in_filmmaking_001",
 "topicId": "art",
 "subtopicId": "movies",
