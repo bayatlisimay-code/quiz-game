@@ -237,7 +237,7 @@ levelId: "l2",
 partId: "p4",
 relation: "known_for_style",
 subject: "Jørn Utzon",
-object: "Expressionism",
+object: "Expressionist Modernism",
 answerKind: "short",
 difficulty: 2,
 distractorGroup: "architect_styles",
@@ -269,7 +269,7 @@ levelId: "l2",
 partId: "p4",
 relation: "known_for_style",
 subject: "Zaha Hadid",
-object: "Parametricism",
+object: "Deconstructivism",
 answerKind: "short",
 difficulty: 2,
 distractorGroup: "architect_styles",
@@ -317,4 +317,3 @@ concepts
 };
 
 export default conceptSet;
-

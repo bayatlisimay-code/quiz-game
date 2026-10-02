@@ -157,7 +157,7 @@ levelId: "l3",
 partId: "p4",
 relation: "characteristic_of_architectural_style",
 subject: "Mughal Architecture",
-object: "Onion domes, strict symmetry, and inlaid marble decoration",
+object: "Bulbous domes, strict symmetry, and inlaid marble decoration",
 answerKind: "short",
 difficulty: 3,
 distractorGroup: "architectural_style_characteristics",
@@ -317,4 +317,3 @@ concepts
 };
 
 export default conceptSet;
-
