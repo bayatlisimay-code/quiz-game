@@ -1,23 +1,23 @@
 type LocalConcept = {
-  id: string;
-  topicId: string;
-  subtopicId: string;
-  levelId: string;
-  partId: string;
-  relation: string;
-  subject: string;
-  object: string;
-  answerKind: "short" | "long";
-  difficulty: number;
-  distractorGroup: string;
-  tags: string[];
-  introducedIn?: "A" | "B" | "C";
-  factPriority?: "core" | "secondary";
+id: string;
+topicId: string;
+subtopicId: string;
+levelId: string;
+partId: string;
+relation: string;
+subject: string;
+object: string;
+answerKind: "short" | "long";
+difficulty: number;
+distractorGroup: string;
+tags: string[];
+introducedIn?: "A" | "B" | "C";
+factPriority?: "core" | "secondary";
 };
 
 type LocalConceptSet = {
-  id: string;
-  concepts: LocalConcept[];
+id: string;
+concepts: LocalConcept[];
 };
 
 const concepts: LocalConcept[] = [
@@ -111,7 +111,7 @@ const concepts: LocalConcept[] = [
 "subject": "Massimo Vignelli",
 "object": "Graphic design",
 "answerKind": "short",
-"difficulty": 2,
+"difficulty": 1,
 "distractorGroup": "design_styles_fields",
 "tags": ["design", "designers", "level_2"],
 "introducedIn": "A",
@@ -205,7 +205,7 @@ const concepts: LocalConcept[] = [
 "partId": "p4",
 "relation": "known_for_field_or_style",
 "subject": "George Carwardine",
-"object": "Industrial design",
+"object": "Lighting design",
 "answerKind": "short",
 "difficulty": 2,
 "distractorGroup": "design_styles_fields",
@@ -312,8 +312,8 @@ const concepts: LocalConcept[] = [
 ];
 
 const conceptSet: LocalConceptSet = {
-  id: "art_design_l2_p4",
-  concepts,
+id: "art_design_l2_p4_known_for_field_or_style",
+concepts,
 };
 
 export default conceptSet;

@@ -1,23 +1,23 @@
 type LocalConcept = {
-  id: string;
-  topicId: string;
-  subtopicId: string;
-  levelId: string;
-  partId: string;
-  relation: string;
-  subject: string;
-  object: string;
-  answerKind: "short" | "long";
-  difficulty: number;
-  distractorGroup: string;
-  tags: string[];
-  introducedIn?: "A" | "B" | "C";
-  factPriority?: "core" | "secondary";
+id: string;
+topicId: string;
+subtopicId: string;
+levelId: string;
+partId: string;
+relation: string;
+subject: string;
+object: string;
+answerKind: "short" | "long";
+difficulty: number;
+distractorGroup: string;
+tags: string[];
+introducedIn?: "A" | "B" | "C";
+factPriority?: "core" | "secondary";
 };
 
 type LocalConceptSet = {
-  id: string;
-  concepts: LocalConcept[];
+id: string;
+concepts: LocalConcept[];
 };
 
 const concepts: LocalConcept[] = [
@@ -237,7 +237,7 @@ const concepts: LocalConcept[] = [
 "partId": "p2",
 "relation": "reaction_against",
 "subject": "Pop Design",
-"object": "Durable Good Design ideals",
+"object": "Restrained functionalist Good Design ideals",
 "answerKind": "short",
 "difficulty": 4,
 "distractorGroup": "movement_reactions",
@@ -311,10 +311,9 @@ const concepts: LocalConcept[] = [
 }
 ];
 
-
 const conceptSet: LocalConceptSet = {
-  id: "art_design_l6_p2",
-  concepts,
+id: "art_design_l6_p2",
+concepts,
 };
 
 export default conceptSet;

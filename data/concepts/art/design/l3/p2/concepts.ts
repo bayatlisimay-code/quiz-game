@@ -1,23 +1,23 @@
 type LocalConcept = {
-  id: string;
-  topicId: string;
-  subtopicId: string;
-  levelId: string;
-  partId: string;
-  relation: string;
-  subject: string;
-  object: string;
-  answerKind: "short" | "long";
-  difficulty: number;
-  distractorGroup: string;
-  tags: string[];
-  introducedIn?: "A" | "B" | "C";
-  factPriority?: "core" | "secondary";
+id: string;
+topicId: string;
+subtopicId: string;
+levelId: string;
+partId: string;
+relation: string;
+subject: string;
+object: string;
+answerKind: "short" | "long";
+difficulty: number;
+distractorGroup: string;
+tags: string[];
+introducedIn?: "A" | "B" | "C";
+factPriority?: "core" | "secondary";
 };
 
 type LocalConceptSet = {
-  id: string;
-  concepts: LocalConcept[];
+id: string;
+concepts: LocalConcept[];
 };
 
 const concepts: LocalConcept[] = [
@@ -29,7 +29,7 @@ const concepts: LocalConcept[] = [
 "partId": "p2",
 "relation": "period_of_movement",
 "subject": "Arts and Crafts",
-"object": "1880s–1910s",
+"object": "1860s–1910s",
 "answerKind": "short",
 "difficulty": 2,
 "distractorGroup": "design_movement_periods",
@@ -312,8 +312,8 @@ const concepts: LocalConcept[] = [
 ];
 
 const conceptSet: LocalConceptSet = {
-  id: "art_design_l3_p2",
-  concepts,
+id: "art_design_l3_p2",
+concepts,
 };
 
 export default conceptSet;

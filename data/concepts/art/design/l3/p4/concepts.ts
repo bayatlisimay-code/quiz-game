@@ -1,23 +1,23 @@
 type LocalConcept = {
-  id: string;
-  topicId: string;
-  subtopicId: string;
-  levelId: string;
-  partId: string;
-  relation: string;
-  subject: string;
-  object: string;
-  answerKind: "short" | "long";
-  difficulty: number;
-  distractorGroup: string;
-  tags: string[];
-  introducedIn?: "A" | "B" | "C";
-  factPriority?: "core" | "secondary";
+id: string;
+topicId: string;
+subtopicId: string;
+levelId: string;
+partId: string;
+relation: string;
+subject: string;
+object: string;
+answerKind: "short" | "long";
+difficulty: number;
+distractorGroup: string;
+tags: string[];
+introducedIn?: "A" | "B" | "C";
+factPriority?: "core" | "secondary";
 };
 
 type LocalConceptSet = {
-  id: string;
-  concepts: LocalConcept[];
+id: string;
+concepts: LocalConcept[];
 };
 
 const concepts: LocalConcept[] = [
@@ -29,7 +29,7 @@ const concepts: LocalConcept[] = [
 "partId": "p4",
 "relation": "characteristic_of_movement",
 "subject": "Arts and Crafts",
-"object": "Traditional craftsmanship valued over industrial mass production",
+"object": "Emphasis on traditional craftsmanship over industrial mass production",
 "answerKind": "long",
 "difficulty": 2,
 "distractorGroup": "design_movement_characteristics",
@@ -157,7 +157,7 @@ const concepts: LocalConcept[] = [
 "partId": "p4",
 "relation": "characteristic_of_movement",
 "subject": "Mid-Century Modern",
-"object": "Organic curves in new materials such as molded plywood and fiberglass",
+"object": "Organic curves using new materials such as molded plywood and fiberglass",
 "answerKind": "long",
 "difficulty": 2,
 "distractorGroup": "design_movement_characteristics",
@@ -237,7 +237,7 @@ const concepts: LocalConcept[] = [
 "partId": "p4",
 "relation": "characteristic_of_movement",
 "subject": "Pop Design",
-"object": "Bright molded-plastic forms inspired by pop and space-age culture",
+"object": "Brightly colored molded-plastic forms inspired by popular and space-age culture",
 "answerKind": "long",
 "difficulty": 3,
 "distractorGroup": "design_movement_characteristics",
@@ -269,7 +269,7 @@ const concepts: LocalConcept[] = [
 "partId": "p4",
 "relation": "characteristic_of_movement",
 "subject": "Deutscher Werkbund",
-"object": "High-quality design combined with standardized industrial production",
+"object": "Combining high-quality design with standardized industrial production",
 "answerKind": "long",
 "difficulty": 3,
 "distractorGroup": "design_movement_characteristics",
@@ -312,8 +312,8 @@ const concepts: LocalConcept[] = [
 ];
 
 const conceptSet: LocalConceptSet = {
-  id: "art_design_l3_p4",
-  concepts,
+id: "art_design_l3_p4",
+concepts,
 };
 
 export default conceptSet;

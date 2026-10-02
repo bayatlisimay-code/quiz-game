@@ -1,23 +1,23 @@
 type LocalConcept = {
-  id: string;
-  topicId: string;
-  subtopicId: string;
-  levelId: string;
-  partId: string;
-  relation: string;
-  subject: string;
-  object: string;
-  answerKind: "short" | "long";
-  difficulty: number;
-  distractorGroup: string;
-  tags: string[];
-  introducedIn?: "A" | "B" | "C";
-  factPriority?: "core" | "secondary";
+id: string;
+topicId: string;
+subtopicId: string;
+levelId: string;
+partId: string;
+relation: string;
+subject: string;
+object: string;
+answerKind: "short" | "long";
+difficulty: number;
+distractorGroup: string;
+tags: string[];
+introducedIn?: "A" | "B" | "C";
+factPriority?: "core" | "secondary";
 };
 
 type LocalConceptSet = {
-  id: string;
-  concepts: LocalConcept[];
+id: string;
+concepts: LocalConcept[];
 };
 
 const concepts: LocalConcept[] = [
@@ -253,7 +253,7 @@ const concepts: LocalConcept[] = [
 "partId": "p1",
 "relation": "designer_of_product",
 "subject": "iMac G3",
-"object": "Jonathan Ive",
+"object": "Jony Ive",
 "answerKind": "short",
 "difficulty": 4,
 "distractorGroup": "product_furniture_designers",
@@ -312,8 +312,8 @@ const concepts: LocalConcept[] = [
 ];
 
 const conceptSet: LocalConceptSet = {
-  id: "art_design_l8_p1",
-  concepts,
+id: "art_design_l8_p1",
+concepts,
 };
 
 export default conceptSet;

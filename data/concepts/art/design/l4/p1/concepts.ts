@@ -1,23 +1,23 @@
 type LocalConcept = {
-  id: string;
-  topicId: string;
-  subtopicId: string;
-  levelId: string;
-  partId: string;
-  relation: string;
-  subject: string;
-  object: string;
-  answerKind: "short" | "long";
-  difficulty: number;
-  distractorGroup: string;
-  tags: string[];
-  introducedIn?: "A" | "B" | "C";
-  factPriority?: "core" | "secondary";
+id: string;
+topicId: string;
+subtopicId: string;
+levelId: string;
+partId: string;
+relation: string;
+subject: string;
+object: string;
+answerKind: "short" | "long";
+difficulty: number;
+distractorGroup: string;
+tags: string[];
+introducedIn?: "A" | "B" | "C";
+factPriority?: "core" | "secondary";
 };
 
 type LocalConceptSet = {
-  id: string;
-  concepts: LocalConcept[];
+id: string;
+concepts: LocalConcept[];
 };
 
 const concepts: LocalConcept[] = [
@@ -205,7 +205,7 @@ const concepts: LocalConcept[] = [
 "partId": "p1",
 "relation": "core_feature_of_design_field",
 "subject": "Editorial Design",
-"object": "Structuring text and images for magazines, newspapers, and books",
+"object": "Structuring text and images for clear and engaging publications",
 "answerKind": "long",
 "difficulty": 2,
 "distractorGroup": "design_field_features",
@@ -253,7 +253,7 @@ const concepts: LocalConcept[] = [
 "partId": "p1",
 "relation": "core_feature_of_design_field",
 "subject": "Title Sequence Design",
-"object": "Designing animated opening credits that set the tone of a film",
+"object": "Designing opening credit sequences that introduce a film and establish its visual tone",
 "answerKind": "long",
 "difficulty": 3,
 "distractorGroup": "design_field_features",
@@ -284,8 +284,8 @@ const concepts: LocalConcept[] = [
 "levelId": "l4",
 "partId": "p1",
 "relation": "core_feature_of_design_field",
-"subject": "Glass Design",
-"object": "Shaping glass into functional and decorative objects",
+"subject": "Book Design",
+"object": "Shaping a book's typography, page structure, cover, and visual organization",
 "answerKind": "long",
 "difficulty": 3,
 "distractorGroup": "design_field_features",
@@ -312,8 +312,8 @@ const concepts: LocalConcept[] = [
 ];
 
 const conceptSet: LocalConceptSet = {
-  id: "art_design_l4_p1",
-  concepts,
+id: "art_design_l4_p1",
+concepts,
 };
 
 export default conceptSet;

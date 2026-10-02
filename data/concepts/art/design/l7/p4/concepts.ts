@@ -1,23 +1,23 @@
 type LocalConcept = {
-  id: string;
-  topicId: string;
-  subtopicId: string;
-  levelId: string;
-  partId: string;
-  relation: string;
-  subject: string;
-  object: string;
-  answerKind: "short" | "long";
-  difficulty: number;
-  distractorGroup: string;
-  tags: string[];
-  introducedIn?: "A" | "B" | "C";
-  factPriority?: "core" | "secondary";
+id: string;
+topicId: string;
+subtopicId: string;
+levelId: string;
+partId: string;
+relation: string;
+subject: string;
+object: string;
+answerKind: "short" | "long";
+difficulty: number;
+distractorGroup: string;
+tags: string[];
+introducedIn?: "A" | "B" | "C";
+factPriority?: "core" | "secondary";
 };
 
 type LocalConceptSet = {
-  id: string;
-  concepts: LocalConcept[];
+id: string;
+concepts: LocalConcept[];
 };
 
 const concepts: LocalConcept[] = [
@@ -109,7 +109,7 @@ const concepts: LocalConcept[] = [
 "partId": "p4",
 "relation": "visual_characteristic_of",
 "subject": "Munich 1972 Olympic Visual Identity",
-"object": "A pastel rainbow palette paired with simple geometric pictograms",
+"object": "A rainbow-derived color palette paired with simple geometric pictograms",
 "answerKind": "long",
 "difficulty": 3,
 "distractorGroup": "visual_design_characteristics",
@@ -312,8 +312,8 @@ const concepts: LocalConcept[] = [
 ];
 
 const conceptSet: LocalConceptSet = {
-  id: "art_design_l7_p4",
-  concepts,
+id: "art_design_l7_p4",
+concepts,
 };
 
 export default conceptSet;

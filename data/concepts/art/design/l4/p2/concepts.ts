@@ -1,23 +1,23 @@
 type LocalConcept = {
-  id: string;
-  topicId: string;
-  subtopicId: string;
-  levelId: string;
-  partId: string;
-  relation: string;
-  subject: string;
-  object: string;
-  answerKind: "short" | "long";
-  difficulty: number;
-  distractorGroup: string;
-  tags: string[];
-  introducedIn?: "A" | "B" | "C";
-  factPriority?: "core" | "secondary";
+id: string;
+topicId: string;
+subtopicId: string;
+levelId: string;
+partId: string;
+relation: string;
+subject: string;
+object: string;
+answerKind: "short" | "long";
+difficulty: number;
+distractorGroup: string;
+tags: string[];
+introducedIn?: "A" | "B" | "C";
+factPriority?: "core" | "secondary";
 };
 
 type LocalConceptSet = {
-  id: string;
-  concepts: LocalConcept[];
+id: string;
+concepts: LocalConcept[];
 };
 
 const concepts: LocalConcept[] = [
@@ -284,8 +284,8 @@ const concepts: LocalConcept[] = [
 "levelId": "l4",
 "partId": "p2",
 "relation": "example_of_design_field",
-"subject": "Glass Design",
-"object": "Savoy Vase",
+"subject": "Book Design",
+"object": "Penguin Books Cover System",
 "answerKind": "short",
 "difficulty": 3,
 "distractorGroup": "design_field_examples",
@@ -311,10 +311,9 @@ const concepts: LocalConcept[] = [
 }
 ];
 
-
 const conceptSet: LocalConceptSet = {
-  id: "art_design_l4_p2",
-  concepts,
+id: "art_design_l4_p2",
+concepts,
 };
 
 export default conceptSet;

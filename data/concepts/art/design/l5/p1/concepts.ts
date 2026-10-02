@@ -1,23 +1,23 @@
 type LocalConcept = {
-  id: string;
-  topicId: string;
-  subtopicId: string;
-  levelId: string;
-  partId: string;
-  relation: string;
-  subject: string;
-  object: string;
-  answerKind: "short" | "long";
-  difficulty: number;
-  distractorGroup: string;
-  tags: string[];
-  introducedIn?: "A" | "B" | "C";
-  factPriority?: "core" | "secondary";
+id: string;
+topicId: string;
+subtopicId: string;
+levelId: string;
+partId: string;
+relation: string;
+subject: string;
+object: string;
+answerKind: "short" | "long";
+difficulty: number;
+distractorGroup: string;
+tags: string[];
+introducedIn?: "A" | "B" | "C";
+factPriority?: "core" | "secondary";
 };
 
 type LocalConceptSet = {
-  id: string;
-  concepts: LocalConcept[];
+id: string;
+concepts: LocalConcept[];
 };
 
 const concepts: LocalConcept[] = [
@@ -173,7 +173,7 @@ const concepts: LocalConcept[] = [
 "partId": "p1",
 "relation": "definition_of_design_principle",
 "subject": "Rhythm",
-"object": "Arranging repeated elements at patterned intervals",
+"object": "Creating a sense of movement through repeated or varied visual patterns",
 "answerKind": "long",
 "difficulty": 2,
 "distractorGroup": "design_principle_definitions",
@@ -312,9 +312,8 @@ const concepts: LocalConcept[] = [
 ];
 
 const conceptSet: LocalConceptSet = {
-  id: "art_design_l5_p1",
-  concepts,
+id: "art_design_l5_p1",
+concepts,
 };
 
 export default conceptSet;
-
