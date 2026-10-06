@@ -309,38 +309,6 @@ const concepts: LocalConcept[] = [
 "introducedIn": "C",
 "factPriority": "secondary"
 },
-{
-"id": "art_painting_l9_p2_lived_in_001",
-"topicId": "art",
-"subtopicId": "painting",
-"levelId": "l9",
-"partId": "p2",
-"relation": "lived_in",
-"subject": "Pablo Picasso",
-"object": "Paris",
-"answerKind": "short",
-"difficulty": 1,
-"distractorGroup": "cities",
-"tags": ["cubism", "france", "modern art"],
-"introducedIn": "A",
-"factPriority": "core"
-},
-{
-"id": "art_painting_l9_p2_lived_in_002",
-"topicId": "art",
-"subtopicId": "painting",
-"levelId": "l9",
-"partId": "p2",
-"relation": "lived_in",
-"subject": "Vincent van Gogh",
-"object": "Arles",
-"answerKind": "short",
-"difficulty": 1,
-"distractorGroup": "cities",
-"tags": ["post-impressionism", "france", "sunflowers"],
-"introducedIn": "A",
-"factPriority": "core"
-}
 ]
 const conceptSet: LocalConceptSet = {
   id: "art_painting_l9_p1",

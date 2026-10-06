@@ -311,7 +311,7 @@ const concepts: LocalConcept[] = [
 ]
 
 const conceptSet: LocalConceptSet = {
-  id: "art_painting_l3_p4",
+  id: "art_painting_l4_p1",
   concepts,
 };
 
