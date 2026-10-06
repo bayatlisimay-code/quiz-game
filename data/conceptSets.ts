@@ -10,9 +10,9 @@ import concepts_art_painting_l2_p3_concepts from "./concepts/art/painting/l2/p3/
 import concepts_art_painting_l2_p4_concepts from "./concepts/art/painting/l2/p4/concepts";
 import concepts_art_painting_l2_p5_concepts from "./concepts/art/painting/l2/p5/concepts";
 
-import concepts_art_painting_l3_p3_concepts from "./concepts/art/painting/l2/p3/concepts";
-import concepts_art_painting_l3_p1_concepts from "./concepts/art/painting/l3/p1/concepts";
+import concepts_art_painting_l3_p1_concepts from "./concepts/art/painting/l2/p1/concepts";
 import concepts_art_painting_l3_p2_concepts from "./concepts/art/painting/l3/p2/concepts";
+import concepts_art_painting_l3_p3_concepts from "./concepts/art/painting/l3/p3/concepts";
 import concepts_art_painting_l3_p4_concepts from "./concepts/art/painting/l3/p4/concepts";
 import concepts_art_painting_l3_p5_concepts from "./concepts/art/painting/l3/p5/concepts";
 
@@ -369,11 +369,11 @@ import concepts_art_sculpture_l2_p3_concepts from "./concepts/art/sculpture/l2/p
 import concepts_art_sculpture_l2_p4_concepts from "./concepts/art/sculpture/l2/p4/concepts";
 import concepts_art_sculpture_l2_p5_concepts from "./concepts/art/sculpture/l2/p5/concepts";
 
-import concepts_art_sculpture_l3_p1_concepts from "./concepts/art/sculpture/l4/p1/concepts";
-import concepts_art_sculpture_l3_p2_concepts from "./concepts/art/sculpture/l4/p2/concepts";
-import concepts_art_sculpture_l3_p3_concepts from "./concepts/art/sculpture/l4/p3/concepts";
-import concepts_art_sculpture_l3_p4_concepts from "./concepts/art/sculpture/l4/p4/concepts";
-import concepts_art_sculpture_l3_p5_concepts from "./concepts/art/sculpture/l4/p5/concepts";
+import concepts_art_sculpture_l3_p1_concepts from "./concepts/art/sculpture/l3/p1/concepts";
+import concepts_art_sculpture_l3_p2_concepts from "./concepts/art/sculpture/l3/p2/concepts";
+import concepts_art_sculpture_l3_p3_concepts from "./concepts/art/sculpture/l3/p3/concepts";
+import concepts_art_sculpture_l3_p4_concepts from "./concepts/art/sculpture/l3/p4/concepts";
+import concepts_art_sculpture_l3_p5_concepts from "./concepts/art/sculpture/l3/p5/concepts";
 
 import concepts_art_sculpture_l4_p1_concepts from "./concepts/art/sculpture/l4/p1/concepts";
 import concepts_art_sculpture_l4_p2_concepts from "./concepts/art/sculpture/l4/p2/concepts";
