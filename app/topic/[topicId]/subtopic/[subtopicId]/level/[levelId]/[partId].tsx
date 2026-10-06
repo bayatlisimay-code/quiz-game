@@ -12,7 +12,9 @@ import {
   getPartPath,
 } from "../../../../../../../lib/routes";
 import { buildQuiz } from "../../../../../../../src/quizEngine/buildQuiz";
-import type { Exercise } from "../../../../../../../src/quizEngine/conceptTypes";
+import { QuizImage } from "../../../../../../../components/quiz/QuizImage";
+import { attachQuizImages } from "../../../../../../../src/images/attachQuizImages";
+import type { PresentedExercise } from "../../../../../../../src/images/types";
 import { enrichConcepts } from "../../../../../../../src/quizEngine/enrichConcepts";
 import { saveLastLocation } from "../../../../../../../src/state/lastLocation";
 import { getCompletedQuizVariants, markQuizVariantCompleted } from "../../../../../../../src/state/progress";
@@ -286,7 +288,7 @@ export default function PartQuizScreen() {
 
   const [attempt, setAttempt] = useState(0);
 
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [exercises, setExercises] = useState<PresentedExercise[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [quizAUnlocked, setQuizAUnlocked] = useState(true);
@@ -571,7 +573,8 @@ export default function PartQuizScreen() {
     seed,
   });
 
-  setExercises(built);
+  const presented = attachQuizImages(built);
+  setExercises(presented);
   setLoading(false);
 }, [topicId, subtopicId, levelId, partId, set, attempt]);
 
@@ -873,6 +876,8 @@ if (exercises.length === 0) {
       <Text style={styles.question}>
         {q.type === "true_false" ? q.statement : q.prompt}
       </Text>
+
+      {q.type !== "matching" && q.image && <QuizImage image={q.image} />}
 
       {q.type === "mcq" &&
        (q as any).options.map((opt: string) => {
