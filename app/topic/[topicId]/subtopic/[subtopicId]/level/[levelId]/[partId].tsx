@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { TOPIC_BY_ID } from "../../../../../../../data/catalog";
 import { CONCEPT_SETS } from "../../../../../../../data/conceptSets";
@@ -310,27 +310,33 @@ export default function PartQuizScreen() {
   const [shuffledMatchingRights, setShuffledMatchingRights] = useState<any[]>([]);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (!topicId || !subtopicId || !levelId || !partId) return;
+  useFocusEffect(
+    useCallback(() => {
+      if (!topicId || !subtopicId || !levelId || !partId) return;
 
-    (async () => {
-      const completed = await getCompletedQuizVariants(
-        String(topicId),
-        String(subtopicId),
-        String(levelId),
-        String(partId)
-      );
+      let active = true;
 
-      console.log("completed variants for this part:", completed);
+      (async () => {
+        const completed = await getCompletedQuizVariants(
+          String(topicId),
+          String(subtopicId),
+          String(levelId),
+          String(partId)
+        );
+        if (!active) return;
 
-      const hasA = completed.includes("A");
-      const hasB = completed.includes("B");
+        console.log("completed variants for this part:", completed);
 
-      setQuizAUnlocked(true);
-      setQuizBUnlocked(hasA);
-      setQuizCUnlocked(hasB);
-    })();
-  }, [topicId, subtopicId, levelId, partId]);
+        setQuizAUnlocked(true);
+        setQuizBUnlocked(completed.includes("A"));
+        setQuizCUnlocked(completed.includes("B"));
+      })();
+
+      return () => {
+        active = false;
+      };
+    }, [topicId, subtopicId, levelId, partId])
+  );
 
   useEffect(() => {
     const q = exercises[idx];
