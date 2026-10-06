@@ -8,7 +8,7 @@ import type {
 } from "./conceptTypes";
 import { enrichConcepts } from "./enrichConcepts";
 import { createFactTracker } from "./factTracker";
-import { renderPrompt } from "./templates";
+import { getRelationTemplate, renderPrompt } from "./templates";
 
 function hashString(s: string) {
   let h = 2166136261;
@@ -214,7 +214,9 @@ function buildTrueFalse(concept: Concept, pool: Concept[]): Exercise {
     };
   }
 
-  const falseStatement = trueStatement.replace(correct, wrong);
+  const falseStatement = getRelationTemplate(concept.relation).statement(
+    concept.subject, wrong, concept.context
+  );
 
   return {
     type: "true_false",
@@ -230,7 +232,7 @@ function buildFillBlank(concept: Concept): Exercise {
   return {
     type: "fill_blank",
     conceptId: concept.id,
-    prompt: rendered.prompt,
+    prompt: getRelationTemplate(concept.relation).blank(concept.subject, concept.context),
     answerText: rendered.answerText.trim(),
   };
 }
@@ -282,6 +284,8 @@ export function buildExercise(
 
   // We try MCQ first, but only if we can find enough distractors.
   const correct = String(concept.object);
+  const template = getRelationTemplate(String(concept.relation));
+  const subject = String(concept.subject);
 
   // 1) best distractors: same distractorGroup (if you have it)
   const sameGroup = allConcepts.filter(
@@ -315,15 +319,7 @@ export function buildExercise(
     const options = pickFrom([correct, ...distractors], seed + 99, optionCount);
     const correctIndex = options.findIndex((o) => o === correct);
 
-    const relation = String(concept.relation);
-
-    let prompt = "";
-
-    if (relation === "painted_by") {
-      prompt = `Who painted ${String(concept.subject)}?`;
-    } else {
-      prompt = `Who ${relation.replace(/_/g, " ")} ${String(concept.subject)}?`;
-    }
+    const prompt = template.question(subject, concept.context);
 
     return {
       type: "mcq",
@@ -341,15 +337,7 @@ export function buildExercise(
     const truth = (seed % 2) === 0;
     const shown = truth ? correct : wrong;
 
-    const relation = String(concept.relation);
-
-    let statement = "";
-
-    if (relation === "painted_by") {
-      statement = `${String(concept.subject)} was painted by ${shown}.`;
-    } else {
-      statement = `${String(concept.subject)} was ${relation.replace(/_/g, " ")} by ${shown}.`;
-    }
+    const statement = template.statement(subject, shown, concept.context);
 
     return {
       type: "true_false",
@@ -362,15 +350,7 @@ export function buildExercise(
 
   // Helper: build Fill-in-the-blank (THIS WILL SHOW A BLANK)
   const buildBlank = (): Exercise => {
-    const relation = String(concept.relation);
-
-    let prompt = "";
-
-    if (relation === "painted_by") {
-      prompt = `${String(concept.subject)} was painted by _____.`;
-    } else {
-      prompt = `${String(concept.subject)} was ${relation.replace(/_/g, " ")} by _____.`;
-    }
+    const prompt = template.blank(subject, concept.context);
 
     const options = pickFrom([correct, ...distractors], seed + 77, optionCount);
     const correctIndex = options.findIndex((o) => o === correct);
