@@ -1,9 +1,15 @@
+import { ART_CURRICULUM_VERSION } from "../../../../../../../data/artCurriculum";
+import { attemptMatchingPair, visibleMatchingPairs } from "../../../../../../../src/quizEngine/matchingInteraction";
+import type { MatchingInteraction } from "../../../../../../../src/quizEngine/matchingInteraction";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { TOPIC_BY_ID } from "../../../../../../../data/catalog";
-import { CONCEPT_SETS } from "../../../../../../../data/conceptSets";
+import { ACTIVE_CONCEPT_SETS as CONCEPT_SETS, activeSemanticContext } from "../../../../../../../src/quizEngine/contentSnapshot";
+import { lessonAccess } from "../../../../../../../src/state/lessonAccess";
+import { withoutFailedImages } from "../../../../../../../src/images/assessmentImages";
+import { AssessmentStimulus } from "../../../../../../../components/quiz/AssessmentStimulus";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -11,26 +17,19 @@ import {
   getLevelPath,
   getPartPath,
 } from "../../../../../../../lib/routes";
-import { buildQuiz } from "../../../../../../../src/quizEngine/buildQuiz";
+import { buildQuizResult } from "../../../../../../../src/quizEngine/buildQuiz";
 import { QuizImage } from "../../../../../../../components/quiz/QuizImage";
 import { attachQuizImages } from "../../../../../../../src/images/attachQuizImages";
 import type { PresentedExercise } from "../../../../../../../src/images/types";
+import { getCurriculumPool } from "../../../../../../../src/quizEngine/curriculumPool";
+
+import { gradeMatchingAssignment, isMatchingPairCorrect, isTypedAnswerCorrect } from "../../../../../../../src/quizEngine/answerValidation";
+import type { MatchingPair } from "../../../../../../../src/quizEngine/conceptTypes";
 import { enrichConcepts } from "../../../../../../../src/quizEngine/enrichConcepts";
 import { saveLastLocation } from "../../../../../../../src/state/lastLocation";
-import { getCompletedQuizVariants, markQuizVariantCompleted } from "../../../../../../../src/state/progress";
+import { loadProgress, getCompletedQuizVariants, markQuizVariantCompleted } from "../../../../../../../src/state/progress";
 import { useStreak } from "../../../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../../../src/state/useTotalXp";
-
-type MatchingPair = {
-  id?: string | number;
-  left: string;
-  right: string;
-};
-
-type MatchingQuestion = {
-  type: "matching";
-  pairs: MatchingPair[];
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -188,64 +187,6 @@ const styles = StyleSheet.create({
   },
 });
 
-function getDeterministicType(
-  concept: any,
-  variant: "A" | "B" | "C"
-): "mcq" | "true_false" | "fill_blank" {
-  const types: ("mcq" | "true_false" | "fill_blank")[] = [
-    "mcq",
-    "true_false",
-    "fill_blank",
-  ];
-
-  const base =
-    (concept.id.length +
-      concept.subject.length +
-      concept.object.length) %
-    3;
-
-  if (variant === "A") {
-    return types[base];
-  }
-
-  if (variant === "B") {
-    return types[(base + 1) % 3];
-  }
-
-  return types[(base + 2) % 3];
-}
-
-function normalizeText(text: string) {
-  return text
-    .toLowerCase()
-    .normalize("NFD") // splits accents
-    .replace(/[\u0300-\u036f]/g, "") // removes accents
-    .trim();
-}
-
-function levenshtein(a: string, b: string) {
-  const matrix = [];
-
-  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-
-  for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b[i - 1] === a[j - 1]) {
-        matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
-        );
-      }
-    }
-  }
-
-  return matrix[b.length][a.length];
-}
-
 export default function PartQuizScreen() {
   const router = useRouter();
 
@@ -267,7 +208,6 @@ export default function PartQuizScreen() {
 
   const topic = TOPIC_BY_ID[String(topicId)];
   const subtopic = topic?.subtopics.find((s) => s.id === String(subtopicId));
-  const level = subtopic?.levels.find((l) => l.id === String(levelId));
 
   const setValue = String(set ?? "");
   const hasQuizVariant =
@@ -287,11 +227,28 @@ export default function PartQuizScreen() {
   );
 
   const [attempt, setAttempt] = useState(0);
+  const [attemptScope, setAttemptScope] = useState<string | null>(null);
+  const requestedScope = `${topicId}/${subtopicId}/${levelId}/${partId}/${set}`;
+  const [accessDenied, setAccessDenied] = useState<string | null>("Checking lesson access...");
+  const failedImages = useRef(new Set<string>());
+  const [readyScope, setReadyScope] = useState<string | null>(null);
+  const [failedImageIds, setFailedImageIds] = useState<readonly string[]>([]);
+  const imageUnavailable = useCallback((imageId: string) => {
+    // A required-image failure invalidates the unfinished quiz. Replanning starts
+    // it again with the same curriculum pool and no failed asset; no XP is awarded.
+    if (failedImages.current.has(imageId)) return;
+    failedImages.current.add(imageId);
+    setLoading(true);
+    setReadyScope(null);
+    setExercises([]);
+    setFailedImageIds([...failedImages.current].sort());
+  }, []);
 
   const [exercises, setExercises] = useState<PresentedExercise[]>([]);
   const [loading, setLoading] = useState(true);
+  const [shortage, setShortage] = useState<string | null>(null);
 
-  const [quizAUnlocked, setQuizAUnlocked] = useState(true);
+  const generationScope = `${topicId}/${subtopicId}/${levelId}/${partId}/${set}/${attempt}/${failedImageIds.join(",")}`;
   const [quizBUnlocked, setQuizBUnlocked] = useState(false);
   const [quizCUnlocked, setQuizCUnlocked] = useState(false);
 
@@ -305,9 +262,10 @@ export default function PartQuizScreen() {
 
   const [selectedLeft, setSelectedLeft] = useState<number | null>(null);
   const [selectedRight, setSelectedRight] = useState<number | null>(null);
-  const [matchedPairs, setMatchedPairs] = useState<Record<string, number>>({});
-  const [shuffledMatchingLefts, setShuffledMatchingLefts] = useState<any[]>([]);
-  const [shuffledMatchingRights, setShuffledMatchingRights] = useState<any[]>([]);
+  const [matchingState, setMatchingState] = useState<MatchingInteraction>({ locked: {} });
+  const matchedPairs = visibleMatchingPairs(matchingState);
+  const [shuffledMatchingLefts, setShuffledMatchingLefts] = useState<{ pairIndex: number; pair: MatchingPair; id: string; text: string }[]>([]);
+  const [shuffledMatchingRights, setShuffledMatchingRights] = useState<{ pairIndex: number; pair: MatchingPair; id: string; text: string }[]>([]);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
 
   useFocusEffect(
@@ -317,6 +275,10 @@ export default function PartQuizScreen() {
       let active = true;
 
       (async () => {
+        const progress = await loadProgress();
+        if (!active) return;
+        const access = lessonAccess(progress, { topicId: String(topicId), subtopicId: String(subtopicId), levelId: String(levelId), partId: String(partId), variant: /^quiz[ABC]$/.test(String(set)) ? String(set).slice(4) : undefined });
+        setAccessDenied(access.allowed ? null : access.reason);
         const completed = await getCompletedQuizVariants(
           String(topicId),
           String(subtopicId),
@@ -327,15 +289,14 @@ export default function PartQuizScreen() {
 
         console.log("completed variants for this part:", completed);
 
-        setQuizAUnlocked(true);
         setQuizBUnlocked(completed.includes("A"));
-        setQuizCUnlocked(completed.includes("B"));
+        setQuizCUnlocked(completed.includes("A") && completed.includes("B"));
       })();
 
       return () => {
         active = false;
       };
-    }, [topicId, subtopicId, levelId, partId])
+    }, [topicId, subtopicId, levelId, partId, set])
   );
 
   useEffect(() => {
@@ -346,21 +307,19 @@ export default function PartQuizScreen() {
       return;
     }
 
-    const lefts = matchingQ
-      ? matchingQ.pairs.map((pair: MatchingPair, pairIndex: number) => ({
+    const lefts = q.pairs.map((pair: MatchingPair, pairIndex: number) => ({
           pairIndex,
+          pair,
           id: String(pair.id ?? `left-${pairIndex}`),
           text: pair.left,
-        }))
-      : [];
+        }));
 
-    const rights = matchingQ
-      ? matchingQ.pairs.map((pair: MatchingPair, pairIndex: number) => ({
+    const rights = q.pairs.map((pair: MatchingPair, pairIndex: number) => ({
           pairIndex,
+          pair,
           id: String(pair.id ?? `right-${pairIndex}`),
           text: pair.right,
-        }))
-      : [];
+        }));
 
     setShuffledMatchingLefts(shuffleSeeded(lefts, idx + attempt + 1));
     setShuffledMatchingRights(shuffleSeeded(rights, idx + attempt + 101));
@@ -377,27 +336,10 @@ export default function PartQuizScreen() {
 
     if (!leftItem || !rightItem) return;
 
-    const isCorrect = leftItem.pairIndex === rightItem.pairIndex;
-
-    setMatchedPairs((prev) => ({
-      ...prev,
-      [selectedLeft]: selectedRight,
-    }));
-
+    setMatchingState(previous => attemptMatchingPair(previous,
+      shuffledMatchingLefts.map(item => item.pair), shuffledMatchingRights.map(item => item.pair), selectedLeft, selectedRight));
     setSelectedLeft(null);
     setSelectedRight(null);
-
-    if (!isCorrect) {
-      const leftIndex = selectedLeft;
-
-      setTimeout(() => {
-        setMatchedPairs((prev) => {
-          const next = { ...prev };
-          delete next[leftIndex];
-          return next;
-        });
-      }, 800);
-    }
   }, [
     selectedLeft,
     selectedRight,
@@ -407,6 +349,13 @@ export default function PartQuizScreen() {
     shuffledMatchingLefts,
     shuffledMatchingRights,
   ]);
+
+  useEffect(() => {
+    const wrong = matchingState.wrong;
+    if (!wrong) return;
+    const timeout = setTimeout(() => setMatchingState(previous => previous.wrong === wrong ? { locked: previous.locked } : previous), 800);
+    return () => clearTimeout(timeout);
+  }, [matchingState.wrong, exercises, idx, attempt]);
 
   function shuffleSeeded<T>(arr: readonly T[], seed: number): T[] {
   const a = [...arr];
@@ -439,60 +388,64 @@ export default function PartQuizScreen() {
   const setValue = String(set ?? "");
   const variant = setValue.includes("quizC") ? "C" : setValue.includes("quizB") ? "B" : "A";
 
-  const attemptKey = `quizAttempt:v1:${key}:quiz${variant}`;
-
-  (async () => {
+  const attemptKey = `quizAttempt:${topicId === "art" ? ART_CURRICULUM_VERSION : "v1"}:${key}:quiz${variant}`;
+  let active = true;
+  setAttemptScope(null);
+  if (!/^quiz[ABC]$/.test(String(set))) return;
+  void (async () => {
+    const access = lessonAccess(await loadProgress(), { topicId: String(topicId), subtopicId: String(subtopicId), levelId: String(levelId), partId: String(partId), variant });
+    if (!active || !access.allowed) return;
     const raw = await AsyncStorage.getItem(attemptKey);
-    const next = (raw ? Number(raw) : 0) + 1;
+    const previous = Number(raw);
+    const next = Number.isSafeInteger(previous) && previous >= 0 && previous < Number.MAX_SAFE_INTEGER ? previous + 1 : 1;
     await AsyncStorage.setItem(attemptKey, String(next));
-    setAttempt(next);
-  })();
-}, [topicId, subtopicId, levelId, partId, set]);
+    if (active) { setAttempt(next); setAttemptScope(requestedScope); }
+  })().catch(() => { if (active) { setShortage("Unable to prepare this quiz attempt. Please try again."); setLoading(false); } });
+  return () => { active = false; };
+}, [topicId, subtopicId, levelId, partId, set, requestedScope]);
 
   useEffect(() => {
     if (!topicId || !subtopicId || !levelId || !partId) return;
 
-    saveLastLocation({
+    void loadProgress().then(progress => {
+      if (!lessonAccess(progress, { topicId: String(topicId), subtopicId: String(subtopicId), levelId: String(levelId), partId: String(partId) }).allowed) return;
+      saveLastLocation({
       topicId: String(topicId),
       subtopicId: String(subtopicId),
       levelId: String(levelId),
       partId: String(partId),
+      });
     });
   }, [topicId, subtopicId, levelId, partId, set, attempt]);
 
  useEffect(() => {
   if (!topicId || !subtopicId || !levelId || !partId) return;
-
+  let active = true;
   setLoading(true);
+  setReadyScope(null);
+  setExercises([]);
+  void (async () => {
+    const progress = await loadProgress();
+    if (!active) return;
+    const selectedVariant = /^quiz[ABC]$/.test(String(set)) ? String(set).slice(4) : undefined;
+    const access = lessonAccess(progress, { topicId: String(topicId), subtopicId: String(subtopicId), levelId: String(levelId), partId: String(partId), variant: selectedVariant });
+    if (!access.allowed || (/^quiz/i.test(String(set)) && !selectedVariant)) {
+      const reason = access.allowed ? "Unknown quiz variant." : access.reason;
+      setAccessDenied(reason); setExercises([]); setLoading(false); return;
+    }
+    setAccessDenied(null);
+    if (!selectedVariant) { setExercises([]); setLoading(false); return; }
+    if (attemptScope !== requestedScope || attempt < 1) return;
+
+  setShortage(null);
 
   const lvl = `l${String(levelId)}`;
   const prt = `p${String(partId)}`;
   const key = `${topicId}_${subtopicId}_${lvl}_${prt}`;
 
-  const conceptSetsToUse: any[] =
-  lvl === "l10"
-    ? ["l1", "l2", "l3", "l4", "l5", "l6", "l7", "l8", "l9"]
-        .flatMap((reviewLevelId) => {
-          const sourcePartIds = getSourcePartIds(prt);
-
-          return sourcePartIds
-            .map((sourcePartId) => {
-              const reviewKey = `${topicId}_${subtopicId}_${reviewLevelId}_${sourcePartId}`;
-              return CONCEPT_SETS[reviewKey];
-            })
-            .filter(Boolean);
-        })
-    : [CONCEPT_SETS[key]].filter(Boolean);
-
-  if (conceptSetsToUse.length === 0) {
-    setExercises([]);
-    setLoading(false);
-    return;
-  }
-
   setSelectedLeft(null);
   setSelectedRight(null);
-  setMatchedPairs({});
+  setMatchingState({ locked: {} });
   setShuffledMatchingLefts([]);
   setShuffledMatchingRights([]);
 
@@ -504,41 +457,9 @@ export default function PartQuizScreen() {
   setIsCorrect(null);
   setCorrectCount(0);
 
-  function getSourcePartIds(partId: string): string[] {
-    if (partId === "p1") return ["p1"];
-    if (partId === "p2") return ["p2"];
-    if (partId === "p3") return ["p1", "p2"];
-    if (partId === "p4") return ["p4"];
-    if (partId === "p5") return ["p1", "p2", "p4"];
-    return [];
-  }
-
-  function getPartDifficultyRange(partId: string): [number, number] {
-    if (partId === "p1") return [1, 2]; // very easy
-    if (partId === "p2") return [2, 3]; // introduce slightly harder
-    if (partId === "p3") return [2, 4]; // review + stretch
-    if (partId === "p4") return [3, 5]; // new + harder
-    if (partId === "p5") return [3, 5]; // final mix (hardest)
-    return [1, 5];
-  }
-
-  const sourcePartIds = getSourcePartIds(prt);
-
-  const concepts = conceptSetsToUse
-    .flatMap((cs) => cs.concepts)
-    .filter(
-      (c: any) =>
-        (lvl === "l10" || c.levelId === lvl) &&
-        sourcePartIds.includes(c.partId)
-    );
-
-  const [minDifficulty, maxDifficulty] = getPartDifficultyRange(prt);
-
-  const filteredRaw = concepts.filter(
-    (c: any) => c.difficulty >= minDifficulty && c.difficulty <= maxDifficulty
-  );
-
-  const filteredConcepts = enrichConcepts(filteredRaw);
+  const filteredConcepts = enrichConcepts(getCurriculumPool(CONCEPT_SETS, {
+    topicId: String(topicId), subtopicId: String(subtopicId), levelId: lvl, partId: prt,
+  }));
 
   // Decide quiz variant from query param: "quizA" | "quizB" | "quizC"
   const setValue = String(set ?? "");
@@ -548,116 +469,78 @@ export default function PartQuizScreen() {
     ? "B"
     : "A";
 
-  // Spaced repetition by introduction stage
-  const filtered =
-    variant === "A"
-      ? filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "A")
-      : variant === "B"
-      ? filteredConcepts.filter((c) => {
-          const intro = c.introducedIn ?? "A";
-          return intro === "A" || intro === "B";
-        })
-      : filteredConcepts.filter((c) => {
-          const intro = c.introducedIn ?? "A";
-          return intro === "A" || intro === "B" || intro === "C";
-        });
+  // Stage eligibility belongs to the engine; reviews must retain every taught stage.
+  const filtered = filteredConcepts;
 
-  // --- deterministic shuffle by seed (so A/B/C are stable) ---
+  const seed = `${key}_quiz${variant}_attempt${attempt}:failed-images:${failedImageIds.join(",")}`;
+  const context = failedImageIds.length ? activeSemanticContext.withImages(withoutFailedImages(activeSemanticContext.images, failedImageIds)) : activeSemanticContext;
 
-  const QUIZ_TYPE_ORDER = ["mcq", "true_false", "fill_blank"] as const;
-
-  const seed = `${key}_quiz${variant}_attempt${attempt}`;
-
-  // Split by introduction stage
-  const aConcepts = filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "A");
-  const bConcepts = filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "B");
-  const cConcepts = filteredConcepts.filter((c) => (c.introducedIn ?? "A") === "C");
-
-  const built = buildQuiz({
+  const result = buildQuizResult({
     concepts: filtered,
+    mode: lvl === "l10" || prt === "p3" || prt === "p5" ? "review" : "teaching",
     variant,
     seed,
+    context,
   });
 
-  const presented = attachQuizImages(built);
+  setShortage(result.status === "insufficient-content"
+    ? "This quiz needs more verified content to provide all eight required exercises. Please choose another quiz." : null);
+  const presented = attachQuizImages(result.status === "ready" ? result.exercises : []);
   setExercises(presented);
+  setReadyScope(result.status === "ready" ? generationScope : null);
   setLoading(false);
-}, [topicId, subtopicId, levelId, partId, set, attempt]);
+  })().catch(() => { if (active) { setExercises([]); setShortage("Unable to verify lesson access. Please try again."); setLoading(false); } });
+  return () => { active = false; };
+}, [topicId, subtopicId, levelId, partId, set, attempt, failedImageIds, generationScope, attemptScope, requestedScope]);
 
   const q = exercises[idx];
+  const allowedFillModes = q?.type === "fill_blank" ? q.allowedInputModes ?? ["input", "options"] : [];
+  const activeFillMode = allowedFillModes.includes(fillMode) ? fillMode : allowedFillModes[0];
 
   const fillAnswerOptions =
-    q?.type === "fill_blank" && (q as any).options
-      ? (q as any).options
+    q?.type === "fill_blank" && q.options
+      ? q.options
       : [];
 
-  const matchingQ =
-    q?.type === "matching" ? (q as MatchingQuestion) : null;
   const total = exercises.length;
   const progress = total > 0 ? (idx + 1) / total : 0;
 
-  const correct =
-    !!q &&
-    (q.type === "mcq"
-      ? selectedAnswer === (q as any).options[(q as any).correctIndex]
-      : q.type === "true_false"
-      ? selectedAnswer === (q.correctAnswer ? "true" : "false")
-      : q.type === "fill_blank"
-      ? typedAnswer.trim().toLowerCase() === q.answerText.trim().toLowerCase()
-      : q.type === "matching"
-        ? !!matchingQ &&
-          matchingQ.pairs.every((pair: MatchingPair) => {
-            const rightIdx = matchedPairs[pair.left];
-            return rightIdx !== undefined && shuffledMatchingRights[rightIdx] === pair.right;
-          })
-      : false);
-    const canCheck = useMemo(() => {
+  const canCheck = useMemo(() => {
       if (!q || checked) return false;
       if (q.type === "mcq") return selectedAnswer !== null;
       if (q.type === "true_false") return selectedAnswer !== null;
       if (q.type === "fill_blank") {
-        return fillMode === "input"
+        return activeFillMode === "input"
           ? typedAnswer.trim().length > 0
           : selectedOptionIndex !== null;
       }
-      if (q.type === "matching") return !!matchingQ && Object.keys(matchedPairs).length === matchingQ.pairs.length;
+      if (q.type === "matching") return !matchingState.wrong && Object.keys(matchingState.locked).length === q.pairs.length;
       return false;
-    }, [q, checked, selectedAnswer, typedAnswer, fillMode, selectedOptionIndex, matchedPairs]);
+    }, [q, checked, selectedAnswer, typedAnswer, activeFillMode, selectedOptionIndex, matchingState]);
 
   const onCheck = () => {
-    if (!q) return;
+    if (readyScope !== generationScope || loading || accessDenied || !q || shortage || exercises.length !== 8 || !canCheck) return;
 
     let ok = false;
 
     if (q.type === "mcq") {
-      ok = (q as any).options[(q as any).correctIndex] === selectedAnswer;
+      ok = q.options[q.correctIndex] === selectedAnswer;
     } else if (q.type === "true_false") {
       ok = (selectedAnswer === "true") === q.correctAnswer;
     } else if (q.type === "fill_blank") {
-        if (fillMode === "input") {
-          const user = normalizeText(typedAnswer);
-
-          const acceptedAnswers = q.answerText
-            .split("|")
-            .map((answer) => normalizeText(answer));
-
-          ok = acceptedAnswers.some((answer) => {
-            const distance = levenshtein(user, answer);
-            return distance <= 2;
-          });
+        if (activeFillMode === "input") {
+          ok = isTypedAnswerCorrect(q, typedAnswer);
         } else {
           // options mode → use existing MCQ logic
           ok =
           selectedOptionIndex !== null &&
-          fillAnswerOptions[selectedOptionIndex] === q.answerText.split("|")[0];
+          selectedOptionIndex === q.correctIndex;
         }
       } else if (q.type === "matching") {
-        ok = shuffledMatchingLefts.every((leftItem, leftIndex) => {
-          const rightIdx = matchedPairs[leftIndex];
-          if (rightIdx === undefined) return false;
-          const rightItem = shuffledMatchingRights[rightIdx];
-          return rightItem && rightItem.pairIndex === leftItem.pairIndex;
-        });
+        ok = gradeMatchingAssignment(
+          shuffledMatchingLefts.map((item) => item.pair),
+          shuffledMatchingRights.map((item) => item.pair), matchedPairs
+        );
       }
 
     setChecked(true);
@@ -668,6 +551,7 @@ export default function PartQuizScreen() {
   const quizVariant = String(set ?? "A").replace(/^quiz/i, "").toUpperCase();
 
   const onNext = async () => {
+    if (readyScope !== generationScope || loading || accessDenied || shortage || !q || !checked || exercises.length !== 8) return;
     const isLast = idx + 1 >= exercises.length;
 
   if (isLast) {
@@ -718,12 +602,17 @@ export default function PartQuizScreen() {
     setIsCorrect(null);
     setSelectedLeft(null);
     setSelectedRight(null);
-    setMatchedPairs({});
+    setMatchingState({ locked: {} });
     setFillMode("input");
     setTypedAnswer("");
     setSelectedOptionIndex(null);
   };
 
+if (subtopic?.availability === "coming-soon" || accessDenied) {
+  return <ScrollView style={styles.container}><Text style={styles.title}>{subtopic?.title}</Text>
+    <Text style={styles.body}>{subtopic?.availability === "coming-soon" ? "Coming soon" : accessDenied}</Text>
+    <Pressable onPress={() => router.replace(levelPath)}><Text style={styles.backText}>← Back</Text></Pressable></ScrollView>;
+}
 if (!hasQuizVariant) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
@@ -851,7 +740,7 @@ if (exercises.length === 0) {
         </Pressable>
       </View>
 
-      <Text style={styles.body}>No concepts found for this part.</Text>
+      <Text style={styles.body}>{shortage ?? "No concepts found for this part."}</Text>
     </ScrollView>
   );
 }
@@ -883,7 +772,9 @@ if (exercises.length === 0) {
         {q.type === "true_false" ? q.statement : q.prompt}
       </Text>
 
-      {q.type !== "matching" && q.image && <QuizImage image={q.image} />}
+      {failedImageIds.length > 0 && <Text style={styles.body}>An image was unavailable. This quiz restarted using verified alternatives.</Text>}
+      {q.type !== "matching" && q.stimulus && <AssessmentStimulus stimulus={q.stimulus} onUnavailable={imageUnavailable} />}
+      {q.type !== "matching" && !q.stimulus && q.image && <QuizImage image={q.image} />}
 
       {q.type === "mcq" &&
        (q as any).options.map((opt: string) => {
@@ -934,7 +825,7 @@ if (exercises.length === 0) {
 
       {q.type === "fill_blank" && (
         <View>
-          {fillMode === "input" ? (
+          {activeFillMode === "input" ? (
             <>
               <TextInput
                 value={typedAnswer}
@@ -950,9 +841,9 @@ if (exercises.length === 0) {
                 ]}
               />
 
-              <Pressable onPress={() => !checked && setFillMode("options")}>
+              {allowedFillModes.includes("options") && <Pressable onPress={() => !checked && setFillMode("options")}>
                 <Text style={styles.switchText}>Use options instead</Text>
-              </Pressable>
+              </Pressable>}
 
               {checked && isCorrect === false && (
                 <Text style={styles.correctAnswerText}>
@@ -984,9 +875,9 @@ if (exercises.length === 0) {
                 );
               })}
 
-              <Pressable onPress={() => !checked && setFillMode("input")}>
+              {allowedFillModes.includes("input") && <Pressable onPress={() => !checked && setFillMode("input")}>
                 <Text style={styles.switchText}>Type instead</Text>
-              </Pressable>
+              </Pressable>}
             </>
           )}
         </View>
@@ -1006,7 +897,7 @@ if (exercises.length === 0) {
               const isMatchCorrect =
                 isMatched &&
                 matchedRightItem &&
-                matchedRightItem.pairIndex === leftItem.pairIndex;
+                isMatchingPairCorrect(leftItem.pair, matchedRightItem.pair);
 
               return (
                 <Pressable
@@ -1025,6 +916,7 @@ if (exercises.length === 0) {
                     isMatchCorrect && styles.matchingItemFaded,
                   ]}
                 >
+                  {leftItem.pair.stimulus && <AssessmentStimulus stimulus={leftItem.pair.stimulus} onUnavailable={imageUnavailable} />}
                   <Text
                     style={[
                       styles.matchingItemText,
@@ -1054,7 +946,7 @@ if (exercises.length === 0) {
               const isMatchCorrect =
                 alreadyUsed &&
                 matchedLeftItem &&
-                matchedLeftItem.pairIndex === rightItem.pairIndex;
+                isMatchingPairCorrect(matchedLeftItem.pair, rightItem.pair);
 
               return (
                 <Pressable
@@ -1093,7 +985,7 @@ if (exercises.length === 0) {
             disabled={
               !canCheck ||
               (q.type === "fill_blank" &&
-                fillMode === "input" &&
+                activeFillMode === "input" &&
                 typedAnswer.trim().length === 0)
             }
             onPress={onCheck}

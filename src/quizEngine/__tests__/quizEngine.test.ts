@@ -1,9 +1,13 @@
-import { buildQuiz } from "../buildQuiz";
+import { certifiedFixtureContext } from "../testSupport/certifiedFixtures";
+import type { Concept } from "../conceptTypes";
+import type { QuizRequest } from "../buildQuiz";
+import { buildQuiz as generateQuiz } from "../buildQuiz";
 import { enrichConcepts } from "../enrichConcepts";
 import { buildExercise, buildMatchingExercise } from "../exerciseFactory";
 
-const mockConcepts = [
+const mockConcepts: Concept[] = [
   {
+    topicId: "art", subtopicId: "fixture", levelId: "l1", partId: "p1", answerKind: "short",
     id: "c1",
     subject: "Mona Lisa",
     object: "Leonardo da Vinci",
@@ -12,6 +16,7 @@ const mockConcepts = [
     distractorGroup: "art",
   },
   {
+    topicId: "art", subtopicId: "fixture", levelId: "l1", partId: "p1", answerKind: "short",
     id: "c2",
     subject: "Starry Night",
     object: "Vincent van Gogh",
@@ -21,7 +26,7 @@ const mockConcepts = [
   },
 ];
 
-const matchingConcepts = [
+const matchingConcepts: Concept[] = [
   {
     id: "m1",
     topicId: "art",
@@ -80,26 +85,26 @@ const matchingConcepts = [
   },
 ];
 
+const buildQuiz = (request: QuizRequest) => generateQuiz({ ...request, context: certifiedFixtureContext(request.concepts) });
+
 describe("Quiz Engine", () => {
-  test("buildExercise returns a valid exercise", () => {
-    const ex = buildExercise(mockConcepts[0] as any, mockConcepts as any, 4, "mcq");
-    expect(ex).toBeTruthy();
-    expect(["mcq", "true_false", "fill_blank"]).toContain(ex.type);
+  test("a two-answer pool reports unavailability instead of inventing an assessment", () => {
+    for (const type of ["mcq", "true_false", "fill_blank"] as const) {
+      expect(buildExercise(mockConcepts[0] , mockConcepts , 4, type)).toBeNull();
+    }
   });
 
-  test("different types can be generated", () => {
-    const types = ["mcq", "true_false", "fill_blank"] as const;
-
-    types.forEach((type) => {
-      const ex = buildExercise(mockConcepts[0] as any, mockConcepts as any, 4, type);
+  test("a sufficiently populated legacy pool retains valid supported exercise structures", () => {
+    for (const type of ["mcq", "true_false", "fill_blank"] as const) {
+      const ex = buildExercise(matchingConcepts[0] , matchingConcepts , 4, type, certifiedFixtureContext(matchingConcepts));
       expect(ex).toBeTruthy();
-      expect(["mcq", "true_false", "fill_blank"]).toContain(ex.type);
-    });
+      expect(ex?.type).toBe(type);
+    }
   });
 
   test("matching requires 4 valid concepts with the same relation", () => {
-    const enriched = enrichConcepts(matchingConcepts as any);
-    const match = buildMatchingExercise(enriched, "seed");
+    const enriched = enrichConcepts(matchingConcepts );
+    const match = buildMatchingExercise(enriched, "seed", certifiedFixtureContext(enriched));
 
     expect(match).toBeTruthy();
     expect(match?.type).toBe("matching");
@@ -107,8 +112,8 @@ describe("Quiz Engine", () => {
   });
 
     test("matching requires 4 valid concepts with the same relation", () => {
-    const enriched = enrichConcepts(matchingConcepts as any);
-    const match = buildMatchingExercise(enriched, "seed");
+    const enriched = enrichConcepts(matchingConcepts );
+    const match = buildMatchingExercise(enriched, "seed", certifiedFixtureContext(enriched));
 
     expect(match).toBeTruthy();
     expect(match?.type).toBe("matching");
@@ -116,14 +121,15 @@ describe("Quiz Engine", () => {
   });
 
   test("matching uses only provided concepts (no external selection)", () => {
-    const enriched = enrichConcepts(matchingConcepts as any);
+    const enriched = enrichConcepts(matchingConcepts );
     const concepts = enriched.slice(0, 4);
 
-    const match = buildMatchingExercise(concepts, "seed");
+    const match = buildMatchingExercise(concepts, "seed", certifiedFixtureContext(concepts));
 
     expect(match).toBeTruthy();
 
     const conceptIds = concepts.map((c) => c.id);
+    expect(match!.pairs.every(pair => conceptIds.includes(pair.id!))).toBe(true);
     const usedLefts = match!.pairs.map((p) => p.left);
 
     usedLefts.forEach((left) => {
@@ -266,34 +272,9 @@ it("buildQuiz matching uses only facts already selected in that quiz", () => {
   expect(matching).toBeTruthy();
   expect(nonMatching).toHaveLength(7);
 
-  const allowedTexts = new Set<string>();
-
-  for (const q of nonMatching) {
-    if (q.type === "mcq") {
-      allowedTexts.add(q.prompt);
-      q.options.forEach((opt) => allowedTexts.add(opt));
-    }
-
-    if (q.type === "true_false") {
-      allowedTexts.add(q.statement);
-    }
-
-    if (q.type === "fill_blank") {
-      allowedTexts.add(q.prompt);
-    }
-  }
-
+  const selectedIds = new Set(nonMatching.map((q) => q.conceptId));
   expect(matching?.pairs).toHaveLength(4);
+  for (const pair of matching?.pairs ?? []) expect(selectedIds.has(pair.id!)).toBe(true);
 
-  for (const pair of matching?.pairs ?? []) {
-    expect(allowedTexts.has(pair.left) || allowedTexts.has(pair.right)).toBe(true);
-  }
-
-  const outsidePairUsed = matching?.pairs.some(
-    (pair) =>
-      pair.left === "American Gothic" || pair.right === "Grant Wood"
-  );
-
-  expect(outsidePairUsed).toBe(false);
 });
 });

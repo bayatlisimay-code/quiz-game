@@ -1,5 +1,8 @@
 import type { Exercise, ExerciseType, MatchingExercise } from "../quizEngine/conceptTypes";
 
+export type ImageExerciseType = ExerciseType | "matching";
+export type RecognitionApproval = Readonly<{ answerId: string; answerLeakageReviewed: true }>;
+
 export type ImageReviewStatus = "pending" | "needs-review" | "approved" | "rejected";
 
 export interface ImageAttribution {
@@ -61,7 +64,8 @@ export type ConceptImageBinding = {
   readonly imageId: string;
   readonly candidateIdentity: string;
   readonly altText: string;
-  readonly allowedExerciseTypes: readonly ExerciseType[];
+  readonly allowedExerciseTypes: readonly ImageExerciseType[];
+  readonly recognition?: RecognitionApproval;
 } & Review;
 
 export interface ImageCurationDataset {
@@ -82,7 +86,8 @@ export interface QuizImage {
 export interface RuntimeImageBinding {
   readonly reviewStatus: "approved";
   readonly conceptId: string;
-  readonly allowedExerciseTypes: readonly ExerciseType[];
+  readonly allowedExerciseTypes: readonly ImageExerciseType[];
+  readonly recognition?: RecognitionApproval;
   readonly image: QuizImage;
 }
 

@@ -312,7 +312,7 @@ const concepts: LocalConcept[] = [
 ];
 
 const conceptSet: LocalConceptSet = {
-id: "art_design_l2_p1_nationality_of_designer",
+id: "art_design_l2_p1",
 concepts,
 };
 

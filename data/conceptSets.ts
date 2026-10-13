@@ -1,3 +1,5 @@
+import { adaptConceptSets } from "../src/quizEngine/contentRegistry";
+import type { AuthoredConceptSet } from "../src/quizEngine/contentRegistry";
 import concepts_art_painting_l1_p1_concepts from "./concepts/art/painting/l1/p1/concepts";
 import concepts_art_painting_l1_p2_concepts from "./concepts/art/painting/l1/p2/concepts";
 import concepts_art_painting_l1_p3_concepts from "./concepts/art/painting/l1/p3/concepts";
@@ -82,11 +84,11 @@ import concepts_art_literature_l4_p3_concepts from "./concepts/art/literature/l4
 import concepts_art_literature_l4_p4_concepts from "./concepts/art/literature/l4/p4/concepts";
 import concepts_art_literature_l4_p5_concepts from "./concepts/art/literature/l4/p5/concepts";
 
-import concepts_art_literature_l5_p1_concepts from "./concepts/art/literature/l6/p1/concepts";
-import concepts_art_literature_l5_p2_concepts from "./concepts/art/literature/l6/p2/concepts";
-import concepts_art_literature_l5_p3_concepts from "./concepts/art/literature/l6/p3/concepts";
-import concepts_art_literature_l5_p4_concepts from "./concepts/art/literature/l6/p4/concepts";
-import concepts_art_literature_l5_p5_concepts from "./concepts/art/literature/l6/p5/concepts";
+import concepts_art_literature_l5_p1_concepts from "./concepts/art/literature/l5/p1/concepts";
+import concepts_art_literature_l5_p2_concepts from "./concepts/art/literature/l5/p2/concepts";
+import concepts_art_literature_l5_p3_concepts from "./concepts/art/literature/l5/p3/concepts";
+import concepts_art_literature_l5_p4_concepts from "./concepts/art/literature/l5/p4/concepts";
+import concepts_art_literature_l5_p5_concepts from "./concepts/art/literature/l5/p5/concepts";
 
 import concepts_art_literature_l6_p1_concepts from "./concepts/art/literature/l6/p1/concepts";
 import concepts_art_literature_l6_p2_concepts from "./concepts/art/literature/l6/p2/concepts";
@@ -154,11 +156,11 @@ import concepts_art_movies_l6_p3_concepts from "./concepts/art/movies/l6/p3/conc
 import concepts_art_movies_l6_p4_concepts from "./concepts/art/movies/l6/p4/concepts";
 import concepts_art_movies_l6_p5_concepts from "./concepts/art/movies/l6/p5/concepts";
 
-import concepts_art_movies_l7_p1_concepts from "./concepts/art/movies/l8/p1/concepts";
-import concepts_art_movies_l7_p2_concepts from "./concepts/art/movies/l8/p2/concepts";
-import concepts_art_movies_l7_p3_concepts from "./concepts/art/movies/l8/p3/concepts";
-import concepts_art_movies_l7_p4_concepts from "./concepts/art/movies/l8/p4/concepts";
-import concepts_art_movies_l7_p5_concepts from "./concepts/art/movies/l8/p5/concepts";
+import concepts_art_movies_l7_p1_concepts from "./concepts/art/movies/l7/p1/concepts";
+import concepts_art_movies_l7_p2_concepts from "./concepts/art/movies/l7/p2/concepts";
+import concepts_art_movies_l7_p3_concepts from "./concepts/art/movies/l7/p3/concepts";
+import concepts_art_movies_l7_p4_concepts from "./concepts/art/movies/l7/p4/concepts";
+import concepts_art_movies_l7_p5_concepts from "./concepts/art/movies/l7/p5/concepts";
 
 import concepts_art_movies_l8_p1_concepts from "./concepts/art/movies/l8/p1/concepts";
 import concepts_art_movies_l8_p2_concepts from "./concepts/art/movies/l8/p2/concepts";
@@ -479,7 +481,7 @@ import concepts_art_theatre_l10_p4_concepts from "./concepts/art/theatre/l10/p4/
 import concepts_art_theatre_l10_p5_concepts from "./concepts/art/theatre/l10/p5/concepts";
 
 
-export const CONCEPT_SETS: Record<string, { id: string; concepts: any[] }> = {
+export const AUTHORED_CONCEPT_SETS: Readonly<Record<string, AuthoredConceptSet>> = {
   art_painting_l1_p1: concepts_art_painting_l1_p1_concepts,
   art_painting_l1_p2: concepts_art_painting_l1_p2_concepts,
   art_painting_l1_p3: concepts_art_painting_l1_p3_concepts,
@@ -960,4 +962,8 @@ export const CONCEPT_SETS: Record<string, { id: string; concepts: any[] }> = {
   art_theatre_l10_p4: concepts_art_theatre_l10_p4_concepts,
   art_theatre_l10_p5: concepts_art_theatre_l10_p5_concepts,
 
-}
+};
+
+const adapted = adaptConceptSets(AUTHORED_CONCEPT_SETS);
+export const CONCEPT_SETS = adapted.sets;
+export const REGISTRATION_ISSUES = adapted.issues;

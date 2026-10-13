@@ -26,5 +26,9 @@ checks, upload tooling, generation CLI, and release automation are deferred.
 The projection rejects incomplete approved bindings and duplicate approved keys.
 
 Use immutable hosted URLs. Validate actual bytes and licenses before release.
-Matching remains text-only. Replacing or withdrawing an image only changes its
-presentation binding, never the concept ID or quiz generation.
+Recognition matching is supported only with an independently approved answer
+identity binding, reviewed leakage controls, and a safe pairing matrix. Optional
+illustrations remain presentation-only. Required recognition stimuli participate
+in planning: verified authored text may replace a missing/failed image; otherwise
+the ungraded quiz is replanned without that asset or reports a shortage.
+Replacing a binding never changes concept IDs. See `docs/art-engine-upgrade.md`.

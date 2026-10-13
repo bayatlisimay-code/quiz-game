@@ -1,19 +1,21 @@
 import { Image } from "expo-image";
-import { useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { useState, useRef, useEffect } from "react";
+import { ActivityIndicator, StyleSheet, View, Text } from "react-native";
 import type { QuizImage as QuizImageData } from "../../src/images/types";
 import { QuizImageAttribution } from "./QuizImageAttribution";
 
 // A keyed child resets state and rejects late callbacks from the previous image.
-export function QuizImage({ image }: { image: QuizImageData }) {
-  return <ImageFrame key={`${image.imageId}:${image.uri}`} image={image} />;
+export function QuizImage(props: { image: QuizImageData; fallbackText?: string; onFailure?: () => void }) {
+  return <ImageFrame key={`${props.image.imageId}:${props.image.uri}`} {...props} />;
 }
 
-function ImageFrame({ image }: { image: QuizImageData }) {
+function ImageFrame({ image, fallbackText, onFailure }: { image: QuizImageData; fallbackText?: string; onFailure?: () => void }) {
+  const mounted = useRef(true);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   const [width, setWidth] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
-  if (failed) return null; // Restore the text-only layout; answering never depends on loading.
+  if (failed) return fallbackText ? <Text style={{ color: "#E5F3FF", marginVertical: 12 }}>{fallbackText}</Text> : null;
   const height = width > 0 ? Math.min(300, Math.max(100, width * image.height / image.width)) : 180;
   return (
     <View style={styles.container} onLayout={event => setWidth(event.nativeEvent.layout.width)}>
@@ -26,8 +28,8 @@ function ImageFrame({ image }: { image: QuizImageData }) {
           recyclingKey={`${image.imageId}:${image.uri}`}
           accessible
           accessibilityLabel={image.altText}
-          onLoad={() => setLoaded(true)}
-          onError={() => setFailed(true)}
+          onLoad={() => { if (mounted.current) setLoaded(true); }}
+          onError={() => { if (!mounted.current) return; setFailed(true); if (!fallbackText) onFailure?.(); }}
         />
         {!loaded && <View pointerEvents="none" style={styles.loading}><ActivityIndicator color="#B3C7E6" /></View>}
       </View>

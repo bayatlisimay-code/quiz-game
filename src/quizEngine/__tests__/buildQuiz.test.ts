@@ -1,7 +1,12 @@
-import { buildQuiz } from "../buildQuiz";
+import { certifiedFixtureContext } from "../testSupport/certifiedFixtures";
+import type { QuizRequest } from "../buildQuiz";
+import type { Concept } from "../conceptTypes";
+import { buildQuiz as generateQuiz } from "../buildQuiz";
 import { enrichConcepts } from "../enrichConcepts";
 
-const mockConcepts = [
+const buildQuiz = (request: QuizRequest) => generateQuiz({ ...request, context: certifiedFixtureContext(request.concepts) });
+
+const mockConcepts: Concept[] = [
   { id: "a1", topicId: "art", subtopicId: "painting", levelId: "l1", partId: "p1", relation: "painted_by", subject: "Mona Lisa", object: "Leonardo da Vinci", answerKind: "short", difficulty: 2, distractorGroup: "artists", tags: [], introducedIn: "A" },
   { id: "a2", topicId: "art", subtopicId: "painting", levelId: "l1", partId: "p1", relation: "painted_by", subject: "Starry Night", object: "Vincent van Gogh", answerKind: "short", difficulty: 2, distractorGroup: "artists", tags: [], introducedIn: "A" },
   { id: "a3", topicId: "art", subtopicId: "painting", levelId: "l1", partId: "p1", relation: "painted_by", subject: "The Persistence of Memory", object: "Salvador Dalí", answerKind: "short", difficulty: 3, distractorGroup: "artists", tags: [], introducedIn: "A" },
@@ -21,10 +26,10 @@ const mockConcepts = [
 
 describe("buildQuiz", () => {
   test("builds 8 exercises total", () => {
-    const enriched = enrichConcepts(mockConcepts as any);
+    const enriched = enrichConcepts(mockConcepts );
 
     const quiz = buildQuiz({
-      concepts: enriched as any,
+      concepts: enriched ,
       variant: "A",
       seed: "test-seed",
     });
@@ -33,10 +38,10 @@ describe("buildQuiz", () => {
   });
 
     test("builds 7 normal exercises and 1 matching exercise", () => {
-    const enriched = enrichConcepts(mockConcepts as any);
+    const enriched = enrichConcepts(mockConcepts );
 
     const quiz = buildQuiz({
-      concepts: enriched as any,
+      concepts: enriched ,
       variant: "A",
       seed: "test-seed",
     });
@@ -49,11 +54,11 @@ describe("buildQuiz", () => {
     expect(normal).toHaveLength(7);
   });
 
-    test("the 7 normal exercises follow a 2+2+3 type distribution", () => {
-    const enriched = enrichConcepts(mockConcepts as any);
+    test("the 7 legacy exercises retain variety without uncertified False assertions", () => {
+    const enriched = enrichConcepts(mockConcepts );
 
     const quiz = buildQuiz({
-      concepts: enriched as any,
+      concepts: enriched ,
       variant: "A",
       seed: "test-seed",
     });
@@ -69,20 +74,23 @@ describe("buildQuiz", () => {
     const values = Object.values(counts).sort((a, b) => a - b);
 
     expect(values).toEqual([2, 2, 3]);
+    expect(counts.mcq).toBeGreaterThan(0);
+    expect(counts.fill_blank).toBeGreaterThan(0);
+    expect(counts.true_false).toBe(2);
   });
 
   test("variant A only uses A concepts", () => {
-    const enriched = enrichConcepts(mockConcepts as any);
+    const enriched = enrichConcepts(mockConcepts );
 
     const quiz = buildQuiz({
-        concepts: enriched as any,
+        concepts: enriched ,
         variant: "A",
         seed: "test-seed",
     });
 
     const usedSubjects = quiz
         .filter((q) => q.type !== "matching")
-        .map((q: any) => q.prompt || q.statement || "");
+        .map((q) => q.type === "true_false" ? q.statement : q.prompt);
 
     const aSubjects = mockConcepts
         .filter((c) => c.introducedIn === "A")
@@ -95,17 +103,17 @@ describe("buildQuiz", () => {
     });
 
       test("variant B uses B concepts with 1-2 A repeats only", () => {
-    const enriched = enrichConcepts(mockConcepts as any);
+    const enriched = enrichConcepts(mockConcepts );
 
     const quiz = buildQuiz({
-      concepts: enriched as any,
+      concepts: enriched ,
       variant: "B",
       seed: "test-seed",
     });
 
     const normalTexts = quiz
       .filter((q) => q.type !== "matching")
-      .map((q: any) => q.prompt || q.statement || "");
+      .map((q) => q.type === "true_false" ? q.statement : q.prompt);
 
     const aSubjects = mockConcepts
       .filter((c) => c.introducedIn === "A")
@@ -136,17 +144,17 @@ describe("buildQuiz", () => {
   });
 
   test("variant C uses C concepts with 2-3 repeats from A and B", () => {
-    const enriched = enrichConcepts(mockConcepts as any);
+    const enriched = enrichConcepts(mockConcepts );
 
     const quiz = buildQuiz({
-        concepts: enriched as any,
+        concepts: enriched ,
         variant: "C",
         seed: "test-seed",
     });
 
     const normalTexts = quiz
         .filter((q) => q.type !== "matching")
-        .map((q: any) => q.prompt || q.statement || "");
+        .map((q) => q.type === "true_false" ? q.statement : q.prompt);
 
     const aSubjects = mockConcepts
         .filter((c) => c.introducedIn === "A")
@@ -176,7 +184,7 @@ describe("buildQuiz", () => {
     expect(repeatCount).toBeGreaterThanOrEqual(2);
     expect(repeatCount).toBeLessThanOrEqual(3);
     });
-    it("buildQuiz always returns a 2-2-3 normal question distribution", () => {
+    it("buildQuiz plans a full varied legacy quiz using feasible types", () => {
   const concepts = enrichConcepts([
     {
       id: "c1",
@@ -319,6 +327,8 @@ describe("buildQuiz", () => {
   const sortedCounts = Object.values(counts).sort((a, b) => a - b);
 
   expect(sortedCounts).toEqual([2, 2, 3]);
+  expect(counts.true_false).toBe(2);
+  expect(counts.mcq + counts.fill_blank).toBe(5);
 });
 it("buildQuiz keeps Quiz B dominated by B concepts with only limited A repeats", () => {
   const concepts = enrichConcepts([
@@ -850,7 +860,7 @@ it("buildQuiz still returns matching by reshaping the 7 selected facts when init
   expect(quiz).toHaveLength(8);
   expect(matching?.pairs).toHaveLength(4);
 });
-it("buildQuiz still returns a full quiz when the concept pool is thin", () => {
+it("buildQuiz supports a thin four-fact pool without duplicate family assessments", () => {
   const concepts = enrichConcepts([
     {
       id: "a1",
@@ -924,8 +934,8 @@ it("buildQuiz still returns a full quiz when the concept pool is thin", () => {
   const matching = quiz.find((q) => q.type === "matching");
 
   expect(normal).toHaveLength(7);
-  expect(matching).toBeTruthy();
   expect(matching?.pairs).toHaveLength(4);
   expect(quiz).toHaveLength(8);
+  expect(new Set(normal.map((q) => `${q.conceptId}:${q.type}`)).size).toBe(7);
 });
 });

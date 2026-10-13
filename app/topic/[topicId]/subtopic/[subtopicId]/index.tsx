@@ -82,8 +82,9 @@ export default function SubtopicScreen() {
   }
 
   const isUnlocked = (levelNumber: number) => {
+    if (subtopic.availability === "coming-soon") return false;
     if (levelNumber <= 1) return true;
-    return completedLevelsMap[String(levelNumber - 1)] === true;
+    return Array.from({ length: levelNumber - 1 }, (_, i) => String(i + 1)).every(id => completedLevelsMap[id] === true);
   };
 
   const isCompleted = (levelId: string) => completedLevelsMap[levelId] === true;
@@ -99,7 +100,7 @@ export default function SubtopicScreen() {
         </Pressable>
 
         <Text numberOfLines={1} style={styles.headerTitle}>
-          {subtopic.title}
+          {subtopic.title}{subtopic.availability === "coming-soon" ? " • Coming soon" : ""}
         </Text>
 
         <View style={styles.xpPill}>

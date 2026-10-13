@@ -1,3 +1,4 @@
+import { relationDefinitions } from "./relationCatalogue";
 // Centralized, deliberately assigned relation wording. Display formatting does
 // not change concept values, options, seeds, or correctness decisions.
 import type { Concept } from "./conceptTypes";
@@ -719,11 +720,15 @@ export const deferredRelationSemantics: Readonly<Record<string, string>> = {
 const fallback = wording("Which option correctly relates to {s}?", "{s} is associated with {a}.");
 export function hasRelationTemplate(relation: string): boolean {
   return Object.prototype.hasOwnProperty.call(explicitRelationTemplates, relation) ||
-    Object.prototype.hasOwnProperty.call(relationFamilies, relation);
+    Object.prototype.hasOwnProperty.call(relationFamilies, relation) || Object.prototype.hasOwnProperty.call(relationDefinitions, relation);
 }
 export function getRelationTemplate(relation: string): RelationTemplate {
   if (Object.prototype.hasOwnProperty.call(explicitRelationTemplates, relation)) return explicitRelationTemplates[relation];
   if (Object.prototype.hasOwnProperty.call(relationFamilies, relation)) return semanticFamilies[relationFamilies[relation]];
+  if (Object.prototype.hasOwnProperty.call(relationDefinitions, relation)) {
+    const d = relationDefinitions[relation];
+    return wording(d.question, d.statement, d.blank);
+  }
   return fallback;
 }
 export function renderPrompt(concept: Concept): RenderedPrompt {

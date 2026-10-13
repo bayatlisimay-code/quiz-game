@@ -1,8 +1,11 @@
+import { ART_CURRICULUM_VERSION } from "../../data/artCurriculum";
+import { lessonAccess } from "./lessonAccess";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const STORAGE_KEY = "quizgame_progress_v2"; // Changed version to avoid conflicts
 
 export type Progress = {
+  curriculumVersion?: string;
   totalXP: number;
   completedParts: Record<string, Record<string, Record<string, string[]>>>; // topicId -> subtopicId -> levelId -> partIds[]
   streakCount: number;
@@ -14,6 +17,7 @@ export type Progress = {
 };
 
 const DEFAULT_PROGRESS: Progress = {
+  curriculumVersion: ART_CURRICULUM_VERSION,
   totalXP: 0,
   completedParts: {},
   streakCount: 0,
@@ -22,6 +26,7 @@ const DEFAULT_PROGRESS: Progress = {
 };
 
 let inMemory: Progress | null = null;
+let pendingLoad: Promise<Progress> | null = null;
 
 function normalize(progress: Partial<Progress>): Progress {
   const completedParts: Progress["completedParts"] = {};
@@ -57,6 +62,7 @@ function normalize(progress: Partial<Progress>): Progress {
   }
 
   return {
+    curriculumVersion: progress.curriculumVersion ?? ART_CURRICULUM_VERSION,
     totalXP: Number.isFinite(progress.totalXP) ? progress.totalXP! : 0,
     completedParts,
     streakCount: Number.isFinite(progress.streakCount) ? progress.streakCount! : 0,
@@ -67,6 +73,10 @@ function normalize(progress: Partial<Progress>): Progress {
 
 export async function loadProgress(): Promise<Progress> {
   if (inMemory) return inMemory;
+  if (!pendingLoad) pendingLoad = readProgress().finally(() => { pendingLoad = null; });
+  return pendingLoad;
+}
+async function readProgress(): Promise<Progress> {
 
   try {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
@@ -74,7 +84,18 @@ export async function loadProgress(): Promise<Progress> {
       inMemory = DEFAULT_PROGRESS;
       return inMemory;
     }
-    inMemory = normalize(JSON.parse(raw));
+    const parsed: Partial<Progress> = JSON.parse(raw);
+    let next = normalize(parsed);
+    if (parsed.curriculumVersion !== ART_CURRICULUM_VERSION) {
+      // Pre-release activation: retain a recoverable storage backup and unrelated
+      // progress/XP/streaks. Old Art positions cannot imply new lesson completion.
+      await AsyncStorage.setItem("quizgame_progress_before_art_miro", raw);
+      const { art: _oldParts, ...completedParts } = next.completedParts;
+      const { art: _oldVariants, ...completedQuizVariants } = next.completedQuizVariants;
+      next = { ...next, completedParts, completedQuizVariants, curriculumVersion: ART_CURRICULUM_VERSION };
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    }
+    inMemory = next;
     return inMemory;
   } catch {
     inMemory = DEFAULT_PROGRESS;
@@ -137,7 +158,7 @@ export function isLevelCompleted(
   totalParts: number
 ): boolean {
   const completedPartIds = progress.completedParts?.[topicId]?.[subtopicId]?.[levelId] ?? [];
-  return completedPartIds.length === totalParts;
+  return totalParts > 0 && Array.from({ length: totalParts }, (_, i) => String(i + 1)).every(id => completedPartIds.includes(id));
 }
 
 // Helper function to check if a part is completed
@@ -190,6 +211,8 @@ export async function markQuizVariantCompleted(
   variant: string
 ): Promise<boolean> {
   const progress = await loadProgress();
+  const access = lessonAccess(progress, { topicId, subtopicId, levelId, partId, variant });
+  if (!access.allowed) throw new Error(access.reason);
 
   const currentVariants =
     progress.completedQuizVariants?.[topicId]?.[subtopicId]?.[levelId]?.[partId] ?? [];

@@ -16,7 +16,7 @@ function isHostname(value: unknown): value is string {
 }
 
 function isSupportedType(value: unknown): boolean {
-  return value === "mcq" || value === "true_false" || value === "fill_blank";
+  return value === "mcq" || value === "true_false" || value === "fill_blank" || value === "matching";
 }
 
 export function isOwnedImageUrl(uri: unknown, ownedHosts: unknown): boolean {
@@ -51,6 +51,7 @@ export function resolveQuizImage(
       !Array.isArray(binding.allowedExerciseTypes) ||
       !binding.allowedExerciseTypes.every(isSupportedType) ||
       !binding.allowedExerciseTypes.includes(exerciseType)) return undefined;
+  if (exerciseType === "matching" && !binding.recognition?.answerLeakageReviewed) return undefined;
   const image = binding.image;
   if (!isRecord(image) || !isNonEmptyString(image.imageId) || !isNonEmptyString(image.altText) ||
       typeof image.width !== "number" || !Number.isFinite(image.width) || image.width <= 0 ||

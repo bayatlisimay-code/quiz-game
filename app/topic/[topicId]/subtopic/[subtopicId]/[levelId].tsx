@@ -1,3 +1,4 @@
+import { lessonAccess } from "../../../../../src/state/lessonAccess";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -25,8 +26,8 @@ export default function LevelScreen() {
   const subtopic = topic?.subtopics.find((s) => s.id === String(subtopicId));
   const level = subtopic?.levels.find((l) => l.id === String(levelId));
 
+  const [accessDenied, setAccessDenied] = useState<string | null>("Checking lesson access...");
   const [completedPartsMap, setCompletedPartsMap] = useState<Record<string, boolean>>({});
-  const [completedParts, setCompletedParts] = useState<string[]>([]);
 
 
   const refreshProgress = useCallback(() => {
@@ -35,6 +36,8 @@ export default function LevelScreen() {
     (async () => {
       const progress = await loadProgress();
       if (!alive) return;
+      const access = lessonAccess(progress, { topicId: String(topicId), subtopicId: String(subtopicId), levelId: String(levelId) });
+      setAccessDenied(access.allowed ? null : access.reason);
 
       const map: Record<string, boolean> = {};
       level?.parts?.forEach((part) => {
@@ -70,6 +73,9 @@ export default function LevelScreen() {
     );
   }
 
+  if (accessDenied) return <ScrollView style={styles.container}><Text style={styles.title}>{subtopic.title}</Text><Text style={styles.value}>{accessDenied}</Text>
+    <Pressable onPress={() => router.replace(subtopicPath)}><Text style={styles.backText}>← Back</Text></Pressable></ScrollView>;
+
   if (!level.parts || level.parts.length === 0) {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
@@ -83,13 +89,6 @@ export default function LevelScreen() {
       </ScrollView>
     );
   }
-
-  const isUnlocked = (partNumber: number) => {
-    if (partNumber <= 1) return true;
-    return completedPartsMap[String(partNumber - 1)] === true;
-  };
-
-  const isCompleted = (partId: string) => completedPartsMap[partId] === true;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
@@ -136,11 +135,10 @@ export default function LevelScreen() {
 
       {level.parts.map((part) => {
         const partNumber = Number(part.id);
-        const prevPartId = String(partNumber - 1);
 
         const done = completedPartsMap[part.id] === true;
         const partUnlocked =
-          part.id === "1" || completedPartsMap[prevPartId] === true;
+          Array.from({ length: partNumber - 1 }, (_, i) => String(i + 1)).every(id => completedPartsMap[id] === true);
 
         const locked = !partUnlocked;
 

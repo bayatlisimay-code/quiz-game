@@ -32,7 +32,9 @@ export function createRuntimeRegistry(
         !Number.isFinite(asset.hosted.height) || asset.hosted.height <= 0 ||
         !asset.hosted.storageKey.trim() || !/^[a-f0-9]{64}$/i.test(asset.hosted.sha256) ||
         binding.allowedExerciseTypes.length === 0 ||
-        binding.allowedExerciseTypes.some(type => !["mcq", "true_false", "fill_blank"].includes(type)) ||
+        binding.allowedExerciseTypes.some(type => !["mcq", "true_false", "fill_blank", "matching"].includes(type)) ||
+        (binding.allowedExerciseTypes.includes("matching") && !binding.recognition) ||
+        (binding.recognition && (!binding.recognition.answerLeakageReviewed || binding.recognition.answerId !== binding.candidateIdentity || binding.recognition.answerId !== asset.provenance.candidateIdentity)) ||
         (license.status === "CC-BY" && !hasRequiredAttribution(license.attribution))) {
       throw new Error(`Incomplete approved image binding: ${binding.conceptId}`);
     }
@@ -40,6 +42,7 @@ export function createRuntimeRegistry(
     bindings[binding.conceptId] = {
       reviewStatus: "approved",
       conceptId: binding.conceptId,
+      ...(binding.recognition ? { recognition: binding.recognition } : {}),
       allowedExerciseTypes: [...binding.allowedExerciseTypes],
       image: {
         imageId: asset.imageId, uri: asset.hosted.hostedUrl,

@@ -1,3 +1,4 @@
+import { artCurriculum, artAvailability } from "./artCurriculum";
 // data/catalog.ts
 
 export type Catalog = {
@@ -17,6 +18,7 @@ export type Subtopic = {
   id: string;
   title: string;
   levels: Level[];
+  availability?: "available" | "coming-soon";
 };
 
 export type Level = {
@@ -67,7 +69,7 @@ function makeLevels(topicId: string, subtopicId: string): Level[] {
   const ids = ["1","2","3","4","5","6","7","8","9","10"];
   return ids.map((id) => ({
     id,
-    title: `Level ${id}`,
+    title: topicId === "art" ? artCurriculum[subtopicId]?.[`l${id}`]?.title ?? `Level ${id}` : `Level ${id}`,
     parts: makeParts(topicId, subtopicId, id),
   }));
 }
@@ -91,6 +93,7 @@ function makeSubtopic(topicId: string, title: string): Subtopic {
     id,
     title,
     levels: makeLevels(topicId, id),
+    ...(topicId === "art" ? { availability: artAvailability[id] ?? "available" as const } : {}),
   };
 }
 
@@ -128,14 +131,7 @@ export const TOPICS: Topic[] = [
     emoji: "🎨",
     color: "#A855F7",
     subtopics: [
-      "Literature",
-      "Painting",
-      "Sculpture",
-      "Architecture",
-      "Music",
-      "Theatre",
-      "Design",
-      "Movies",
+      "Painting", "Literature", "Movies", "Music", "Design", "Architecture", "Sculpture", "Theatre",
     ].map((t) => makeSubtopic("art", t)),
   },
 

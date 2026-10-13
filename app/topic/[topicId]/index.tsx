@@ -1,9 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TOPIC_BY_ID } from "../../../data/catalog";
-import { getXpLevel } from "../../../src/state/leveling";
 import { useStreak } from "../../../src/state/useStreak";
 import { useTotalXp } from "../../../src/state/useTotalXp";
 import { getHomePath, getTopicsPath } from "../../../lib/routes";
@@ -15,7 +13,6 @@ export default function TopicScreen() {
   const topic = TOPIC_BY_ID[String(topicId)];
 
   const totalXP = useTotalXp();
-  const xpLevel = useMemo(() => getXpLevel(totalXP), [totalXP]);
   const streak = useStreak();
 
   if (!topic) {
@@ -68,6 +65,7 @@ export default function TopicScreen() {
       {topic.subtopics.map((s) => (
         <Pressable
           key={s.id}
+          disabled={s.availability === "coming-soon"}
           style={[styles.card, { borderLeftColor: topic.color }]}
           onPress={() =>
             router.push({
@@ -76,7 +74,7 @@ export default function TopicScreen() {
             })
           }
         >
-          <Text style={styles.cardTitle}>{s.title}</Text>
+          <Text style={styles.cardTitle}>{s.title}{s.availability === "coming-soon" ? " • Coming soon" : ""}</Text>
           <Text style={styles.cardMeta}>{s.levels.length} levels</Text>
         </Pressable>
       ))}

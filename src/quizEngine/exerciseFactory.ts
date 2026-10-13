@@ -1,391 +1,260 @@
-// src/quizEngine/exerciseFactory.ts
+import { typedResponseIsSafe } from "./semanticEvidence";
+import { relationDefinitions } from "./relationCatalogue";
+import { planAssessmentStimulus } from "../images/assessmentImages";
+import { getAssessmentTemplate } from "./assessmentTemplates";
+import { isPermanentlyLockable } from "./matchingSafety";
+import type { Concept, Exercise, MatchingExercise } from "./conceptTypes";
+import { hasRelationTemplate } from "./templates";
+import { getRelationPolicy } from "./relationPolicies";
+import { createSemanticContext, equivalentAnswers, normalizeSemanticText } from "./semanticValidation";
+import type { SemanticContext } from "./semanticValidation";
+import { hashString, seededShuffle } from "./deterministic";
 
-import type {
-  Concept,
-  Exercise,
-  ExerciseType,
-  MatchingExercise
-} from "./conceptTypes";
-import { enrichConcepts } from "./enrichConcepts";
-import { createFactTracker } from "./factTracker";
-import { getRelationTemplate, renderPrompt } from "./templates";
+export type AssessmentForm = "mcq" | "true" | "false" | "blank_options" | "blank_typed";
+export type Capability = Readonly<{ available: boolean; reason: string }>;
+export type ExerciseCapabilities = Readonly<{
+  semanticContext: SemanticContext;
+  claimIdentity: string;
+  forms: Readonly<Record<AssessmentForm | "matching", Capability>>;
+  optionCandidates: readonly Concept[];
+  falseCandidates: readonly Concept[];
+  acceptedAnswers: readonly string[];
+  acceptedAnswerForms: readonly { readonly text: string; readonly caseSensitive: boolean }[];
+}>;
+export type GenerationResult<T = Exercise> =
+  | { status: "generated"; exercise: T; form: AssessmentForm | "matching" }
+  | { status: "unavailable"; reason: string; conceptId?: string };
+const capability = (available: boolean, reason: string): Capability => Object.freeze({ available, reason });
 
-function hashString(s: string) {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
+function uniqueCandidates(candidates: readonly Concept[], context: SemanticContext): Concept[] {
+  const identities = new Set<string>(), displays = new Set<string>();
+  const forms = new Set<string>();
+  return candidates.filter((candidate) => {
+    const answer = context.claim(candidate).answer;
+    const display = normalizeSemanticText(answer.text);
+    const exact = answer.forms.map((text) => `exact:${normalizeSemanticText(text)}`);
+    const folded = answer.caseSensitive ? [] : answer.forms.map((text) => `fold:${normalizeSemanticText(text).toLowerCase()}`);
+    // Conservative alias deduplication is linear in the number of display forms.
+    // It can exclude an ambiguous candidate, never authorize one as a negative.
+    if (!display || identities.has(answer.identity) || displays.has(display) || [...exact, ...folded].some((key) => forms.has(key))) return false;
+    identities.add(answer.identity); displays.add(display);
+    for (const key of [...exact, ...folded]) forms.add(key);
+    return true;
+  });
+}
+export function getExerciseCapabilities(concept: Concept, pool: readonly Concept[], context: SemanticContext, optionCount = 3): ExerciseCapabilities {
+  const policy = getRelationPolicy(concept.relation, context.policies);
+  const claim = context.claim(concept);
+  const metadataErrors = context.strategies[policy.semanticStrategy]?.validateMetadata(claim, context) ?? ["Unknown semantic strategy"];
+  const enabled = policy.status !== "blocked-pending-metadata" && metadataErrors.length === 0 && hasRelationTemplate(concept.relation) && !!concept.object.trim();
+  const candidates = pool.filter((candidate) => candidate.id !== concept.id &&
+    normalizeSemanticText(candidate.object) !== normalizeSemanticText(concept.object));
+  const decisions = new Map(candidates.map((c) => [c, context.evaluate(concept, c)]));
+  const accepted = context.acceptedAnswers(concept);
+  const displayIsAccepted = (candidate: Concept) => accepted.some((answer) => answer.forms.some((text) => {
+    const display = normalizeSemanticText(candidate.object), form = normalizeSemanticText(text);
+    return answer.caseSensitive ? display === form : display.toLowerCase() === form.toLowerCase();
+  }));
+  const displays = new Map<string, Concept[]>();
+  for (const c of candidates) {
+    const key = normalizeSemanticText(c.object);
+    const group = displays.get(key) ?? []; group.push(c); displays.set(key, group);
   }
-  return h >>> 0;
+  const allowed = candidates.filter((c) => {
+    const verdict = decisions.get(c)!.verdict;
+    return verdict === "invalid" && !displayIsAccepted(c) &&
+      displays.get(normalizeSemanticText(c.object))!.every((other) =>
+        context.claim(other).answer.identity === context.claim(c).answer.identity || decisions.get(other)!.verdict === "invalid");
+  });
+  // Filtering and deduplication precede sampling within each preferred bucket.
+  const buckets = [
+    allowed.filter((c) => !!concept.distractorGroup && c.distractorGroup === concept.distractorGroup),
+    allowed.filter((c) => c.relation === concept.relation), allowed,
+  ].map((bucket) => uniqueCandidates(bucket, context));
+  const optionCandidates = buckets.find((bucket) => bucket.length >= Math.max(1, optionCount - 1)) ?? buckets[2];
+  const falseCandidates = uniqueCandidates(allowed, context);
+  const hasOptions = Number.isInteger(optionCount) && optionCount >= 3 && optionCandidates.length >= optionCount - 1;
+  const acceptedValues = context.acceptedAnswers(concept);
+  const acceptedForms = acceptedValues.flatMap((a) => a.forms);
+  const typedConstrained = policy.semanticStrategy === "reviewed-evidence" ? typedResponseIsSafe(claim, context) : (concept.answerKind !== "long" && claim.metadata.exclusive === true) ||
+    (claim.metadata.acceptedAnswerSetComplete === true && !!concept.semantic?.acceptedAnswers?.length);
+  const enabledReason = policy.status === "blocked-pending-metadata" ? "Relation blocked pending semantic metadata/content review"
+    : metadataErrors.join("; ") || (!hasRelationTemplate(concept.relation) ? "Missing relation template" : "Empty answer");
+  const availability = (permitted: boolean, safe: boolean, failure: string, type: Exercise["type"]) => {
+    const presentation = planAssessmentStimulus(concept, context, type);
+    return capability(enabled && permitted && safe && presentation.available,
+      !enabled ? enabledReason : !permitted ? "Form disallowed by relation policy" : !safe ? failure : presentation.reason);
+  };
+  return Object.freeze({
+    semanticContext: context, claimIdentity: `${claim.key}:${claim.answer.identity}`,
+    forms: Object.freeze({
+      mcq: availability(policy.allowedExerciseTypes.includes("mcq"), hasOptions, "Insufficient compatible negative options", "mcq"),
+      true: availability(policy.allowedExerciseTypes.includes("true_false"), true, "Stored positive assertion", "true_false"),
+      false: availability(policy.allowedExerciseTypes.includes("true_false"), falseCandidates.length > 0, "No certified false assertion", "true_false"),
+      blank_options: availability(policy.allowedExerciseTypes.includes("fill_blank") && policy.allowOptionsBlank, hasOptions, "Insufficient compatible negative options", "fill_blank"),
+      blank_typed: availability(policy.allowedExerciseTypes.includes("fill_blank") && policy.allowTypedBlank, typedConstrained, "Typed recall requires an explicitly complete constrained answer set", "fill_blank"),
+      matching: availability(policy.allowMatching, true, "Matching additionally requires a compatible four-pair group", "matching"),
+    }),
+    optionCandidates: Object.freeze(optionCandidates), falseCandidates: Object.freeze(falseCandidates),
+    acceptedAnswers: Object.freeze(concept.assessment?.response ? concept.assessment.response.forms.map(f => f.text) : [...new Set(acceptedForms)]),
+    acceptedAnswerForms: Object.freeze(concept.assessment?.response?.forms ?? acceptedValues.flatMap((a) => a.forms.map((text) => Object.freeze({ text, caseSensitive: a.caseSensitive })))),
+  });
 }
 
-function seededShuffle<T>(array: T[], seed: string): T[] {
-  const result = [...array];
-  let h = hashString(seed);
-
-  for (let i = result.length - 1; i > 0; i--) {
-    h = Math.imul(h ^ (h >>> 15), 1 | h);
-    const j = (h >>> 0) % (i + 1);
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-
-  return result;
+// True is observable as a capability, but assessed TF is only available when
+// both truth values are feasible for this same concept. This prevents a relation
+// family from becoming an always-True shortcut, even in a mixed quiz.
+export function assessableForms(capabilities: ExerciseCapabilities): AssessmentForm[] {
+  return (["mcq", "true", "false", "blank_options", "blank_typed"] as const).filter((form) =>
+    capabilities.forms[form].available && ((form !== "true" && form !== "false") ||
+      (capabilities.forms.true.available && capabilities.forms.false.available)));
 }
-
-export function buildMatchingExercise(
-    concepts: any[],
-    seed: string
-  ): MatchingExercise | null {
-    if (!concepts || concepts.length < 4) return null;
-
-    const byRelation: Record<string, any[]> = {};
-
-    for (const c of concepts) {
-      if (!c?.relation || !c?.subject || !c?.object) continue;
-
-      if (!byRelation[c.relation]) {
-        byRelation[c.relation] = [];
-      }
-
-      byRelation[c.relation].push(c);
+export function generateExercise(
+  concept: Concept, capabilities: ExerciseCapabilities, form: AssessmentForm,
+  context: SemanticContext, seed: string, optionCount = 3
+): GenerationResult {
+  const current = context.claim(concept);
+  if (capabilities.semanticContext !== context || capabilities.claimIdentity !== `${current.key}:${current.answer.identity}`) {
+    return { status: "unavailable", conceptId: concept.id, reason: "Capabilities belong to another semantic snapshot or claim" };
+  }
+  if (!assessableForms(capabilities).includes(form)) {
+    return { status: "unavailable", conceptId: concept.id, reason: capabilities.forms[form].reason || "Form is not safely assessable" };
+  }
+  const template = getAssessmentTemplate(concept);
+  const type = form === "true" || form === "false" ? "true_false" : form === "mcq" ? "mcq" : "fill_blank";
+  const presentation = planAssessmentStimulus(concept, context, type);
+  if (!presentation.available) return { status: "unavailable", reason: presentation.reason, conceptId: concept.id };
+  const base = { conceptId: concept.id, answerText: concept.object, direction: concept.assessment?.direction ?? "forward" as const,
+    factId: concept.assessment?.factId ?? concept.id, ...(presentation.stimulus ? { stimulus: presentation.stimulus } : {}) };
+  if (form === "true" || form === "false") {
+    const substitute = form === "false" ? seededShuffle(capabilities.falseCandidates, `${seed}:false`)[0] : undefined;
+    if (substitute && context.evaluate(concept, substitute).verdict !== "invalid") {
+      return { status: "unavailable", conceptId: concept.id, reason: "False assertion lost semantic certification" };
     }
-
-    const validGroups = Object.values(byRelation)
-      .map((group) => {
-        const seenFactIds = new Set<string>();
-        const seenLeftItems = new Set<string>();
-
-        const uniqueGroup = group.filter((c) => {
-          const factId = String(c.id ?? "");
-          const left = String(c.subject).trim();
-
-          if (!left) return false;
-          if (factId && seenFactIds.has(factId)) return false;
-          if (seenLeftItems.has(left)) return false;
-
-          if (factId) {
-            seenFactIds.add(factId);
-          }
-          seenLeftItems.add(left);
-
-          return true;
-        });
-
-        return uniqueGroup;
-      })
-      .filter((group) => group.length >= 4);
-
-    if (validGroups.length === 0) return null;
-
-    const group = seededShuffle(validGroups, `${seed}_matching_group`)[0];
-    if (!group) return null;
-
-    const selected = seededShuffle(group, `${seed}_matching_select`).slice(0, 4);
-
-    if (selected.length < 4) return null;
-
-    const pairs = selected.map((c, index) => ({
-      id: String(c.id ?? `match_${index}`),
-      left: String(c.subject),
-      right: String(c.object),
-    }));
-
-    return {
-      type: "matching",
-      prompt: "Match the pairs",
-      pairs,
-    };
+    return { status: "generated", form, exercise: { ...base, type: "true_false", correctAnswer: form === "true",
+      statement: template.statement(concept.subject, substitute?.object ?? concept.object, concept.context) } };
   }
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const tmp = a[i];
-    a[i] = a[j];
-    a[j] = tmp;
+  const picked = seededShuffle(capabilities.optionCandidates, `${seed}:negatives`).slice(0, optionCount - 1);
+  if ((form === "mcq" || form === "blank_options") && (picked.length !== optionCount - 1 ||
+      picked.some((c) => context.evaluate(concept, c).verdict !== "invalid"))) {
+    return { status: "unavailable", conceptId: concept.id, reason: "Options lost semantic certification" };
   }
-  return a;
+  const distractors = picked.map((c) => c.object);
+  const options = seededShuffle([concept.object, ...distractors], `${seed}:options`);
+  const correctIndex = options.indexOf(concept.object);
+  if (form === "mcq") return { status: "generated", form, exercise: { ...base, type: "mcq",
+    prompt: template.question(concept.subject, concept.context), options, correctIndex } };
+  const allowedInputModes = [
+    ...(capabilities.forms.blank_typed.available ? ["input" as const] : []),
+    ...(capabilities.forms.blank_options.available ? ["options" as const] : []),
+  ];
+  return { status: "generated", form, exercise: { ...base, type: "fill_blank",
+    prompt: template.blank(concept.subject, concept.context), allowedInputModes,
+    acceptedAnswers: capabilities.acceptedAnswers, acceptedAnswerForms: capabilities.acceptedAnswerForms, caseSensitive: context.claim(concept).answer.caseSensitive,
+    ...(capabilities.forms.blank_options.available ? { options, correctIndex } : {}),
+  } };
 }
 
-function pickN<T>(arr: T[], n: number): T[] {
-  if (arr.length <= n) return [...arr];
-  return shuffle(arr).slice(0, n);
-}
-
-function sameBucket(a: Concept, b: Concept): boolean {
-  // Prefer distractorGroup if present; otherwise fall back to relation
-  if (a.distractorGroup && b.distractorGroup) {
-    return a.distractorGroup === b.distractorGroup;
-  }
-  return a.relation === b.relation;
-}
-
-function getAnswerText(c: Concept): string {
-  return renderPrompt(c).answerText.trim();
-}
-
-function chooseType(concept: Concept): ExerciseType {
-  // For long answers (definitions), keep it simple and high-quality for now:
-  // only MCQ. (No matching, no fill.)
-  if (concept.answerKind === "long") return "mcq";
-
-  // For short answers, we can rotate between types.
-  const choices: ExerciseType[] = ["mcq", "true_false", "fill_blank"];
-  return choices[Math.floor(Math.random() * choices.length)];
-}
-
-function buildMcq(concept: Concept, pool: Concept[], optionCount: number): Exercise {
-  const rendered = renderPrompt(concept);
-  const correct = rendered.answerText.trim();
-
-  // Gather candidate distractors from similar concepts
-  const candidates = pool
-    .filter((c) => c.id !== concept.id)
-    .filter((c) => sameBucket(concept, c))
-    .map((c) => getAnswerText(c))
-    .filter((t) => t && t !== correct);
-
-  // De-dupe
-  const uniqueCandidates = Array.from(new Set(candidates));
-
-  const distractors = pickN(uniqueCandidates, Math.max(0, optionCount - 1));
-  const optionsUnshuffled = [correct, ...distractors];
-
-  // If we couldn't find enough distractors, we still proceed with fewer options
-  const options = shuffle(optionsUnshuffled);
-  const correctIndex = options.indexOf(correct);
-
-  const tracker = createFactTracker();
-
-  // TEMP: assume variant A for now (we will fix later)
-  const variant = "A";
-
-  return {
-    type: "mcq",
-    conceptId: concept.id,
-    prompt: rendered.prompt,
-    options,
-    correctIndex,
-    answerText: correct,
-  };
-}
-
-function buildTrueFalse(concept: Concept, pool: Concept[]): Exercise {
-  const rendered = renderPrompt(concept);
-
-  // If we don't have a good sentence, fall back to MCQ-style prompt statement
-  const trueStatement = (rendered.sentence ?? `${rendered.prompt} ${rendered.answerText}`).trim();
-
-  // 50/50 whether we show a true or false statement
-  const makeTrue = Math.random() < 0.5
-
-
-  if (makeTrue) {
-    return {
-      type: "true_false",
-      conceptId: concept.id,
-      statement: trueStatement,
-      correctAnswer: true,
-      answerText: rendered.answerText.trim(),
-    };
-  }
-
-  // Make a false statement by swapping the answer with a distractor answerText
-  const correct = rendered.answerText.trim();
-
-  const falseCandidates = pool
-    .filter((c) => c.id !== concept.id)
-    .filter((c) => sameBucket(concept, c))
-    .map((c) => getAnswerText(c))
-    .filter((t) => t && t !== correct);
-
-  const uniqueFalse = Array.from(new Set(falseCandidates));
-  const wrong = uniqueFalse.length > 0 ? uniqueFalse[Math.floor(Math.random() * uniqueFalse.length)] : correct;
-
-  // If we couldn't find a wrong answer, we still return a "true" statement to avoid nonsense
-  if (wrong === correct) {
-    return {
-      type: "true_false",
-      conceptId: concept.id,
-      statement: trueStatement,
-      correctAnswer: true,
-      answerText: correct,
-    };
-  }
-
-  const falseStatement = getRelationTemplate(concept.relation).statement(
-    concept.subject, wrong, concept.context
-  );
-
-  return {
-    type: "true_false",
-    conceptId: concept.id,
-    statement: falseStatement,
-    correctAnswer: false,
-    answerText: correct,
-  };
-}
-
-function buildFillBlank(concept: Concept): Exercise {
-  const rendered = renderPrompt(concept);
-  return {
-    type: "fill_blank",
-    conceptId: concept.id,
-    prompt: getRelationTemplate(concept.relation).blank(concept.subject, concept.context),
-    answerText: rendered.answerText.trim(),
-  };
-}
-
-function pickFrom<T>(arr: T[], seed: number, count: number): T[] {
-  const a = [...arr];
-  let s = seed || 1;
-
-  function next() {
-    // xorshift32
-    s ^= s << 13;
-    s ^= s >>> 17;
-    s ^= s << 5;
-    return (s >>> 0) / 4294967296;
-  }
-
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(next() * (i + 1));
-    const tmp = a[i];
-    a[i] = a[j];
-    a[j] = tmp;
-  }
-  
-  return a.slice(0, Math.min(count, a.length));
-}
-
+// Compatibility adapter for callers requesting a single exercise. New callers
+// should consume GenerationResult. An omitted context intentionally means the
+// supplied pool is an isolated snapshot; production passes its registered context.
 export function buildExercise(
-  
-  concept: any,
-  allConcepts: any[],
-  optionCount = 4,
-  preferredType?: Exercise["type"]
-): Exercise {
+  concept: Concept, allConcepts: Concept[], optionCount = 4,
+  preferredType?: Exercise["type"], context = createSemanticContext(allConcepts)
+): Exercise | null {
+  if (!concept || preferredType === "matching") return null;
+  const capabilities = getExerciseCapabilities(concept, allConcepts, context, optionCount);
+  const forms = assessableForms(capabilities);
+  const seed = `${concept.id}:${concept.subject}:${concept.object}:${concept.relation}:${preferredType}`;
+  const preferred = preferredType === "mcq" ? "mcq" : preferredType === "fill_blank"
+    ? capabilities.forms.blank_options.available ? "blank_options" : "blank_typed"
+    : hashString(seed) % 2 ? "false" : "true";
+  const form = preferredType ? (forms.includes(preferred) ? preferred : undefined) : seededShuffle(forms, seed)[0];
+  if (!form) return null;
+  const result = generateExercise(concept, capabilities, form, context, seed, optionCount);
+  return result.status === "generated" ? result.exercise : null;
+}
 
-  if (!concept || !allConcepts || allConcepts.length === 0) {
-    return {
-      type: "fill_blank",
-      conceptId: String(concept?.id ?? "missing"),
-      prompt: "Question unavailable.",
-      answerText: "",
-    };
+export { isMatchingPairCorrect } from "./answerValidation";
+
+export type SearchBudget = { examined: number; limit: number; exhausted: boolean };
+export function spendSearchNode(budget: SearchBudget): boolean {
+  if (budget.examined >= budget.limit) { budget.exhausted = true; return false; }
+  budget.examined++;
+  return true;
+}
+// Lazy enumeration lets the joint planner try another clique when the first
+// valid matching group would starve ordinary quotas. The caller owns the bound.
+export function* matchingCandidates(
+  concepts: readonly Concept[], seed: string, context: SemanticContext,
+  budget: SearchBudget
+): Generator<{ concepts: readonly Concept[]; exercise: MatchingExercise }> {
+  const groups = new Map<string, Concept[]>();
+  for (const concept of concepts) {
+    const policy = getRelationPolicy(concept.relation, context.policies);
+    if (!planAssessmentStimulus(concept, context, "matching").available) continue;
+    if (policy.status === "blocked-pending-metadata" || !policy.allowMatching || !hasRelationTemplate(concept.relation) ||
+        !context.strategies[policy.semanticStrategy] || context.strategies[policy.semanticStrategy].validateMetadata(context.claim(concept), context).length) continue;
+    const group = groups.get(concept.relation) ?? [];
+    if (!group.some((c) => c.id === concept.id)) group.push(concept);
+    groups.set(concept.relation, group);
   }
-
-  allConcepts = enrichConcepts(allConcepts);
-  
-  const seed = hashString(
-    `${concept.id}:${concept.subject}:${concept.object}:${concept.relation}:${preferredType}`
-  );
-
-  // We try MCQ first, but only if we can find enough distractors.
-  const correct = String(concept.object);
-  const template = getRelationTemplate(String(concept.relation));
-  const subject = String(concept.subject);
-
-  // 1) best distractors: same distractorGroup (if you have it)
-  const sameGroup = allConcepts.filter(
-    (c) => c.id !== concept.id && String(c.object) !== correct && c.distractorGroup === concept.distractorGroup
-  );
-
-  // 2) fallback distractors: same relation (keeps it relevant)
-  const sameRelation = allConcepts.filter(
-    (c) => c.id !== concept.id && String(c.object) !== correct && c.relation === concept.relation
-  );
-
-  // 3) last fallback: anything with a different object
-  const anyPool = allConcepts.filter((c) => c.id !== concept.id && String(c.object) !== correct);
-
-  const pool =
-    sameGroup.length >= optionCount - 1
-      ? sameGroup
-      : sameRelation.length >= optionCount - 1
-      ? sameRelation
-      : anyPool;
-
-  const distractors = pickFrom(pool, seed, optionCount - 1).map((c) => String(c.object));
-
-  const canMakeMcq = distractors.length >= Math.min(optionCount - 1, 3); // need at least 3 distractors for a real MCQ
-
-  // Deterministic mix: rotates type per concept so you see variety.
-  const typePick = seed % 3; // 0,1,2
-
-  // Helper: build MCQ
-  const buildMcq = (): Exercise => {
-    const options = pickFrom([correct, ...distractors], seed + 99, optionCount);
-    const correctIndex = options.findIndex((o) => o === correct);
-
-    const prompt = template.question(subject, concept.context);
-
-    return {
-      type: "mcq",
-      conceptId: String(concept.id),
-      prompt,
-      options,
-      correctIndex,
-      answerText: correct,
+  for (const group of seededShuffle([...groups.values()], `${seed}:matching-groups`)) {
+    const ordered = seededShuffle(group, `${seed}:matching-select`);
+    const selected: Concept[] = [];
+    const compatibility = new Map<string, boolean>();
+    const compatible = (a: Concept, b: Concept) => {
+      const key = JSON.stringify([a.id, b.id]);
+      if (compatibility.has(key)) return compatibility.get(key)!;
+      const aa = context.claim(a).answer, bb = context.claim(b).answer;
+      const first = planAssessmentStimulus(a, context, "matching").stimulus;
+      const second = planAssessmentStimulus(b, context, "matching").stimulus;
+      const firstText = first?.kind === "text" ? first.text : first?.fallbackText;
+      const secondText = second?.kind === "text" ? second.text : second?.fallbackText;
+      const indistinguishable = (firstText && secondText && normalizeSemanticText(firstText) === normalizeSemanticText(secondText)) || first && second && ((first.kind === "text" && second.kind === "text" && normalizeSemanticText(first.text) === normalizeSemanticText(second.text)) ||
+        (first.kind === "image" && second.kind === "image" && (first.image.imageId === second.image.imageId || first.image.uri === second.image.uri)));
+      const result = !indistinguishable && context.claim(a).subjectIdentity !== context.claim(b).subjectIdentity &&
+        normalizeSemanticText(a.subject) !== normalizeSemanticText(b.subject) && (normalizeSemanticText(aa.text) !== normalizeSemanticText(bb.text) && ((aa.caseSensitive && bb.caseSensitive) || normalizeSemanticText(aa.text).toLowerCase() !== normalizeSemanticText(bb.text).toLowerCase())) && !equivalentAnswers(aa, bb) &&
+        context.evaluate(a, b).verdict !== "unknown" && context.evaluate(b, a).verdict !== "unknown";
+      compatibility.set(key, result);
+      return result;
     };
-  };
-
-  // Helper: build True/False
-  const buildTf = (): Exercise => {
-    const wrong = distractors[0] ?? (anyPool[0] ? String(anyPool[0].object) : "Unknown");
-    const truth = (seed % 2) === 0;
-    const shown = truth ? correct : wrong;
-
-    const statement = template.statement(subject, shown, concept.context);
-
-    return {
-      type: "true_false",
-      conceptId: String(concept.id),
-      statement,
-      correctAnswer: truth,
-      answerText: correct,
-    };
-  };
-
-  // Helper: build Fill-in-the-blank (THIS WILL SHOW A BLANK)
-  const buildBlank = (): Exercise => {
-    const prompt = template.blank(subject, concept.context);
-
-    const options = pickFrom([correct, ...distractors], seed + 77, optionCount);
-    const correctIndex = options.findIndex((o) => o === correct);
-
-    return {
-      type: "fill_blank",
-      conceptId: String(concept.id),
-      prompt,
-      answerText: correct,
-      options,
-      correctIndex,
-    };
-  };
-
-// If the caller requested a specific type, try to build it
-if (preferredType === "mcq") {
-  if (canMakeMcq) return buildMcq();
-  // fallback if MCQ impossible
-  return (seed % 2) === 0 ? buildTf() : buildBlank();
+    function* search(start: number): Generator<{ concepts: readonly Concept[]; exercise: MatchingExercise }> {
+      if (!spendSearchNode(budget)) return;
+      if (selected.length === 4) {
+        if (!selected.some((left) => selected.some((right) => context.evaluate(left, right).verdict === "invalid"))) return;
+        const matrix = selected.map(left => selected.map(right => context.evaluate(left, right).verdict === "valid"));
+        if (!isPermanentlyLockable(matrix)) return;
+        const pairs = selected.map((concept) => ({
+          id: concept.id, left: `${relationDefinitions[concept.relation]?.family === "identification" ? "Identify this work" : concept.subject}${concept.assessment?.scope?.text ? ` (${concept.assessment.scope.text})` : ""}`, right: concept.object,
+          stimulus: planAssessmentStimulus(concept, context, "matching").stimulus,
+          answerIdentity: context.claim(concept).answer.identity, caseSensitive: context.claim(concept).answer.caseSensitive,
+          acceptedAnswerIdentities: [...new Set(selected.filter((candidate) => context.evaluate(concept, candidate).verdict === "valid")
+            .map((candidate) => context.claim(candidate).answer.identity))],
+        }));
+        yield { concepts: [...selected], exercise: { type: "matching", direction: selected[0].assessment?.direction ?? "forward", prompt: "Match the pairs", pairs } };
+        return;
+      }
+      for (let i = start; i <= ordered.length - (4 - selected.length); i++) {
+        if (budget.exhausted) return;
+        if (!selected.every((prior) => compatible(prior, ordered[i]))) continue;
+        selected.push(ordered[i]);
+        yield* search(i + 1);
+        selected.pop();
+      }
+    }
+    yield* search(0);
+    if (budget.exhausted) return;
+  }
 }
-
-if (preferredType === "true_false") {
-  return buildTf();
+export function generateMatchingExercise(concepts: readonly Concept[], seed: string, context: SemanticContext): GenerationResult<MatchingExercise> {
+  const budget = { examined: 0, limit: 10000, exhausted: false };
+  for (const candidate of matchingCandidates(concepts, seed, context, budget)) {
+    return { status: "generated", form: "matching", exercise: candidate.exercise };
+  }
+  return { status: "unavailable", reason: budget.exhausted ? "Matching search limit reached; feasibility undetermined" : "No safe four-pair matching group in selected curriculum facts" };
 }
-
-if (preferredType === "fill_blank") {
-  return buildBlank();
-}
-
-// If no type preference is given (safety fallback)
-if (canMakeMcq) {
-  if (typePick === 0) return buildMcq();
-  if (typePick === 1) return buildTf();
-  return buildBlank();
-}
-
-return typePick % 2 === 0 ? buildTf() : buildBlank();
+export function buildMatchingExercise(concepts: Concept[], seed: string, context = createSemanticContext(concepts)): MatchingExercise | null {
+  const result = generateMatchingExercise(concepts, seed, context);
+  return result.status === "generated" ? result.exercise : null;
 }
