@@ -1,5 +1,4 @@
 import { typedResponseIsSafe } from "./semanticEvidence";
-import { relationDefinitions } from "./relationCatalogue";
 import { planAssessmentStimulus } from "../images/assessmentImages";
 import { getAssessmentTemplate } from "./assessmentTemplates";
 import { isPermanentlyLockable } from "./matchingSafety";
@@ -226,7 +225,9 @@ export function* matchingCandidates(
         const matrix = selected.map(left => selected.map(right => context.evaluate(left, right).verdict === "valid"));
         if (!isPermanentlyLockable(matrix)) return;
         const pairs = selected.map((concept) => ({
-          id: concept.id, left: `${relationDefinitions[concept.relation]?.family === "identification" ? "Identify this work" : concept.subject}${concept.assessment?.scope?.text ? ` (${concept.assessment.scope.text})` : ""}`, right: concept.object,
+          // The same scoped question must govern matching and ordinary forms.
+          // A bare title loses role/event qualifiers (e.g. completion vs creation).
+          id: concept.id, left: getAssessmentTemplate(concept).question(concept.subject), right: concept.object,
           stimulus: planAssessmentStimulus(concept, context, "matching").stimulus,
           answerIdentity: context.claim(concept).answer.identity, caseSensitive: context.claim(concept).answer.caseSensitive,
           acceptedAnswerIdentities: [...new Set(selected.filter((candidate) => context.evaluate(concept, candidate).verdict === "valid")

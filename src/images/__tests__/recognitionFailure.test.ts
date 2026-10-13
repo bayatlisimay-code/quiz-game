@@ -4,9 +4,9 @@ import type { ReactNode, ReactElement } from "react";
 let mockStates: unknown[] = [];
 let mockIndex = 0;
 let mockCleanup: (() => void) | undefined;
-const mockMounted = { current: true };
+const mockLifecycle = { current: { mounted: true, settled: false } };
 jest.mock("react", () => ({ ...jest.requireActual("react"),
-  useRef: () => mockMounted,
+  useRef: () => mockLifecycle,
   useEffect: (effect: () => (() => void)) => { mockCleanup = effect(); },
   useState: (initial: unknown) => {
     const i = mockIndex++;
@@ -22,7 +22,8 @@ function find(node: ReactNode, type: string): ReactElement<Record<string, unknow
   if (node.type === type) return node;
   return React.Children.toArray(node.props.children as ReactNode).map(child => find(child, type)).find(Boolean);
 }
-beforeEach(() => { mockStates = []; mockIndex = 0; mockMounted.current = true; mockCleanup = undefined; });
+afterEach(() => { mockCleanup?.(); jest.useRealTimers(); });
+beforeEach(() => { mockStates = []; mockIndex = 0; mockLifecycle.current = { mounted: true, settled: false }; jest.useFakeTimers(); mockCleanup = undefined; });
 test("required image failure displays only the supplied verified fallback", () => {
   const onFailure = jest.fn();
   const element = QuizImage({ image, fallbackText: "Verified authored clue", onFailure });
@@ -41,4 +42,29 @@ test("image-only failure signals replanning; late callbacks after unmount are ig
   const error = find(first, "ExpoImage")!.props.onError as () => void;
   error(); expect(onFailure).toHaveBeenCalledTimes(1);
   mockCleanup!(); error(); expect(onFailure).toHaveBeenCalledTimes(1);
+});
+
+test("stalled required images time out to verified fallback without grading an empty stimulus", () => {
+  const onFailure = jest.fn(), element = QuizImage({ image, fallbackText: "Verified authored clue", onFailure });
+  const Frame = element.type as (props: typeof element.props) => ReactNode;
+  Frame(element.props);
+  jest.advanceTimersByTime(15000); mockIndex = 0;
+  expect(find(Frame(element.props), "Text")?.props.children).toBe("Verified authored clue");
+  expect(onFailure).not.toHaveBeenCalled();
+});
+test("stalled image-only requests signal replanning once; late load/error events cannot undo failure", () => {
+  const onFailure = jest.fn(), element = QuizImage({ image, onFailure });
+  const Frame = element.type as (props: typeof element.props) => ReactNode;
+  const first = Frame(element.props), view = find(first, "ExpoImage")!;
+  jest.advanceTimersByTime(15000);
+  (view.props.onLoad as () => void)(); (view.props.onError as () => void)();
+  expect(onFailure).toHaveBeenCalledTimes(1);
+});
+test("loaded images preserve contain rendering, source aspect ratio and never time out", () => {
+  const onFailure = jest.fn(), element = QuizImage({ image, onFailure });
+  const Frame = element.type as (props: typeof element.props) => ReactNode;
+  const first = Frame(element.props), view = find(first, "ExpoImage")!;
+  expect(view.props.contentFit).toBe("contain");
+  (view.props.onLoad as () => void)(); jest.advanceTimersByTime(15000);
+  expect(onFailure).not.toHaveBeenCalled();
 });

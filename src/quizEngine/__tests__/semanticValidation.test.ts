@@ -216,8 +216,8 @@ test("accepted alternative matching pairs are represented and graded, not assume
   const result = generateMatchingExercise(records, "alternates", ctx);
   expect(result.status).toBe("generated");
   if (result.status === "generated") for (const left of result.exercise.pairs) for (const right of result.exercise.pairs) {
-    const original = records.find((c) => c.subject === left.left)!;
-    const candidate = records.find((c) => c.subject === right.left)!;
+    const original = records.find((c) => c.id === left.id)!;
+    const candidate = records.find((c) => c.id === right.id)!;
     expect(isMatchingPairCorrect(left, right)).toBe(ctx.evaluate(original, candidate).verdict === "valid");
   }
 });

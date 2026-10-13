@@ -1,5 +1,65 @@
 {
   "schemaVersion": 1,
-  "assets": [],
-  "bindings": []
+  "assets": [
+    {
+      "imageId": "pilot-002",
+      "provenance": {
+        "candidateIdentity": "artwork:accademia-1076",
+        "source": "Wikimedia Commons",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:%27David%27_by_Michelangelo_Fir_JBU009.jpg",
+        "originalImageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/44/%27David%27_by_Michelangelo_Fir_JBU009.jpg",
+        "creator": "Jörg Bittner Unna",
+        "artworkCreator": "Michelangelo Buonarroti",
+        "retrievedAt": "2026-10-13T11:49:38.665517+00:00",
+        "license": {
+          "status": "CC-BY",
+          "version": "3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+          "evidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File:%27David%27_by_Michelangelo_Fir_JBU009.jpg&oldid=920465977",
+          "attribution": {
+            "creator": "Jörg Bittner Unna",
+            "title": "‘David’ by Michelangelo Fir JBU009",
+            "source": "Wikimedia Commons",
+            "sourceUrl": "https://commons.wikimedia.org/wiki/File:%27David%27_by_Michelangelo_Fir_JBU009.jpg",
+            "licenseLabel": "CC BY 3.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+            "changes": "Resized and JPEG recompressed; EXIF/XMP removed; no crop."
+          }
+        },
+        "rightsNotes": "File-specific Commons licensing inspected, not inferred from artwork age or page footer. No institutional endorsement. Photographer explicitly licenses photograph CC BY 3.0. Original Accademia marble detail; Italian cultural-property/commercial reproduction clearance remains a separate release review.",
+        "evidenceRefs": [
+          "https://commons.wikimedia.org/w/index.php?title=File:%27David%27_by_Michelangelo_Fir_JBU009.jpg&oldid=920465977",
+          "https://www.galleriaaccademiafirenze.it/en/artworks/david-michelangelo/"
+        ]
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Source identity and file license compared by Codex; optimized bytes visually inspected. Owned hosting and independent editorial release review pending.",
+      "staged": {
+        "path": "assets/staged-art/pilot-002-f58668bdbba4.jpg",
+        "width": 853,
+        "height": 1280,
+        "sha256": "f58668bdbba48b0feca8b122525f185d158351be3c86d1c4532c70b49d226688",
+        "sourceSha256": "912f013b2c199447f93b1eabcf82c1828010ab3630268d9f700d1a0907a4901c",
+        "mimeType": "image/jpeg",
+        "sourceWidth": 3471,
+        "sourceHeight": 5207
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "conceptId": "art_sculpture_l3_p1_accademia-1076",
+      "imageId": "pilot-002",
+      "candidateIdentity": "artwork:accademia-1076",
+      "altText": "Detail of an original marble figure in a museum.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "reviewStatus": "needs-review",
+      "reviewReason": "Source identity and file license compared by Codex; optimized bytes visually inspected. Owned hosting and independent editorial release review pending. Review answer-bearing titles/source credits before recognition approval."
+    }
+  ]
 }

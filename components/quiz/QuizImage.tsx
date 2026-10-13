@@ -10,11 +10,25 @@ export function QuizImage(props: { image: QuizImageData; fallbackText?: string; 
 }
 
 function ImageFrame({ image, fallbackText, onFailure }: { image: QuizImageData; fallbackText?: string; onFailure?: () => void }) {
-  const mounted = useRef(true);
-  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  const lifecycle = useRef({ mounted: true, settled: false });
   const [width, setWidth] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
+  const fail = () => {
+    if (!lifecycle.current.mounted || lifecycle.current.settled) return;
+    lifecycle.current.settled = true;
+    setFailed(true);
+    if (!fallbackText) onFailure?.();
+  };
+  useEffect(() => {
+    lifecycle.current = { mounted: true, settled: false };
+    // Some stalled network requests never emit onError. A required recognition
+    // image must not leave a learner grading an indefinitely blank stimulus.
+    const timeout = setTimeout(fail, 15000);
+    return () => { lifecycle.current.mounted = false; clearTimeout(timeout); };
+    // This keyed frame owns one immutable image request and its initial fallback.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   if (failed) return fallbackText ? <Text style={{ color: "#E5F3FF", marginVertical: 12 }}>{fallbackText}</Text> : null;
   const height = width > 0 ? Math.min(300, Math.max(100, width * image.height / image.width)) : 180;
   return (
@@ -28,8 +42,12 @@ function ImageFrame({ image, fallbackText, onFailure }: { image: QuizImageData; 
           recyclingKey={`${image.imageId}:${image.uri}`}
           accessible
           accessibilityLabel={image.altText}
-          onLoad={() => { if (mounted.current) setLoaded(true); }}
-          onError={() => { if (!mounted.current) return; setFailed(true); if (!fallbackText) onFailure?.(); }}
+          onLoad={() => {
+            if (!lifecycle.current.mounted || lifecycle.current.settled) return;
+            lifecycle.current.settled = true;
+            setLoaded(true);
+          }}
+          onError={fail}
         />
         {!loaded && <View pointerEvents="none" style={styles.loading}><ActivityIndicator color="#B3C7E6" /></View>}
       </View>

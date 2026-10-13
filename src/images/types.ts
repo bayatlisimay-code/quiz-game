@@ -54,6 +54,9 @@ type Review =
 export type ImageAssetRecord = {
   readonly imageId: string;
   readonly provenance: ImageProvenance;
+  // Offline derivative only. Does not grant runtime approval or source hotlinking.
+  readonly staged?: Readonly<{ path: string; width: number; height: number;
+    sourceWidth: number; sourceHeight: number; sha256: string; sourceSha256: string; mimeType: "image/jpeg" }>;
 } & (
   | (Extract<Review, { reviewStatus: "approved" }> & { readonly hosted: HostedImage })
   | (Exclude<Review, { reviewStatus: "approved" }> & { readonly hosted?: HostedImage })

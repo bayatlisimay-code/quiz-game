@@ -15,7 +15,20 @@ export function getAssessmentTemplate(concept: Concept): RelationTemplate {
     statement: `The date or period documented for the ${concept.assessment.event} of “{s}” is {a}.`,
     blank: `The date or period documented for the ${concept.assessment.event} of “{s}” is _____.`,
   } : definition;
-  const wording = concept.assessment.direction === "reverse" ? definition.inverse : dateWording;
+  const creatorWording = definition.family === "creator" && concept.assessment.attribution?.status === "certain"
+    ? definition.certainAttribution : undefined;
+  const qualified = definition.family === "creator" && concept.assessment.attribution?.status === "attributed" ? {
+    question: `Who is listed as the attributed ${definition.creatorRole} of “{s}”?`,
+    statement: `“{s}” is attributed to {a} as ${definition.creatorRole}.`,
+    blank: `“{s}” is attributed to _____ as ${definition.creatorRole}.`,
+    inverse: {
+      question: `Which work is attributed to {s} as ${definition.creatorRole}?`,
+      statement: `“{a}” is attributed to {s} as ${definition.creatorRole}.`,
+      blank: `One work attributed to {s} as ${definition.creatorRole} is _____.`,
+    },
+  } : undefined;
+  const attributionWording = qualified ?? creatorWording;
+  const wording = concept.assessment.direction === "reverse" ? attributionWording?.inverse ?? definition.inverse : attributionWording ?? dateWording;
   if (!wording) throw new Error(`Unsupported inverse wording: ${concept.relation}`);
   const scope = concept.assessment.scope?.text.trim();
   const render = (text: string, subject: string, answer: string) => {
@@ -24,8 +37,7 @@ export function getAssessmentTemplate(concept: Concept): RelationTemplate {
   };
   return {
     question: subject => render(wording.question, subject, ""),
-    statement: (subject, answer) => render(definition.family === "creator" && concept.assessment?.attribution?.status === "attributed" && concept.assessment?.direction !== "reverse"
-      ? "The qualified attribution recorded for “{s}” is {a}." : wording.statement, subject, answer),
+    statement: (subject, answer) => render(wording.statement, subject, answer),
     blank: subject => render(wording.blank, subject, "_____"),
   };
 }

@@ -6,15 +6,35 @@ export type RelationDefinition = Readonly<{
   question: string;
   statement: string;
   blank: string;
+  certainAttribution?: Readonly<{ question: string; statement: string; blank: string; inverse: { question: string; statement: string; blank: string } }>;
   inverse?: Readonly<{ question: string; statement: string; blank: string }>;
 }>;
 const spec = (family: RelationFamily, question: string, statement: string, blank: string, inverse?: RelationDefinition["inverse"]): RelationDefinition => Object.freeze({ family, question, statement, blank, inverse });
+// Roles, rather than relation IDs, determine grammar. Unrecognised and qualified
+// credits retain the conservative attribution wording.
+const creatorVerbs: Readonly<Record<string, { active: string; passive: string }>> = {
+  painter: { active: "painted", passive: "painted" },
+  sculptor: { active: "sculpted", passive: "sculpted" },
+  author: { active: "wrote", passive: "written" },
+  poet: { active: "wrote", passive: "written" },
+  director: { active: "directed", passive: "directed" },
+  designer: { active: "designed", passive: "designed" },
+  architect: { active: "designed", passive: "designed" },
+};
 export const familyDefinitions = {
-  definition: (domain: string) => spec("definition", `Which description defines “{s}” in ${domain}?`, `In ${domain}, “{s}” means: {a}.`, `In ${domain}, “{s}” means: _____.`,
+  definition: (domain: string) => spec("definition", `What does “{s}” mean in ${domain}?`, `In ${domain}, “{s}” has this definition: {a}.`, `In ${domain}, “{s}” refers to _____.`,
     { question: `Which term in ${domain} matches this definition: “{s}”?`, statement: `In ${domain}, “{a}” matches this definition: “{s}”.`, blank: `In ${domain}, the term matching “{s}” is _____.` }),
   identification: (noun: string) => spec("identification", `Which ${noun} is shown or described?`, `The ${noun} shown or described is “{a}”.`, `The ${noun} shown or described is _____.`),
-  creator: (role: string, work: string) => ({ ...spec("creator", `Who is credited as ${role} of “{s}”?`, `A credited ${role} of “{s}” is {a}.`, `A credited ${role} of “{s}” is _____.`,
-    { question: `Which ${work} is credited to {s} in this role?`, statement: `“{a}” is credited to {s} in this role.`, blank: `A ${work} credited to {s} in this role is _____.` }), creatorRole: role }),
+  creator: (role: string, work: string): RelationDefinition => {
+    const verb = creatorVerbs[role];
+    return { ...spec("creator", `Who is credited as ${role} of “{s}”?`, `A credited ${role} of “{s}” is {a}.`, `A credited ${role} of “{s}” is _____.`,
+      { question: `Which ${work} is credited to {s} in this role?`, statement: `“{a}” is credited to {s} in this role.`, blank: `A ${work} credited to {s} in this role is _____.` }), creatorRole: role,
+      ...(verb ? { certainAttribution: {
+        question: `Who ${verb.active} “{s}”?`, statement: `{a} ${verb.active} “{s}”.`, blank: `“{s}” was ${verb.passive} by _____.`,
+        inverse: { question: `Which of these works was ${verb.passive} by {s}?`, statement: `“{a}” was ${verb.passive} by {s}.`, blank: `One work ${verb.passive} by {s} is _____.` },
+      } } : {}),
+    };
+  },
   date: (event: string) => spec("date", `What is the ${event} of “{s}”?`, `The ${event} of “{s}” is {a}.`, `The ${event} of “{s}” is _____.`,
     { question: `Which work has the ${event} “{s}”?`, statement: `“{a}” has the ${event} “{s}”.`, blank: `A work with the ${event} “{s}” is _____.` }),
   membership: (label: string) => spec("membership", `Which ${label} describes “{s}”?`, `A ${label} describing “{s}” is {a}.`, `A ${label} describing “{s}” is _____.`),

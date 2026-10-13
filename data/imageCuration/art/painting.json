@@ -1,5 +1,54 @@
 {
   "schemaVersion": 1,
-  "assets": [],
-  "bindings": []
+  "assets": [
+    {
+      "imageId": "pilot-001",
+      "provenance": {
+        "candidateIdentity": "artwork:ng186",
+        "source": "Wikimedia Commons / Closer to Van Eyck",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Arnolfini_Portrait.jpg",
+        "originalImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Arnolfini_Portrait.jpg/960px-Arnolfini_Portrait.jpg",
+        "creator": null,
+        "artworkCreator": "Jan van Eyck",
+        "retrievedAt": "2026-10-13T11:49:38.665517+00:00",
+        "license": {
+          "status": "public-domain",
+          "evidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File:Arnolfini_Portrait.jpg&oldid=1065838803"
+        },
+        "rightsNotes": "File-specific Commons licensing inspected, not inferred from artwork age or page footer. No institutional endorsement. Public Domain Mark for this reproduction; source identifies NG186 oil on oak. No claim of a CC0 dedication.",
+        "evidenceRefs": [
+          "https://commons.wikimedia.org/w/index.php?title=File:Arnolfini_Portrait.jpg&oldid=1065838803",
+          "https://www.nationalgallery.org.uk/paintings/jan-van-eyck-the-arnolfini-portrait"
+        ]
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Source identity and file license compared by Codex; optimized bytes visually inspected. Owned hosting and independent editorial release review pending.",
+      "staged": {
+        "path": "assets/staged-art/pilot-001-92eeeabc155f.jpg",
+        "width": 950,
+        "height": 1280,
+        "sha256": "92eeeabc155f4a6fdb39e9a0fd99783c2db5a8ce3cc3378dd79571679957c431",
+        "sourceSha256": "5eff914ef4523690fd371d6b173714d40c975c50101248701896b834325f5e2e",
+        "mimeType": "image/jpeg",
+        "sourceWidth": 960,
+        "sourceHeight": 1293
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "conceptId": "art_painting_l2_p1_ng186",
+      "imageId": "pilot-001",
+      "candidateIdentity": "artwork:ng186",
+      "altText": "A painted double portrait in an interior.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "reviewStatus": "needs-review",
+      "reviewReason": "Source identity and file license compared by Codex; optimized bytes visually inspected. Owned hosting and independent editorial release review pending. Review answer-bearing titles/source credits before recognition approval."
+    }
+  ]
 }

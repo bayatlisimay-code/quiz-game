@@ -130,11 +130,11 @@ describe("Quiz Engine", () => {
 
     const conceptIds = concepts.map((c) => c.id);
     expect(match!.pairs.every(pair => conceptIds.includes(pair.id!))).toBe(true);
-    const usedLefts = match!.pairs.map((p) => p.left);
-
-    usedLefts.forEach((left) => {
-      expect(concepts.map((c) => c.subject)).toContain(left);
-   });
+    match!.pairs.forEach((pair) => {
+      const concept = concepts.find(c => c.id === pair.id)!;
+      expect(pair.left).toContain(concept.subject);
+      expect(pair.right).toBe(concept.object);
+    });
   });
 it("buildQuiz matching uses only facts already selected in that quiz", () => {
   const concepts = enrichConcepts([

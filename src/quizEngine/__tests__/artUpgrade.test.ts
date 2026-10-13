@@ -74,7 +74,7 @@ test("inverse creator questions independently validate one-to-many works without
   const q = buildExercise(reversed[0], reversed, 3, "mcq", context);
   expect(q?.type).toBe("mcq");
   expect(q && q.type !== "matching" && q.conceptId).toBe(f.records[0].id);
-  expect(q && q.type === "mcq" && q.prompt).toContain("credited to");
+  expect(q && q.type === "mcq" && q.prompt).toContain("Which of these works was painted by");
   const extra: SemanticEvidence = { ...f.evidence[1], kind: "assertion", id: "another-work-by-same-creator", subjectId: f.records[1].semantic!.subject!.id!, valueId: f.records[0].semantic!.value!.id!, verdict: "valid" };
   const evidence = f.evidence.map((e, i) => i === 1 && e.kind === "complete-set" ? { ...e, valueIds: [...e.valueIds, extra.valueId] } : e).concat(extra);
   const multiple = createSemanticContext(f.records, { policies: targetRelationPolicies, evidence });
