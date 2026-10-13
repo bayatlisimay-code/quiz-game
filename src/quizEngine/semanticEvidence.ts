@@ -109,6 +109,7 @@ export const reviewedEvidenceStrategy: SemanticStrategy = Object.freeze({
     if (family === "date" && a.direction !== "reverse" && !["date", "period"].includes(a.valueType)) errors.push("Date questions require a temporal value identity");
     if (family === "creator" && (!a.attribution || a.attribution.role !== claim.metadata.creatorRole || a.attribution.status === "disputed" || claim.qualifiers.role !== a.attribution.role || claim.qualifiers.attributionStatus !== a.attribution.status)) errors.push("Qualified role and non-disputed attribution required");
     if (family === "date" && (!a.event || !(claim.metadata.allowedEvents as readonly string[] | undefined)?.includes(a.event) || claim.qualifiers.event !== a.event)) errors.push("Qualified historical event required");
+    if (family === "date" && ((a.dateInterpretation === "catalogue-label") !== (claim.qualifiers.dateBasis === "catalogue-label"))) errors.push("Catalogue dating identity requires explicit source-qualified wording");
     if (a.event === "casting" && !claim.qualifiers.versionId) errors.push("Casting dates require the exact cast/version identity");
     if (family === "country" && (a.geography !== "present-day" || claim.qualifiers.countryConvention !== "present-day" || a.valueType !== "country")) errors.push("Present-day country convention required");
     if (family === "first-work" && (!a.firstWork?.wellEstablished || claim.qualifiers.firstWorkCriterion !== a.firstWork.criterion)) errors.push("Well-established first-work criterion required");

@@ -6,7 +6,11 @@ import type { RelationTemplate } from "./templates";
 export function getAssessmentTemplate(concept: Concept): RelationTemplate {
   const definition = relationDefinitions[concept.relation];
   if (!definition || !concept.assessment) return getRelationTemplate(concept.relation);
-  const dateWording = definition.family === "date" && concept.assessment.event ? {
+  const dateWording = definition.family === "date" && concept.assessment.event ? concept.assessment.dateInterpretation === "catalogue-label" ? {
+    question: `Which ${concept.assessment.event} date or range is listed for “{s}”?`,
+    statement: `The collection entry lists the ${concept.assessment.event} date or range of “{s}” as {a}.`,
+    blank: `The collection entry lists the ${concept.assessment.event} date or range of “{s}” as _____.`,
+  } : {
     question: `What date or period is documented for the ${concept.assessment.event} of “{s}”?`,
     statement: `The date or period documented for the ${concept.assessment.event} of “{s}” is {a}.`,
     blank: `The date or period documented for the ${concept.assessment.event} of “{s}” is _____.`,

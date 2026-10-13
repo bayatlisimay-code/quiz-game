@@ -1,5 +1,10 @@
 # Approved Art engine upgrade
 
+Pilot update (2026-10-13): the active registry now contains 58 source-checked
+Sculpture/Painting/terminology records. See [art-content-pilot.md](art-content-pilot.md)
+for provenance, source-qualified assessment scope, coverage and remaining release
+gates. The zero-content measurements below describe the original engine milestone.
+
 ## Activation and source ownership
 
 `data/artCurriculum.ts` transcribes the approved Miro curriculum: eight subtopics,
@@ -12,8 +17,9 @@ without inventing review records or weighting duplicate IDs.
 The old authored facts remain recoverable in `data/concepts` and `CONCEPT_SETS`.
 They are not silently served under different new lesson titles. Production uses
 `ACTIVE_CONCEPT_SETS`, `activeSemanticContext`, and `approvedArtContent`. The last
-array is deliberately empty: no replacement historical facts or approved assets
-were fabricated. Consequently all current new Art lessons report shortages.
+array was deliberately empty at the engine milestone. The current pilot adds
+source-checked records only for the documented slices; other teaching slices still
+report shortages. No approved image assets have been fabricated.
 `registeredSemanticContext` is an explicitly archived diagnostic snapshot; public
 policy defaults require reviewed evidence for the new target relations.
 

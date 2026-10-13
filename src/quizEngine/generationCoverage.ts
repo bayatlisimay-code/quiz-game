@@ -9,7 +9,7 @@ import { getAssessmentTemplate, reverseConcept } from "./assessmentTemplates";
 import { isPermanentlyLockable, hasIndistinguishableAnswers } from "./matchingSafety";
 import { isMatchingPairCorrect, getExerciseCapabilities } from "./exerciseFactory";
 
-export type CoverageCase = { id: string; concepts: Concept[]; variant: "A" | "B" | "C"; mode?: "teaching" | "review" };
+export type CoverageCase = { id: string; concepts: Concept[]; variant: "A" | "B" | "C"; mode?: "teaching" | "review"; direction?: "forward" | "reverse" };
 export function catalogCoverageCases(topic: Topic, sets: ConceptSets): CoverageCase[] {
   return topic.subtopics.flatMap((subtopic) => subtopic.levels.flatMap((level) => level.parts.flatMap((part) => {
     const levelId = `l${level.id}`, partId = `p${part.id}`;

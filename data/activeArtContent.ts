@@ -1,12 +1,18 @@
 import { artCurriculum, teachingRelation } from "./artCurriculum";
 import type { Concept } from "../src/quizEngine/conceptTypes";
 import type { SemanticEvidence } from "../src/quizEngine/assessmentTypes";
+import { authorArtworkPilot } from "./artPilot/authoring";
+import { sculpturePilotWorks } from "./artPilot/sculpture";
+import { paintingPilotWorks } from "./artPilot/painting";
+import { terminologyPilotConcepts, terminologyPilotEvidence } from "./artPilot/terminology";
 
-// Production authoring boundary. Intentionally empty until independent fact,
-// description, and asset review. Synthetic pilot fixtures never enter this list.
+// Production authoring boundary. Source-checked pilot originals only;
+// synthetic engine fixtures never enter this list. No image approvals implied.
 // Original authored content remains intact in conceptSets.ts as reusable source material.
-export const approvedArtContent: readonly Concept[] = Object.freeze([]);
-export const approvedArtEvidence: readonly SemanticEvidence[] = Object.freeze([]);
+const sculpture = authorArtworkPilot(sculpturePilotWorks, "sculpture", "l3");
+const painting = authorArtworkPilot(paintingPilotWorks, "painting", "l2");
+export const approvedArtContent: readonly Concept[] = Object.freeze([...sculpture.concepts, ...painting.concepts, ...terminologyPilotConcepts]);
+export const approvedArtEvidence: readonly SemanticEvidence[] = Object.freeze([...sculpture.evidence, ...painting.evidence, ...terminologyPilotEvidence]);
 
 export function createActiveArtSets(records: readonly Concept[]) {
   const sets: Record<string, { id: string; concepts: Concept[] }> = {};

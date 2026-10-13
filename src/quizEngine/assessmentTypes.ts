@@ -34,6 +34,9 @@ export type AssessmentContract = Readonly<{
   response?: Readonly<{ complete: true; forms: readonly { text: string; caseSensitive: boolean }[] }>;
   attribution?: Readonly<{ role: string; status: "certain" | "attributed" | "disputed" }>;
   event?: string;
+  // Source-qualified dating labels are not claims that every other overlapping
+  // interval is historically false. Wording must expose this assessment scope.
+  dateInterpretation?: "catalogue-label";
   geography?: "present-day";
   firstWork?: Readonly<{ criterion: "first-published-novel" | "first-feature-directed" | "first-reliably-documented-play-written"; wellEstablished: true }>;
   association?: Readonly<{ kind: "friendship" | "family" | "romance" | "rivalry" | "companionship"; workId: string; spoilerFree: true }>;
