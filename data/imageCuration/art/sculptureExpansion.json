@@ -1,0 +1,718 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "imageId": "content-101",
+      "provenance": {
+        "candidateIdentity": "artwork:met-66-173",
+        "source": "Metropolitan Museum of Art Open Access",
+        "sourceUrl": "https://www.metmuseum.org/art/collection/search/329074",
+        "originalImageUrl": "https://images.metmuseum.org/CRDImages/an/web-large/DP-12449-001.jpg",
+        "creator": null,
+        "retrievedAt": "2026-10-14T12:42:43.099896+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access image policy releases these digital photographs under CC0 for unrestricted commercial reuse, modification and distribution, without attribution obligations. No separate restricted image is substituted.",
+        "evidenceRefs": [
+          "https://www.metmuseum.org/art/collection/search/329074",
+          "https://www.metmuseum.org/policies/image-resources",
+          "https://collectionapi.metmuseum.org/public/collection/v1/objects/329074",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex primary-source and downloaded-pixel review (not museum or independent human approval)",
+        "reviewedAt": "2026-10-14T12:42:43.099896+00:00",
+        "candidateIdentity": "artwork:met-66-173",
+        "collection": "Metropolitan Museum of Art",
+        "version": "Met66.173 silver original",
+        "identityEvidenceUrl": "https://www.metmuseum.org/art/collection/search/329074",
+        "rightsEvidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+        "rightsBasis": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access image policy releases these digital photographs under CC0 for unrestricted commercial reuse, modification and distribution, without attribution obligations. No separate restricted image is substituted.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "13c2b023bf4c8f3d281e5c19a717107c79c2d240974ed714fd0412a551285f25"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "CC0 identity and actual pixels reviewed for staging; no production approval. Development hosting requires verified upload.",
+      "staged": {
+        "path": "assets/staged-art/content-101-dbed9d37a70c.jpg",
+        "width": 444,
+        "height": 625,
+        "sourceWidth": 444,
+        "sourceHeight": 625,
+        "sha256": "dbed9d37a70c60e90e1aeb0b7a465ee6a67ee38701671f5e72beeaaca2683c20",
+        "sourceSha256": "13c2b023bf4c8f3d281e5c19a717107c79c2d240974ed714fd0412a551285f25",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "content-102",
+      "provenance": {
+        "candidateIdentity": "artwork:met-59-2",
+        "source": "Metropolitan Museum of Art Open Access",
+        "sourceUrl": "https://www.metmuseum.org/art/collection/search/329072",
+        "originalImageUrl": "https://images.metmuseum.org/CRDImages/an/web-large/DP-23786-001.jpg",
+        "creator": null,
+        "retrievedAt": "2026-10-14T12:42:43.099896+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access image policy releases these digital photographs under CC0 for unrestricted commercial reuse, modification and distribution, without attribution obligations. No separate restricted image is substituted.",
+        "evidenceRefs": [
+          "https://www.metmuseum.org/art/collection/search/329072",
+          "https://www.metmuseum.org/policies/image-resources",
+          "https://collectionapi.metmuseum.org/public/collection/v1/objects/329072",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex primary-source and downloaded-pixel review (not museum or independent human approval)",
+        "reviewedAt": "2026-10-14T12:42:43.099896+00:00",
+        "candidateIdentity": "artwork:met-59-2",
+        "collection": "Metropolitan Museum of Art",
+        "version": "Met59.2 seated diorite original",
+        "identityEvidenceUrl": "https://www.metmuseum.org/art/collection/search/329072",
+        "rightsEvidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+        "rightsBasis": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access image policy releases these digital photographs under CC0 for unrestricted commercial reuse, modification and distribution, without attribution obligations. No separate restricted image is substituted.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "727baae7b978ce2c1e49144bc2967e327e2dd7be14fddf20a544e69fafe2284f"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "CC0 identity and actual pixels reviewed for staging; no production approval. Development hosting requires verified upload.",
+      "staged": {
+        "path": "assets/staged-art/content-102-beef95e382c1.jpg",
+        "width": 488,
+        "height": 624,
+        "sourceWidth": 488,
+        "sourceHeight": 624,
+        "sha256": "beef95e382c18cdb165c0f61963d91114fa7e10ac0bc61335958b2d51f000058",
+        "sourceSha256": "727baae7b978ce2c1e49144bc2967e327e2dd7be14fddf20a544e69fafe2284f",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "content-103",
+      "provenance": {
+        "candidateIdentity": "artwork:met-47-100-1",
+        "source": "Metropolitan Museum of Art Open Access",
+        "sourceUrl": "https://www.metmuseum.org/art/collection/search/254587",
+        "originalImageUrl": "https://images.metmuseum.org/CRDImages/gr/web-large/DP256380.jpg",
+        "creator": null,
+        "retrievedAt": "2026-10-14T12:42:43.099896+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access image policy releases these digital photographs under CC0 for unrestricted commercial reuse, modification and distribution, without attribution obligations. No separate restricted image is substituted.",
+        "evidenceRefs": [
+          "https://www.metmuseum.org/art/collection/search/254587",
+          "https://www.metmuseum.org/policies/image-resources",
+          "https://collectionapi.metmuseum.org/public/collection/v1/objects/254587",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex primary-source and downloaded-pixel review (not museum or independent human approval)",
+        "reviewedAt": "2026-10-14T12:42:43.099896+00:00",
+        "candidateIdentity": "artwork:met-47-100-1",
+        "collection": "Metropolitan Museum of Art",
+        "version": "Met47.100.1 marble original",
+        "identityEvidenceUrl": "https://www.metmuseum.org/art/collection/search/254587",
+        "rightsEvidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+        "rightsBasis": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access image policy releases these digital photographs under CC0 for unrestricted commercial reuse, modification and distribution, without attribution obligations. No separate restricted image is substituted.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "1a2f5d6afb2b74356d668308a4ed801bdcb32af9e896de52b4b52f57e54d1bc1"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "CC0 identity and actual pixels reviewed for staging; no production approval. Development hosting requires verified upload.",
+      "staged": {
+        "path": "assets/staged-art/content-103-fa42c3f035df.jpg",
+        "width": 473,
+        "height": 624,
+        "sourceWidth": 473,
+        "sourceHeight": 624,
+        "sha256": "fa42c3f035df63b4d065eb795279a4c87e256cbd49da7c6c847e197acddeb7f6",
+        "sourceSha256": "1a2f5d6afb2b74356d668308a4ed801bdcb32af9e896de52b4b52f57e54d1bc1",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "content-104",
+      "provenance": {
+        "candidateIdentity": "artwork:met-29-3-2",
+        "source": "Metropolitan Museum of Art Open Access",
+        "sourceUrl": "https://www.metmuseum.org/art/collection/search/544450",
+        "originalImageUrl": "https://images.metmuseum.org/CRDImages/eg/web-large/DP-24215-002.jpg",
+        "creator": null,
+        "retrievedAt": "2026-10-14T12:42:43.099896+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access image policy releases these digital photographs under CC0 for unrestricted commercial reuse, modification and distribution, without attribution obligations. No separate restricted image is substituted.",
+        "evidenceRefs": [
+          "https://www.metmuseum.org/art/collection/search/544450",
+          "https://www.metmuseum.org/policies/image-resources",
+          "https://collectionapi.metmuseum.org/public/collection/v1/objects/544450",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex primary-source and downloaded-pixel review (not museum or independent human approval)",
+        "reviewedAt": "2026-10-14T12:42:43.099896+00:00",
+        "candidateIdentity": "artwork:met-29-3-2",
+        "collection": "Metropolitan Museum of Art",
+        "version": "Met29.3.2 seated limestone original",
+        "identityEvidenceUrl": "https://www.metmuseum.org/art/collection/search/544450",
+        "rightsEvidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+        "rightsBasis": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access image policy releases these digital photographs under CC0 for unrestricted commercial reuse, modification and distribution, without attribution obligations. No separate restricted image is substituted.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "a03bfeaf8df5ce2ab399620c06c72e75aab3bb26b0f92ed34ad9276490e428c4"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "CC0 identity and actual pixels reviewed for staging; no production approval. Development hosting requires verified upload.",
+      "staged": {
+        "path": "assets/staged-art/content-104-2d7bbdf3fea7.jpg",
+        "width": 468,
+        "height": 624,
+        "sourceWidth": 468,
+        "sourceHeight": 624,
+        "sha256": "2d7bbdf3fea73d8fcc03c03a94505a09bcc881d895039841545c1b87ac9f45c3",
+        "sourceSha256": "a03bfeaf8df5ce2ab399620c06c72e75aab3bb26b0f92ed34ad9276490e428c4",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "content-105",
+      "provenance": {
+        "candidateIdentity": "artwork:met-1989-281-41",
+        "source": "Metropolitan Museum of Art Open Access",
+        "sourceUrl": "https://www.metmuseum.org/art/collection/search/329073",
+        "originalImageUrl": "https://images.metmuseum.org/CRDImages/an/web-large/DT867.jpg",
+        "creator": null,
+        "retrievedAt": "2026-10-14T15:30:44.092466+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access policy releases these actual digital photographs under CC0 for unrestricted commercial reuse, modification and distribution without attribution obligations. No separately restricted reproduction is substituted.",
+        "evidenceRefs": [
+          "https://www.metmuseum.org/art/collection/search/329073",
+          "https://www.metmuseum.org/policies/image-resources",
+          "https://collectionapi.metmuseum.org/public/collection/v1/objects/329073",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex primary-source and downloaded-pixel review (not museum or independent human approval)",
+        "reviewedAt": "2026-10-14T15:30:44.092466+00:00",
+        "candidateIdentity": "artwork:met-1989-281-41",
+        "collection": "Metropolitan Museum of Art",
+        "version": "Met1989.281.41a,b composite-stone original",
+        "identityEvidenceUrl": "https://www.metmuseum.org/art/collection/search/329073",
+        "rightsEvidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+        "rightsBasis": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access policy releases these actual digital photographs under CC0 for unrestricted commercial reuse, modification and distribution without attribution obligations. No separately restricted reproduction is substituted.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "b2df96f5641d19be81744dac4bff0bb55195af56475d3accd05a6b503e3c55b7"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "CC0 identity and actual pixels reviewed for staging; no production approval. Development activation requires verified hosted bytes.",
+      "staged": {
+        "path": "assets/staged-art/content-105-574f3f598a64.jpg",
+        "width": 599,
+        "height": 617,
+        "sourceWidth": 599,
+        "sourceHeight": 617,
+        "sha256": "574f3f598a64c0388cdd19fe45604ebba80f90f6de471feadcf1e584b20b6bd1",
+        "sourceSha256": "b2df96f5641d19be81744dac4bff0bb55195af56475d3accd05a6b503e3c55b7",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "content-106",
+      "provenance": {
+        "candidateIdentity": "artwork:met-18-2-4",
+        "source": "Metropolitan Museum of Art Open Access",
+        "sourceUrl": "https://www.metmuseum.org/art/collection/search/543882",
+        "originalImageUrl": "https://images.metmuseum.org/CRDImages/eg/web-large/DP-1691-03.jpg",
+        "creator": null,
+        "retrievedAt": "2026-10-14T15:30:44.092466+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access policy releases these actual digital photographs under CC0 for unrestricted commercial reuse, modification and distribution without attribution obligations. No separately restricted reproduction is substituted.",
+        "evidenceRefs": [
+          "https://www.metmuseum.org/art/collection/search/543882",
+          "https://www.metmuseum.org/policies/image-resources",
+          "https://collectionapi.metmuseum.org/public/collection/v1/objects/543882",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex primary-source and downloaded-pixel review (not museum or independent human approval)",
+        "reviewedAt": "2026-10-14T15:30:44.092466+00:00",
+        "candidateIdentity": "artwork:met-18-2-4",
+        "collection": "Metropolitan Museum of Art",
+        "version": "Met18.2.4 original gneiss group",
+        "identityEvidenceUrl": "https://www.metmuseum.org/art/collection/search/543882",
+        "rightsEvidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+        "rightsBasis": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access policy releases these actual digital photographs under CC0 for unrestricted commercial reuse, modification and distribution without attribution obligations. No separately restricted reproduction is substituted.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "39e9501d77b36463e0acfbe1d4ad422cd7a8d2bb316512033d85cd1398bb650c"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "CC0 identity and actual pixels reviewed for staging; no production approval. Development activation requires verified hosted bytes.",
+      "staged": {
+        "path": "assets/staged-art/content-106-a7ff169a3eff.jpg",
+        "width": 459,
+        "height": 625,
+        "sourceWidth": 459,
+        "sourceHeight": 625,
+        "sha256": "a7ff169a3eff51ade3aa0f24f101f83cfbcbe059213e7acb4650feaa463aa9c1",
+        "sourceSha256": "39e9501d77b36463e0acfbe1d4ad422cd7a8d2bb316512033d85cd1398bb650c",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "content-107",
+      "provenance": {
+        "candidateIdentity": "artwork:met-ushumgal-stele",
+        "source": "Metropolitan Museum of Art Open Access",
+        "sourceUrl": "https://www.metmuseum.org/art/collection/search/329079",
+        "originalImageUrl": "https://images.metmuseum.org/CRDImages/an/web-large/DP-42229-001.jpg",
+        "creator": null,
+        "retrievedAt": "2026-10-14T15:30:44.092466+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access policy releases these actual digital photographs under CC0 for unrestricted commercial reuse, modification and distribution without attribution obligations. No separately restricted reproduction is substituted.",
+        "evidenceRefs": [
+          "https://www.metmuseum.org/art/collection/search/329079",
+          "https://www.metmuseum.org/policies/image-resources",
+          "https://collectionapi.metmuseum.org/public/collection/v1/objects/329079",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex primary-source and downloaded-pixel review (not museum or independent human approval)",
+        "reviewedAt": "2026-10-14T15:30:44.092466+00:00",
+        "candidateIdentity": "artwork:met-ushumgal-stele",
+        "collection": "Metropolitan Museum of Art",
+        "version": "Met original transaction stele, collection record329079",
+        "identityEvidenceUrl": "https://www.metmuseum.org/art/collection/search/329079",
+        "rightsEvidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+        "rightsBasis": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access policy releases these actual digital photographs under CC0 for unrestricted commercial reuse, modification and distribution without attribution obligations. No separately restricted reproduction is substituted.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "7a356410b68168ee300d94e858e15897db633faf08d5a609fb638974fb74536b"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "CC0 identity and actual pixels reviewed for staging; no production approval. Development activation requires verified hosted bytes.",
+      "staged": {
+        "path": "assets/staged-art/content-107-80b8f5f4ad70.jpg",
+        "width": 468,
+        "height": 624,
+        "sourceWidth": 468,
+        "sourceHeight": 624,
+        "sha256": "80b8f5f4ad706d6274e251ff933623e4a131ec7281dea12ae35aec4a59437f51",
+        "sourceSha256": "7a356410b68168ee300d94e858e15897db633faf08d5a609fb638974fb74536b",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "content-108",
+      "provenance": {
+        "candidateIdentity": "artwork:met-32-11-1",
+        "source": "Metropolitan Museum of Art Open Access",
+        "sourceUrl": "https://www.metmuseum.org/art/collection/search/253370",
+        "originalImageUrl": "https://images.metmuseum.org/CRDImages/gr/web-large/DP-23263-005.jpg",
+        "creator": null,
+        "retrievedAt": "2026-10-14T15:30:44.092466+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access policy releases these actual digital photographs under CC0 for unrestricted commercial reuse, modification and distribution without attribution obligations. No separately restricted reproduction is substituted.",
+        "evidenceRefs": [
+          "https://www.metmuseum.org/art/collection/search/253370",
+          "https://www.metmuseum.org/policies/image-resources",
+          "https://collectionapi.metmuseum.org/public/collection/v1/objects/253370",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex primary-source and downloaded-pixel review (not museum or independent human approval)",
+        "reviewedAt": "2026-10-14T15:30:44.092466+00:00",
+        "candidateIdentity": "artwork:met-32-11-1",
+        "collection": "Metropolitan Museum of Art",
+        "version": "Met32.11.1 original marble youth",
+        "identityEvidenceUrl": "https://www.metmuseum.org/art/collection/search/253370",
+        "rightsEvidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+        "rightsBasis": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access policy releases these actual digital photographs under CC0 for unrestricted commercial reuse, modification and distribution without attribution obligations. No separately restricted reproduction is substituted.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "fa1afe6a4f86b8a31cdaeeb4ed9149b85fce078c7ad37212f09b297f6d7d30c4"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "CC0 identity and actual pixels reviewed for staging; no production approval. Development activation requires verified hosted bytes.",
+      "staged": {
+        "path": "assets/staged-art/content-108-5acabf7c8a93.jpg",
+        "width": 419,
+        "height": 624,
+        "sourceWidth": 419,
+        "sourceHeight": 624,
+        "sha256": "5acabf7c8a93b27cf519f7afbdc8248637c87554d6c94521ca5aa3d4e8184a68",
+        "sourceSha256": "fa1afe6a4f86b8a31cdaeeb4ed9149b85fce078c7ad37212f09b297f6d7d30c4",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "content-109",
+      "provenance": {
+        "candidateIdentity": "artwork:met-2003-593-1",
+        "source": "Metropolitan Museum of Art Open Access",
+        "sourceUrl": "https://www.metmuseum.org/art/collection/search/72381",
+        "originalImageUrl": "https://images.metmuseum.org/CRDImages/as/web-large/DP123364.jpg",
+        "creator": null,
+        "retrievedAt": "2026-10-14T15:30:44.092466+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access policy releases these actual digital photographs under CC0 for unrestricted commercial reuse, modification and distribution without attribution obligations. No separately restricted reproduction is substituted.",
+        "evidenceRefs": [
+          "https://www.metmuseum.org/art/collection/search/72381",
+          "https://www.metmuseum.org/policies/image-resources",
+          "https://collectionapi.metmuseum.org/public/collection/v1/objects/72381",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex primary-source and downloaded-pixel review (not museum or independent human approval)",
+        "reviewedAt": "2026-10-14T15:30:44.092466+00:00",
+        "candidateIdentity": "artwork:met-2003-593-1",
+        "collection": "Metropolitan Museum of Art",
+        "version": "Met2003.593.1 original bronze with gold traces",
+        "identityEvidenceUrl": "https://www.metmuseum.org/art/collection/search/72381",
+        "rightsEvidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+        "rightsBasis": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access policy releases these actual digital photographs under CC0 for unrestricted commercial reuse, modification and distribution without attribution obligations. No separately restricted reproduction is substituted.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "537ac86d16efe254edee79d3d391698a3134c6bafc0bc0a1d494599b43824abe"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "CC0 identity and actual pixels reviewed for staging; no production approval. Development activation requires verified hosted bytes.",
+      "staged": {
+        "path": "assets/staged-art/content-109-2c59ca31628d.jpg",
+        "width": 600,
+        "height": 600,
+        "sourceWidth": 600,
+        "sourceHeight": 600,
+        "sha256": "2c59ca31628dc74edad0d93127dfb8d1a6db2f1f6536d4822b7d59108640d5c3",
+        "sourceSha256": "537ac86d16efe254edee79d3d391698a3134c6bafc0bc0a1d494599b43824abe",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "content-110",
+      "provenance": {
+        "candidateIdentity": "artwork:met-67-25",
+        "source": "Metropolitan Museum of Art Open Access",
+        "sourceUrl": "https://www.metmuseum.org/art/collection/search/204812",
+        "originalImageUrl": "https://images.metmuseum.org/CRDImages/es/web-large/DP247545.jpg",
+        "creator": null,
+        "retrievedAt": "2026-10-14T15:30:44.092466+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access policy releases these actual digital photographs under CC0 for unrestricted commercial reuse, modification and distribution without attribution obligations. No separately restricted reproduction is substituted.",
+        "evidenceRefs": [
+          "https://www.metmuseum.org/art/collection/search/204812",
+          "https://www.metmuseum.org/policies/image-resources",
+          "https://collectionapi.metmuseum.org/public/collection/v1/objects/204812",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
+        ],
+        "artworkCreator": "Jean-Baptiste Carpeaux"
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex primary-source and downloaded-pixel review (not museum or independent human approval)",
+        "reviewedAt": "2026-10-14T15:30:44.092466+00:00",
+        "candidateIdentity": "artwork:met-67-25",
+        "collection": "Metropolitan Museum of Art",
+        "version": "Met67.25 Saint-Béat marble, not the Orsay bronze",
+        "identityEvidenceUrl": "https://www.metmuseum.org/art/collection/search/204812",
+        "rightsEvidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+        "rightsBasis": "The specific collection image is marked Public Domain and the collection API reports isPublicDomain=true. The Met's Open Access policy releases these actual digital photographs under CC0 for unrestricted commercial reuse, modification and distribution without attribution obligations. No separately restricted reproduction is substituted.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "9f755958ccdd57fe79f139c80d2abc87cd5eddf9e1b1d3c3ae85a879025a0f5a"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "CC0 identity and actual pixels reviewed for staging; no production approval. Development activation requires verified hosted bytes.",
+      "staged": {
+        "path": "assets/staged-art/content-110-6261b584d7ca.jpg",
+        "width": 468,
+        "height": 624,
+        "sourceWidth": 468,
+        "sourceHeight": 624,
+        "sha256": "6261b584d7cabb812b00ee11cbe688097e50a0ab5367d1b57f04c305f664a0d1",
+        "sourceSha256": "9f755958ccdd57fe79f139c80d2abc87cd5eddf9e1b1d3c3ae85a879025a0f5a",
+        "mimeType": "image/jpeg"
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "conceptId": "art_sculpture_l1_p1_met-66-173",
+      "imageId": "content-101",
+      "candidateIdentity": "artwork:met-66-173",
+      "altText": "A kneeling silver animal holds a tall spouted vessel.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:met-66-173",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Recognition identity and no answer-caption leakage checked; development only after hosted-byte verification, never production approval."
+    },
+    {
+      "conceptId": "art_sculpture_l1_p1_met-59-2",
+      "imageId": "content-102",
+      "candidateIdentity": "artwork:met-59-2",
+      "altText": "A seated stone ruler folds his hands above an inscribed robe.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:met-59-2",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Recognition identity and no answer-caption leakage checked; development only after hosted-byte verification, never production approval."
+    },
+    {
+      "conceptId": "art_sculpture_l1_p1_met-47-100-1",
+      "imageId": "content-103",
+      "candidateIdentity": "artwork:met-47-100-1",
+      "altText": "A seated marble musician holds a three-sided stringed instrument.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:met-47-100-1",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Recognition identity and no answer-caption leakage checked; development only after hosted-byte verification, never production approval."
+    },
+    {
+      "conceptId": "art_sculpture_l2_p1_met-29-3-2",
+      "imageId": "content-104",
+      "candidateIdentity": "artwork:met-29-3-2",
+      "altText": "A seated stone ruler wears a headcloth and rests both hands on the knees.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:met-29-3-2",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Recognition identity and no answer-caption leakage checked; development only after hosted-byte verification, never production approval."
+    },
+    {
+      "conceptId": "art_sculpture_l1_p1_met-1989-281-41",
+      "imageId": "content-105",
+      "candidateIdentity": "artwork:met-1989-281-41",
+      "altText": "A seated stone figure has a pale head and a dark patterned robe.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:met-1989-281-41",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Recognition identity and no added answer-caption leakage checked; development only after hosted-byte verification, never production approval."
+    },
+    {
+      "conceptId": "art_sculpture_l1_p1_met-18-2-4",
+      "imageId": "content-106",
+      "candidateIdentity": "artwork:met-18-2-4",
+      "altText": "A seated stone ruler appears beside a smaller standing figure.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:met-18-2-4",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Recognition identity and no added answer-caption leakage checked; development only after hosted-byte verification, never production approval."
+    },
+    {
+      "conceptId": "art_sculpture_l1_p1_met-ushumgal-stele",
+      "imageId": "content-107",
+      "candidateIdentity": "artwork:met-ushumgal-stele",
+      "altText": "A small stone monument combines a carved figure with ancient writing.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:met-ushumgal-stele",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Recognition identity and no added answer-caption leakage checked; development only after hosted-byte verification, never production approval."
+    },
+    {
+      "conceptId": "art_sculpture_l2_p1_met-32-11-1",
+      "imageId": "content-108",
+      "candidateIdentity": "artwork:met-32-11-1",
+      "altText": "A nude marble youth stands with one leg advanced.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:met-32-11-1",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Recognition identity and no added answer-caption leakage checked; development only after hosted-byte verification, never production approval."
+    },
+    {
+      "conceptId": "art_sculpture_l2_p1_met-2003-593-1",
+      "imageId": "content-109",
+      "candidateIdentity": "artwork:met-2003-593-1",
+      "altText": "A seated bronze religious figure raises a hand beneath a serrated halo.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:met-2003-593-1",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Recognition identity and no added answer-caption leakage checked; development only after hosted-byte verification, never production approval."
+    },
+    {
+      "conceptId": "art_sculpture_l6_p1_met-67-25",
+      "imageId": "content-110",
+      "candidateIdentity": "artwork:met-67-25",
+      "altText": "A seated marble man is surrounded by four younger figures.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:met-67-25",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Recognition identity and no added answer-caption leakage checked; development only after hosted-byte verification, never production approval."
+    }
+  ]
+}

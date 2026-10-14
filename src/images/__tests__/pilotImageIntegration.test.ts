@@ -32,7 +32,7 @@ test('research covers every original pilot artwork without passing rejected cand
   };
   expect(new Set(research.candidates.map(c => c.candidateIdentity)).size).toBe(18);
   const eligible = research.candidates.filter(c => c.decision === 'eligible-staging');
-  expect(eligible).toHaveLength(datasets.flatMap(d => d.assets).length);
+  expect(eligible).toHaveLength(datasets.flatMap(d => d.assets).filter(a => a.imageId.startsWith('pilot-')).length);
   for (const a of datasets.flatMap(d => d.assets)) {
     expect(imageLicenseIssue(a.provenance.license)).toBeUndefined();
     expect(stagingApprovalIssue(a)).toBeUndefined();

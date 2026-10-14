@@ -30,9 +30,11 @@ export type AssessmentContract = Readonly<{
   inverse?: Readonly<{ enabled: true; answerLeakageReviewed: true; scope?: Readonly<{ text: string; qualifierKeys: readonly string[] }>; response?: Readonly<{ complete: true; forms: readonly { text: string; caseSensitive: boolean }[] }> }>;
   // Stable learning fact identity; reverse views never create another learned fact.
   factId?: string;
+  // Explicit source-field assessment; not an unqualified exclusive membership.
+  catalogueField?: "cultural attribution" | "dating label";
   scope?: Readonly<{ text: string; qualifierKeys: readonly string[] }>;
   response?: Readonly<{ complete: true; forms: readonly { text: string; caseSensitive: boolean }[] }>;
-  attribution?: Readonly<{ role: string; status: "certain" | "attributed" | "disputed" }>;
+  attribution?: Readonly<{ role: string; status: "certain" | "attributed" | "disputed"; verb?: "created" | "credited" }>;
   event?: string;
   // Source-qualified dating labels are not claims that every other overlapping
   // interval is historically false. Wording must expose this assessment scope.

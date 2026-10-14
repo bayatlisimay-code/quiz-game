@@ -49,7 +49,7 @@ test('all pilot prompts retain qualifier scope, uncertainty and clean punctuatio
       expect(text).not.toMatch(/\{[sa]\}|\.\.|\?\./);
       if(c.assessment?.scope) expect(text).toContain(c.assessment.scope.text);
     }
-    if(c.partId === 'p4') {
+    if(c.assessment?.dateInterpretation === 'catalogue-label') {
       expect(t.statement(c.subject,c.object)).toContain('collection entry lists');
       expect(t.statement(c.subject,c.object)).toContain(c.object);
       expect(t.question(c.subject)).toContain(c.assessment!.event);

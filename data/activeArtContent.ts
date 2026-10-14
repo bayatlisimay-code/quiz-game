@@ -5,14 +5,15 @@ import { authorArtworkPilot } from "./artPilot/authoring";
 import { sculpturePilotWorks } from "./artPilot/sculpture";
 import { paintingPilotWorks } from "./artPilot/painting";
 import { terminologyPilotConcepts, terminologyPilotEvidence } from "./artPilot/terminology";
+import { expandedArtConcepts, expandedArtEvidence } from "./artContent";
 
-// Production authoring boundary. Source-checked pilot originals only;
+// Production authoring boundary. Source-checked teaching facts, including preserved pilot originals;
 // synthetic engine fixtures never enter this list. No image approvals implied.
 // Original authored content remains intact in conceptSets.ts as reusable source material.
 const sculpture = authorArtworkPilot(sculpturePilotWorks, "sculpture", "l3");
 const painting = authorArtworkPilot(paintingPilotWorks, "painting", "l2");
-export const approvedArtContent: readonly Concept[] = Object.freeze([...sculpture.concepts, ...painting.concepts, ...terminologyPilotConcepts]);
-export const approvedArtEvidence: readonly SemanticEvidence[] = Object.freeze([...sculpture.evidence, ...painting.evidence, ...terminologyPilotEvidence]);
+export const approvedArtContent: readonly Concept[] = Object.freeze([...sculpture.concepts, ...painting.concepts, ...terminologyPilotConcepts, ...expandedArtConcepts]);
+export const approvedArtEvidence: readonly SemanticEvidence[] = Object.freeze([...sculpture.evidence, ...painting.evidence, ...terminologyPilotEvidence, ...expandedArtEvidence]);
 
 export function createActiveArtSets(records: readonly Concept[]) {
   const sets: Record<string, { id: string; concepts: Concept[] }> = {};

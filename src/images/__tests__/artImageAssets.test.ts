@@ -1,17 +1,17 @@
 import { createRequire } from 'node:module';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { createRuntimeRegistry } from '../createRuntimeRegistry';
 import type { ImageCurationDataset } from '../types';
 import { activeSemanticContext, activeRegisteredConcepts } from '../../quizEngine/contentSnapshot';
 import { planAssessmentStimulus } from '../assessmentImages';
 
-const datasets: ImageCurationDataset[] = ['painting','sculpture','architecture'].map(id=>JSON.parse(readFileSync(`data/imageCuration/art/${id}.json`,'utf8')) as ImageCurationDataset);
+const datasets: ImageCurationDataset[] = readdirSync('data/imageCuration/art').filter(name => name.endsWith('.json')).sort().map(name=>JSON.parse(readFileSync(`data/imageCuration/art/${name}`,'utf8')) as ImageCurationDataset).filter(d => d.assets.length > 0);
 
 test('actual staged derivatives pass offline identity, license, byte, metadata, size and concept checks', () => {
   const result=execFileSync(process.execPath,['scripts/art-image-assets.cjs','--check'],{encoding:'utf8'});
-  expect(JSON.parse(result)).toEqual({assets:8,staged:8,approved:0,stagingApproved:8});
+  expect(JSON.parse(result)).toEqual({assets:18,staged:18,approved:0,stagingApproved:18});
   for (const dataset of datasets) for(const asset of dataset.assets) {
     const bytes=readFileSync(asset.staged!.path);
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(asset.staged!.sha256);

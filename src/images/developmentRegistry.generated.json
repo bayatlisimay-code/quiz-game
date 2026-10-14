@@ -179,6 +179,226 @@
         "height": 701,
         "altText": "A carved pulpit raised on columns."
       }
+    },
+    "art_sculpture_l1_p1_met-66-173": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l1_p1_met-66-173",
+      "recognition": {
+        "answerId": "artwork:met-66-173",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "content-101",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/content-101/dbed9d37a70c60e90e1aeb0b7a465ee6a67ee38701671f5e72beeaaca2683c20.jpg",
+        "width": 444,
+        "height": 625,
+        "altText": "A kneeling silver animal holds a tall spouted vessel."
+      }
+    },
+    "art_sculpture_l1_p1_met-59-2": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l1_p1_met-59-2",
+      "recognition": {
+        "answerId": "artwork:met-59-2",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "content-102",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/content-102/beef95e382c18cdb165c0f61963d91114fa7e10ac0bc61335958b2d51f000058.jpg",
+        "width": 488,
+        "height": 624,
+        "altText": "A seated stone ruler folds his hands above an inscribed robe."
+      }
+    },
+    "art_sculpture_l1_p1_met-47-100-1": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l1_p1_met-47-100-1",
+      "recognition": {
+        "answerId": "artwork:met-47-100-1",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "content-103",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/content-103/fa42c3f035df63b4d065eb795279a4c87e256cbd49da7c6c847e197acddeb7f6.jpg",
+        "width": 473,
+        "height": 624,
+        "altText": "A seated marble musician holds a three-sided stringed instrument."
+      }
+    },
+    "art_sculpture_l2_p1_met-29-3-2": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l2_p1_met-29-3-2",
+      "recognition": {
+        "answerId": "artwork:met-29-3-2",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "content-104",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/content-104/2d7bbdf3fea73d8fcc03c03a94505a09bcc881d895039841545c1b87ac9f45c3.jpg",
+        "width": 468,
+        "height": 624,
+        "altText": "A seated stone ruler wears a headcloth and rests both hands on the knees."
+      }
+    },
+    "art_sculpture_l1_p1_met-1989-281-41": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l1_p1_met-1989-281-41",
+      "recognition": {
+        "answerId": "artwork:met-1989-281-41",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "content-105",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/content-105/574f3f598a64c0388cdd19fe45604ebba80f90f6de471feadcf1e584b20b6bd1.jpg",
+        "width": 599,
+        "height": 617,
+        "altText": "A seated stone figure has a pale head and a dark patterned robe."
+      }
+    },
+    "art_sculpture_l1_p1_met-18-2-4": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l1_p1_met-18-2-4",
+      "recognition": {
+        "answerId": "artwork:met-18-2-4",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "content-106",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/content-106/a7ff169a3eff51ade3aa0f24f101f83cfbcbe059213e7acb4650feaa463aa9c1.jpg",
+        "width": 459,
+        "height": 625,
+        "altText": "A seated stone ruler appears beside a smaller standing figure."
+      }
+    },
+    "art_sculpture_l1_p1_met-ushumgal-stele": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l1_p1_met-ushumgal-stele",
+      "recognition": {
+        "answerId": "artwork:met-ushumgal-stele",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "content-107",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/content-107/80b8f5f4ad706d6274e251ff933623e4a131ec7281dea12ae35aec4a59437f51.jpg",
+        "width": 468,
+        "height": 624,
+        "altText": "A small stone monument combines a carved figure with ancient writing."
+      }
+    },
+    "art_sculpture_l2_p1_met-32-11-1": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l2_p1_met-32-11-1",
+      "recognition": {
+        "answerId": "artwork:met-32-11-1",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "content-108",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/content-108/5acabf7c8a93b27cf519f7afbdc8248637c87554d6c94521ca5aa3d4e8184a68.jpg",
+        "width": 419,
+        "height": 624,
+        "altText": "A nude marble youth stands with one leg advanced."
+      }
+    },
+    "art_sculpture_l2_p1_met-2003-593-1": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l2_p1_met-2003-593-1",
+      "recognition": {
+        "answerId": "artwork:met-2003-593-1",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "content-109",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/content-109/2c59ca31628dc74edad0d93127dfb8d1a6db2f1f6536d4822b7d59108640d5c3.jpg",
+        "width": 600,
+        "height": 600,
+        "altText": "A seated bronze religious figure raises a hand beneath a serrated halo."
+      }
+    },
+    "art_sculpture_l6_p1_met-67-25": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l6_p1_met-67-25",
+      "recognition": {
+        "answerId": "artwork:met-67-25",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "content-110",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/content-110/6261b584d7cabb812b00ee11cbe688097e50a0ab5367d1b57f04c305f664a0d1.jpg",
+        "width": 468,
+        "height": 624,
+        "altText": "A seated marble man is surrounded by four younger figures."
+      }
     }
   }
 }

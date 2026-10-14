@@ -6,7 +6,15 @@ import type { RelationTemplate } from "./templates";
 export function getAssessmentTemplate(concept: Concept): RelationTemplate {
   const definition = relationDefinitions[concept.relation];
   if (!definition || !concept.assessment) return getRelationTemplate(concept.relation);
-  const dateWording = definition.family === "date" && concept.assessment.event ? concept.assessment.dateInterpretation === "catalogue-label" ? {
+  const dateWording = concept.assessment.catalogueField === "cultural attribution" ? {
+    question: "Which specific primary cultural-attribution label is given for “{s}”?",
+    statement: "The account's specific primary cultural-attribution label for “{s}” is {a}.",
+    blank: "The account's specific primary cultural-attribution label for “{s}” is _____.",
+  } : concept.assessment.catalogueField ? {
+    question: `Which ${concept.assessment.catalogueField} is listed for “{s}”?`,
+    statement: `The collection account lists the ${concept.assessment.catalogueField} of “{s}” as {a}.`,
+    blank: `The collection account lists the ${concept.assessment.catalogueField} of “{s}” as _____.`,
+  } : definition.family === "date" && concept.assessment.event ? concept.assessment.dateInterpretation === "catalogue-label" ? {
     question: `Which ${concept.assessment.event} date or range is listed for “{s}”?`,
     statement: `The collection entry lists the ${concept.assessment.event} date or range of “{s}” as {a}.`,
     blank: `The collection entry lists the ${concept.assessment.event} date or range of “{s}” as _____.`,
@@ -16,7 +24,15 @@ export function getAssessmentTemplate(concept: Concept): RelationTemplate {
     blank: `The date or period documented for the ${concept.assessment.event} of “{s}” is _____.`,
   } : definition;
   const creatorWording = definition.family === "creator" && concept.assessment.attribution?.status === "certain"
-    ? definition.certainAttribution : undefined;
+    ? concept.assessment.attribution.verb === "credited" ? {
+      question: `Which ${concept.assessment.attribution.role} is credited for “{s}”?`,
+      statement: `The ${concept.assessment.attribution.role} credited for “{s}” is {a}.`,
+      blank: `The ${concept.assessment.attribution.role} credited for “{s}” is _____.`,
+      inverse: { question: `Which work is credited to {s} in this role?`, statement: `“{a}” is credited to {s} in this role.`, blank: `One work credited to {s} in this role is _____.` },
+    } : concept.assessment.attribution.verb === "created" ? {
+      question: "Who created “{s}”?", statement: "{a} created “{s}”.", blank: "“{s}” was created by _____.",
+      inverse: { question: "Which work was created by {s}?", statement: "{s} created “{a}”.", blank: "One work created by {s} is _____." },
+    } : definition.certainAttribution : undefined;
   const qualified = definition.family === "creator" && concept.assessment.attribution?.status === "attributed" ? {
     question: `Who is listed as the attributed ${definition.creatorRole} of “{s}”?`,
     statement: `“{s}” is attributed to {a} as ${definition.creatorRole}.`,

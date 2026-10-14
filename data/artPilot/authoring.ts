@@ -53,7 +53,7 @@ export function authorArtworkPilot(works: readonly PilotArtwork[], subtopicId: "
         evidenceIds: [evidenceId], subjectType: subjectIdentity.entityType!, valueType: valueIdentity.entityType!,
         factId: `${workId}:${relation}`, scope: { text: scope, qualifierKeys: Object.keys(qualifiers) },
         ...(partId === "p1" ? { identification: { description: { text: work.clue, evidenceIds: [evidenceId], answerLeakageReviewed: true as const } } } : {}),
-        ...(partId === "p2" ? { attribution: { role, status: "certain" as const }, response: { complete: true as const, forms },
+        ...(partId === "p2" ? { attribution: { role, status: "certain" as const, ...(work.creatorVerb ? { verb: work.creatorVerb } : {}) }, response: { complete: true as const, forms },
           inverse: { enabled: true as const, answerLeakageReviewed: true as const,
             scope: { text: `Principal ${role} credits for original works in their collection entries.`, qualifierKeys: Object.keys(qualifiers) } } } : {}),
         ...(partId === "p4" ? { event: work.event, dateInterpretation: "catalogue-label" as const } : {}),

@@ -11,6 +11,7 @@ export type PilotArtwork = Readonly<{
   creatorId: string;
   creator: string;
   creatorAliases?: readonly string[];
+  creatorVerb?: "created" | "credited";
   introducedIn: NonNullable<Concept["introducedIn"]>;
   period: string;
   periodUrl?: string;
@@ -23,7 +24,7 @@ export type PilotArtwork = Readonly<{
   dateAliases?: readonly string[];
   dateContext?: string;
   event: "creation" | "completion";
-  precision: "year" | "range" | "approximate-year" | "approximate-range" | "uncertain-range";
+  precision: "year" | "month" | "range" | "approximate-year" | "approximate-range" | "uncertain-range";
   clue: string;
   clueUrl?: string;
   clueLocator?: string;

@@ -24,8 +24,8 @@ const cases = slices.flatMap(slice => ["p1", "p2", "p3", "p4", "p5"].flatMap(par
 
 test("production pilot has 18 sourced originals, 54 teaching facts and four terminology facts; no fabricated human review or image approvals", () => {
   expect(paintingPilotWorks).toHaveLength(9); expect(sculpturePilotWorks).toHaveLength(9);
-  expect(approvedArtContent).toHaveLength(58);
-  expect(new Set(approvedArtContent.map(c => c.id)).size).toBe(58);
+  expect(approvedArtContent.filter(c => c.tags?.includes("verified-art-pilot") || terminologyPilotConcepts.some(t => t.id === c.id))).toHaveLength(58);
+  expect(new Set(approvedArtContent.map(c => c.id)).size).toBe(approvedArtContent.length);
   expect(validateContent(approvedArtContent, targetRelationPolicies, undefined, { evidence: approvedArtEvidence }).filter(i => i.severity === "error")).toEqual([]);
   expect(() => createActiveArtSets(approvedArtContent)).not.toThrow();
   expect(approvedArtEvidence.every(e => e.sourceUrl.startsWith("https://") && !e.sourceUrl.includes("example.invalid") && e.reviewedBy?.includes("not independent human"))).toBe(true);
@@ -79,7 +79,8 @@ test("p3/p5 reuse original IDs and all ten l10 review parts collect the availabl
     expect(poolFor(slice.subtopicId, slice.levelId, "p5").map(c => c.id)).toEqual([...p1, ...p2, ...p4].map(c => c.id));
     for (const part of [1, 2, 3, 4, 5]) {
       const pool = poolFor(slice.subtopicId, "l10", `p${part}`);
-      expect(pool).toHaveLength(slice.subtopicId === "sculpture" ? 31 : 27);
+      const taught = approvedArtContent.filter(c => c.subtopicId === slice.subtopicId && ["p1", "p2", "p4"].includes(c.partId));
+      expect(pool.map(c => c.id).sort()).toEqual(taught.map(c => c.id).sort());
       expect(new Set(pool.map(c => c.id)).size).toBe(pool.length);
     }
   }
@@ -98,7 +99,7 @@ test("actual creator blanks accept declared aliases, reject other artists and ne
 });
 
 test("dating preserves uncertainty, collection labels, originals, and event distinctions; invisible source interpretation is blocked", () => {
-  const dates = approvedArtContent.filter(c => c.partId === "p4");
+  const dates = approvedArtContent.filter(c => c.partId === "p4" && c.tags?.includes("verified-art-pilot"));
   expect(dates.map(c => c.object)).toContain("probably c. 1437–1445");
   const supper = dates.find(c => c.subject === "The Last Supper")!;
   expect(supper.assessment?.event).toBe("completion"); expect(supper.object).toBe("1498");
