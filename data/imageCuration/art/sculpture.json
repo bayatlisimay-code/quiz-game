@@ -2,64 +2,232 @@
   "schemaVersion": 1,
   "assets": [
     {
-      "imageId": "pilot-002",
+      "imageId": "pilot-003",
       "provenance": {
-        "candidateIdentity": "artwork:accademia-1076",
-        "source": "Wikimedia Commons",
-        "sourceUrl": "https://commons.wikimedia.org/wiki/File:%27David%27_by_Michelangelo_Fir_JBU009.jpg",
-        "originalImageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/44/%27David%27_by_Michelangelo_Fir_JBU009.jpg",
-        "creator": "Jörg Bittner Unna",
+        "candidateIdentity": "artwork:vatican-pieta-original",
+        "source": "Wikimedia Commons / Flickr",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:La_Piet%C3%A0_de_Michel-Ange_%2825901652585%29.jpg",
+        "originalImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/La_Piet%C3%A0_de_Michel-Ange_%2825901652585%29.jpg/960px-La_Piet%C3%A0_de_Michel-Ange_%2825901652585%29.jpg",
+        "creator": "Philippe Vieux-Jeanton (Miwok)",
         "artworkCreator": "Michelangelo Buonarroti",
-        "retrievedAt": "2026-10-13T11:49:38.665517+00:00",
+        "retrievedAt": "2026-10-14T07:41:14.657948+00:00",
         "license": {
-          "status": "CC-BY",
-          "version": "3.0",
-          "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
-          "evidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File:%27David%27_by_Michelangelo_Fir_JBU009.jpg&oldid=920465977",
-          "attribution": {
-            "creator": "Jörg Bittner Unna",
-            "title": "‘David’ by Michelangelo Fir JBU009",
-            "source": "Wikimedia Commons",
-            "sourceUrl": "https://commons.wikimedia.org/wiki/File:%27David%27_by_Michelangelo_Fir_JBU009.jpg",
-            "licenseLabel": "CC BY 3.0",
-            "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
-            "changes": "Resized and JPEG recompressed; EXIF/XMP removed; no crop."
-          }
+          "status": "CC0",
+          "evidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3ALa_Piet%C3%A0_de_Michel-Ange_%2825901652585%29.jpg&oldid=1005853417",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
         },
-        "rightsNotes": "File-specific Commons licensing inspected, not inferred from artwork age or page footer. No institutional endorsement. Photographer explicitly licenses photograph CC BY 3.0. Original Accademia marble detail; Italian cultural-property/commercial reproduction clearance remains a separate release review.",
+        "rightsNotes": "File-specific CC0 dedication of the actual photograph/digital scan; commercial copying, modification and distribution without attribution. Commons records Flickr license verification by FlickreviewR on 7 October 2016; not inferred from artwork age.",
         "evidenceRefs": [
-          "https://commons.wikimedia.org/w/index.php?title=File:%27David%27_by_Michelangelo_Fir_JBU009.jpg&oldid=920465977",
-          "https://www.galleriaaccademiafirenze.it/en/artworks/david-michelangelo/"
+          "https://commons.wikimedia.org/w/index.php?title=File%3ALa_Piet%C3%A0_de_Michel-Ange_%2825901652585%29.jpg&oldid=1005853417",
+          "https://www.museivaticani.va/content/dam/museivaticani/pdf/eventi_novita/iniziative/eventi/2022/127_pieta_scolpite_da_michelangelo.pdf",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
         ]
       },
+      "stagingApproval": {
+        "reviewedBy": "Codex source and pixel review",
+        "reviewedAt": "2026-10-14T07:41:14.657948+00:00",
+        "candidateIdentity": "artwork:vatican-pieta-original",
+        "collection": "Saint Peter's Basilica, Vatican City",
+        "version": "Original Vatican marble Pietà, not the Bandini or Rondanini sculptures",
+        "identityEvidenceUrl": "https://www.museivaticani.va/content/dam/museivaticani/pdf/eventi_novita/iniziative/eventi/2022/127_pieta_scolpite_da_michelangelo.pdf",
+        "rightsEvidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3ALa_Piet%C3%A0_de_Michel-Ange_%2825901652585%29.jpg&oldid=1005853417",
+        "rightsBasis": "File-specific CC0 dedication of the actual photograph/digital scan; commercial copying, modification and distribution without attribution. Commons records Flickr license verification by FlickreviewR on 7 October 2016; not inferred from artwork age.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "f972f90453d0a32eea21892851cb2be3104fa3196b34d1c60f3940f9cff34f07"
+      },
       "reviewStatus": "needs-review",
-      "reviewReason": "Source identity and file license compared by Codex; optimized bytes visually inspected. Owned hosting and independent editorial release review pending.",
+      "reviewReason": "Eligible for local staging after source/identity/pixel review. Owned hosting, hosted-byte verification and final binding release review pending.",
       "staged": {
-        "path": "assets/staged-art/pilot-002-f58668bdbba4.jpg",
-        "width": 853,
-        "height": 1280,
-        "sha256": "f58668bdbba48b0feca8b122525f185d158351be3c86d1c4532c70b49d226688",
-        "sourceSha256": "912f013b2c199447f93b1eabcf82c1828010ab3630268d9f700d1a0907a4901c",
-        "mimeType": "image/jpeg",
-        "sourceWidth": 3471,
-        "sourceHeight": 5207
+        "path": "assets/staged-art/pilot-003-002ac570f829.jpg",
+        "width": 960,
+        "height": 961,
+        "sourceWidth": 960,
+        "sourceHeight": 961,
+        "sha256": "002ac570f8295f9c1a781882a00f03a911b65ce55ba22d2fccd0576d34c594bb",
+        "sourceSha256": "f972f90453d0a32eea21892851cb2be3104fa3196b34d1c60f3940f9cff34f07",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "pilot-008",
+      "provenance": {
+        "candidateIdentity": "artwork:opera-duomo-cantoria-messe",
+        "source": "Wikimedia Commons",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cantoria_Della_Robbia_OPA_Florence_10.jpg",
+        "originalImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Cantoria_Della_Robbia_OPA_Florence_10.jpg/960px-Cantoria_Della_Robbia_OPA_Florence_10.jpg",
+        "creator": "Jastrow",
+        "artworkCreator": "Luca della Robbia",
+        "retrievedAt": "2026-10-14T07:41:14.657948+00:00",
+        "license": {
+          "status": "public-domain",
+          "evidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3ACantoria_Della_Robbia_OPA_Florence_10.jpg&oldid=1112948276"
+        },
+        "rightsNotes": "File-specific Public Domain determination of the digital reproduction, with no attribution requirement. Jastrow's own photograph is explicitly released using PD-self; not inferred from the sculpture's age.",
+        "evidenceRefs": [
+          "https://commons.wikimedia.org/w/index.php?title=File%3ACantoria_Della_Robbia_OPA_Florence_10.jpg&oldid=1112948276",
+          "https://duomo.firenze.it/en/opera-magazine/post/4647/the-choirs-by-luca-della-robbia-and-donatello-two-unique-masterpieces-of-the-florentine-renaissance_",
+          "https://creativecommons.org/publicdomain/mark/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex source and pixel review",
+        "reviewedAt": "2026-10-14T07:41:14.657948+00:00",
+        "candidateIdentity": "artwork:opera-duomo-cantoria-messe",
+        "collection": "Museo dell'Opera del Duomo, Florence",
+        "version": "Original marble choir gallery by Luca della Robbia, not Donatello's gallery",
+        "identityEvidenceUrl": "https://duomo.firenze.it/en/opera-magazine/post/4647/the-choirs-by-luca-della-robbia-and-donatello-two-unique-masterpieces-of-the-florentine-renaissance_",
+        "rightsEvidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3ACantoria_Della_Robbia_OPA_Florence_10.jpg&oldid=1112948276",
+        "rightsBasis": "File-specific Public Domain determination of the digital reproduction, with no attribution requirement. Jastrow's own photograph is explicitly released using PD-self; not inferred from the sculpture's age.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "de1fc5693fa82fcf99210c50900a4b24eeefeabbaeedab05aa4b00c0dddbbdc7"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Eligible for local staging after source/identity/pixel review. Owned hosting, hosted-byte verification and final binding release review pending.",
+      "staged": {
+        "path": "assets/staged-art/pilot-008-cf68047fbffb.jpg",
+        "width": 960,
+        "height": 639,
+        "sourceWidth": 960,
+        "sourceHeight": 639,
+        "sha256": "cf68047fbffbd7205cb8c38febd97aee502b8dfc76a776487c0b6a2d0f139ef3",
+        "sourceSha256": "de1fc5693fa82fcf99210c50900a4b24eeefeabbaeedab05aa4b00c0dddbbdc7",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "pilot-009",
+      "provenance": {
+        "candidateIdentity": "artwork:pisa-baptistery-pulpit",
+        "source": "Wikimedia Commons / Rijksmuseum",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Pisa_Pulpito_del_Battistero_di_N.Pisano%2C_RP-F-F16906.jpg",
+        "originalImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Pisa_Pulpito_del_Battistero_di_N.Pisano%2C_RP-F-F16906.jpg/960px-Pisa_Pulpito_del_Battistero_di_N.Pisano%2C_RP-F-F16906.jpg",
+        "creator": null,
+        "artworkCreator": "Nicola Pisano",
+        "retrievedAt": "2026-10-14T07:41:14.657948+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3APisa_Pulpito_del_Battistero_di_N.Pisano%2C_RP-F-F16906.jpg&oldid=963831933",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "File-specific CC0 dedication of the actual photograph/digital scan; commercial copying, modification and distribution without attribution. Historical photograph digitized by Rijksmuseum and made available under CC0; anonymous photographer.",
+        "evidenceRefs": [
+          "https://commons.wikimedia.org/w/index.php?title=File%3APisa_Pulpito_del_Battistero_di_N.Pisano%2C_RP-F-F16906.jpg&oldid=963831933",
+          "https://www.opapisa.it/en/square-of-miracles/baptistery/",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex source and pixel review",
+        "reviewedAt": "2026-10-14T07:41:14.657948+00:00",
+        "candidateIdentity": "artwork:pisa-baptistery-pulpit",
+        "collection": "Original work: Pisa Baptistery; historical photograph: Rijksmuseum RP-F-F16906",
+        "version": "Historical photograph of Nicola Pisano's original Baptistery pulpit, not Giovanni Pisano's Cathedral pulpit",
+        "identityEvidenceUrl": "https://www.opapisa.it/en/square-of-miracles/baptistery/",
+        "rightsEvidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3APisa_Pulpito_del_Battistero_di_N.Pisano%2C_RP-F-F16906.jpg&oldid=963831933",
+        "rightsBasis": "File-specific CC0 dedication of the actual photograph/digital scan; commercial copying, modification and distribution without attribution. Historical photograph digitized by Rijksmuseum and made available under CC0; anonymous photographer.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "crop": {
+          "x": 207,
+          "y": 240,
+          "width": 548,
+          "height": 701,
+          "reason": "Remove album mount and printed title while retaining the depicted pulpit; no artwork retouching."
+        },
+        "sourceSha256": "aaa2e58394a2db227673baca999ab1fcad23b93999e382136f5b8c6b95f3c5ec"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Eligible for local staging after source/identity/pixel review. Owned hosting, hosted-byte verification and final binding release review pending.",
+      "staged": {
+        "path": "assets/staged-art/pilot-009-00a9de580592.jpg",
+        "width": 548,
+        "height": 701,
+        "sourceWidth": 960,
+        "sourceHeight": 1204,
+        "crop": {
+          "x": 207,
+          "y": 240,
+          "width": 548,
+          "height": 701,
+          "reason": "Remove album mount and printed title while retaining the depicted pulpit; no artwork retouching."
+        },
+        "sha256": "00a9de580592000f75110da9481867c67b642dd61ae23a25b50e50602d808fdf",
+        "sourceSha256": "aaa2e58394a2db227673baca999ab1fcad23b93999e382136f5b8c6b95f3c5ec",
+        "mimeType": "image/jpeg"
       }
     }
   ],
   "bindings": [
     {
-      "conceptId": "art_sculpture_l3_p1_accademia-1076",
-      "imageId": "pilot-002",
-      "candidateIdentity": "artwork:accademia-1076",
-      "altText": "Detail of an original marble figure in a museum.",
+      "conceptId": "art_sculpture_l3_p1_vatican-pieta-original",
+      "imageId": "pilot-003",
+      "candidateIdentity": "artwork:vatican-pieta-original",
+      "altText": "A marble group of a seated woman holding a reclining man.",
       "allowedExerciseTypes": [
         "mcq",
         "true_false",
         "fill_blank",
         "matching"
       ],
+      "recognition": {
+        "answerId": "artwork:vatican-pieta-original",
+        "answerLeakageReviewed": true
+      },
       "reviewStatus": "needs-review",
-      "reviewReason": "Source identity and file license compared by Codex; optimized bytes visually inspected. Owned hosting and independent editorial release review pending. Review answer-bearing titles/source credits before recognition approval."
+      "reviewReason": "Source identity and no added answer-caption/alt-text leakage reviewed for recognition only. Not approved for runtime until owned hosting and release review."
+    },
+    {
+      "conceptId": "art_sculpture_l3_p1_opera-duomo-cantoria-messe",
+      "imageId": "pilot-008",
+      "candidateIdentity": "artwork:opera-duomo-cantoria-messe",
+      "altText": "A marble balcony with relief panels of children.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:opera-duomo-cantoria-messe",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Source identity and no added answer-caption/alt-text leakage reviewed for recognition only. Not approved for runtime until owned hosting and release review."
+    },
+    {
+      "conceptId": "art_sculpture_l3_p1_pisa-baptistery-pulpit",
+      "imageId": "pilot-009",
+      "candidateIdentity": "artwork:pisa-baptistery-pulpit",
+      "altText": "A carved pulpit raised on columns.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:pisa-baptistery-pulpit",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Source identity and no added answer-caption/alt-text leakage reviewed for recognition only. Not approved for runtime until owned hosting and release review."
     }
   ]
 }

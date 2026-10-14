@@ -16,7 +16,7 @@ jest.mock("react", () => ({ ...jest.requireActual("react"),
 }));
 jest.mock("expo-image", () => ({ Image: "ExpoImage" }));
 jest.mock("react-native", () => ({ Text: "Text", View: "View", ActivityIndicator: "Spinner", StyleSheet: { create: (v: unknown) => v, absoluteFill: {} } }));
-const image = { imageId: "synthetic-image", uri: "https://images.example.invalid/test.jpg", width: 100, height: 100, altText: "Synthetic test image" };
+const image = { licenseStatus: "CC0" as const, imageId: "synthetic-image", uri: "https://images.example.invalid/test.jpg", width: 100, height: 100, altText: "Synthetic test image" };
 function find(node: ReactNode, type: string): ReactElement<Record<string, unknown>> | undefined {
   if (!React.isValidElement<Record<string, unknown>>(node)) return undefined;
   if (node.type === type) return node;

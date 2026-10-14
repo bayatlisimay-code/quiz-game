@@ -5,7 +5,7 @@
       "imageId": "pilot-001",
       "provenance": {
         "candidateIdentity": "artwork:ng186",
-        "source": "Wikimedia Commons / Closer to Van Eyck",
+        "source": "Wikimedia Commons",
         "sourceUrl": "https://commons.wikimedia.org/wiki/File:Arnolfini_Portrait.jpg",
         "originalImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Arnolfini_Portrait.jpg/960px-Arnolfini_Portrait.jpg",
         "creator": null,
@@ -13,16 +13,35 @@
         "retrievedAt": "2026-10-13T11:49:38.665517+00:00",
         "license": {
           "status": "public-domain",
-          "evidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File:Arnolfini_Portrait.jpg&oldid=1065838803"
+          "evidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3AArnolfini_Portrait.jpg&oldid=1065838803"
         },
-        "rightsNotes": "File-specific Commons licensing inspected, not inferred from artwork age or page footer. No institutional endorsement. Public Domain Mark for this reproduction; source identifies NG186 oil on oak. No claim of a CC0 dedication.",
+        "rightsNotes": "File-specific Public Domain determination of the digital reproduction, with no attribution requirement. Commons file licensing and structured image metadata agree on Public Domain; faithful 2D reproduction, not a photograph of a 3D object. Photographer not identified.",
         "evidenceRefs": [
-          "https://commons.wikimedia.org/w/index.php?title=File:Arnolfini_Portrait.jpg&oldid=1065838803",
-          "https://www.nationalgallery.org.uk/paintings/jan-van-eyck-the-arnolfini-portrait"
+          "https://commons.wikimedia.org/w/index.php?title=File%3AArnolfini_Portrait.jpg&oldid=1065838803",
+          "https://www.nationalgallery.org.uk/paintings/jan-van-eyck-the-arnolfini-portrait",
+          "https://creativecommons.org/publicdomain/mark/1.0/"
         ]
       },
+      "stagingApproval": {
+        "reviewedBy": "Codex source and pixel review",
+        "reviewedAt": "2026-10-14T07:41:14.657948+00:00",
+        "candidateIdentity": "artwork:ng186",
+        "collection": "National Gallery, London",
+        "version": "Original NG186 oil on oak panel",
+        "identityEvidenceUrl": "https://www.nationalgallery.org.uk/paintings/jan-van-eyck-the-arnolfini-portrait",
+        "rightsEvidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3AArnolfini_Portrait.jpg&oldid=1065838803",
+        "rightsBasis": "File-specific Public Domain determination of the digital reproduction, with no attribution requirement. Commons file licensing and structured image metadata agree on Public Domain; faithful 2D reproduction, not a photograph of a 3D object. Photographer not identified.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "5eff914ef4523690fd371d6b173714d40c975c50101248701896b834325f5e2e"
+      },
       "reviewStatus": "needs-review",
-      "reviewReason": "Source identity and file license compared by Codex; optimized bytes visually inspected. Owned hosting and independent editorial release review pending.",
+      "reviewReason": "Eligible for local staging after source/identity/pixel review. Owned hosting, hosted-byte verification and final binding release review pending.",
       "staged": {
         "path": "assets/staged-art/pilot-001-92eeeabc155f.jpg",
         "width": 950,
@@ -32,6 +51,229 @@
         "mimeType": "image/jpeg",
         "sourceWidth": 960,
         "sourceHeight": 1293
+      }
+    },
+    {
+      "imageId": "pilot-004",
+      "provenance": {
+        "candidateIdentity": "artwork:ng1314",
+        "source": "Wikimedia Commons",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Holbein-ambassadors.jpg",
+        "originalImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Holbein-ambassadors.jpg/960px-Holbein-ambassadors.jpg",
+        "creator": null,
+        "artworkCreator": "Hans Holbein the Younger",
+        "retrievedAt": "2026-10-14T07:41:14.657948+00:00",
+        "license": {
+          "status": "public-domain",
+          "evidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3AHolbein-ambassadors.jpg&oldid=1148509868"
+        },
+        "rightsNotes": "File-specific Public Domain determination of the digital reproduction, with no attribution requirement. Commons file licensing and structured image metadata agree on Public Domain; faithful 2D reproduction, not a photograph of a 3D object. Photographer not identified.",
+        "evidenceRefs": [
+          "https://commons.wikimedia.org/w/index.php?title=File%3AHolbein-ambassadors.jpg&oldid=1148509868",
+          "https://www.nationalgallery.org.uk/paintings/hans-holbein-the-younger-the-ambassadors",
+          "https://creativecommons.org/publicdomain/mark/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex source and pixel review",
+        "reviewedAt": "2026-10-14T07:41:14.657948+00:00",
+        "candidateIdentity": "artwork:ng1314",
+        "collection": "National Gallery, London",
+        "version": "Original NG1314 oil painting",
+        "identityEvidenceUrl": "https://www.nationalgallery.org.uk/paintings/hans-holbein-the-younger-the-ambassadors",
+        "rightsEvidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3AHolbein-ambassadors.jpg&oldid=1148509868",
+        "rightsBasis": "File-specific Public Domain determination of the digital reproduction, with no attribution requirement. Commons file licensing and structured image metadata agree on Public Domain; faithful 2D reproduction, not a photograph of a 3D object. Photographer not identified.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "668003ff4706bb2c13e88b2130b78e3eda8b7d7ab566ca24bc0b4db9c09761b0"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Eligible for local staging after source/identity/pixel review. Owned hosting, hosted-byte verification and final binding release review pending.",
+      "staged": {
+        "path": "assets/staged-art/pilot-004-2814915973c2.jpg",
+        "width": 960,
+        "height": 947,
+        "sourceWidth": 960,
+        "sourceHeight": 947,
+        "sha256": "2814915973c255f0d5588f722a666168c80415fd5e64c46dcdf98ef5a776413d",
+        "sourceSha256": "668003ff4706bb2c13e88b2130b78e3eda8b7d7ab566ca24bc0b4db9c09761b0",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "pilot-005",
+      "provenance": {
+        "candidateIdentity": "artwork:ng665",
+        "source": "Wikimedia Commons",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Piero_della_Francesca_-_Battesimo_di_Cristo_%28National_Gallery%2C_London%29.jpg",
+        "originalImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Piero_della_Francesca_-_Battesimo_di_Cristo_%28National_Gallery%2C_London%29.jpg/960px-Piero_della_Francesca_-_Battesimo_di_Cristo_%28National_Gallery%2C_London%29.jpg",
+        "creator": null,
+        "artworkCreator": "Piero della Francesca",
+        "retrievedAt": "2026-10-14T07:41:14.657948+00:00",
+        "license": {
+          "status": "public-domain",
+          "evidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3APiero_della_Francesca_-_Battesimo_di_Cristo_%28National_Gallery%2C_London%29.jpg&oldid=1028499461"
+        },
+        "rightsNotes": "File-specific Public Domain determination of the digital reproduction, with no attribution requirement. Commons file licensing and structured image metadata agree on Public Domain; faithful 2D reproduction, not a photograph of a 3D object. Photographer not identified.",
+        "evidenceRefs": [
+          "https://commons.wikimedia.org/w/index.php?title=File%3APiero_della_Francesca_-_Battesimo_di_Cristo_%28National_Gallery%2C_London%29.jpg&oldid=1028499461",
+          "https://www.nationalgallery.org.uk/paintings/piero-della-francesca-the-baptism-of-christ",
+          "https://creativecommons.org/publicdomain/mark/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex source and pixel review",
+        "reviewedAt": "2026-10-14T07:41:14.657948+00:00",
+        "candidateIdentity": "artwork:ng665",
+        "collection": "National Gallery, London",
+        "version": "Original NG665 central panel, not later altarpiece wings",
+        "identityEvidenceUrl": "https://www.nationalgallery.org.uk/paintings/piero-della-francesca-the-baptism-of-christ",
+        "rightsEvidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3APiero_della_Francesca_-_Battesimo_di_Cristo_%28National_Gallery%2C_London%29.jpg&oldid=1028499461",
+        "rightsBasis": "File-specific Public Domain determination of the digital reproduction, with no attribution requirement. Commons file licensing and structured image metadata agree on Public Domain; faithful 2D reproduction, not a photograph of a 3D object. Photographer not identified.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "ab5eea23854a5711c9d9a65b4d5a202fa499c26ea8f7b64de832899fa146a35a"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Eligible for local staging after source/identity/pixel review. Owned hosting, hosted-byte verification and final binding release review pending.",
+      "staged": {
+        "path": "assets/staged-art/pilot-005-d612aac45936.jpg",
+        "width": 891,
+        "height": 1280,
+        "sourceWidth": 960,
+        "sourceHeight": 1379,
+        "sha256": "d612aac45936604560302ffc3e83d899d41ff4bff6f5ff7413fd6f4981f00311",
+        "sourceSha256": "ab5eea23854a5711c9d9a65b4d5a202fa499c26ea8f7b64de832899fa146a35a",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "pilot-006",
+      "provenance": {
+        "candidateIdentity": "artwork:pinakothek-537",
+        "source": "Wikimedia Commons",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Self-portrait_by_Albrecht_D%C3%BCrer.jpg",
+        "originalImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/Self-portrait_by_Albrecht_D%C3%BCrer.jpg/960px-Self-portrait_by_Albrecht_D%C3%BCrer.jpg",
+        "creator": null,
+        "artworkCreator": "Albrecht Dürer",
+        "retrievedAt": "2026-10-14T07:41:14.657948+00:00",
+        "license": {
+          "status": "public-domain",
+          "evidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3ASelf-portrait_by_Albrecht_D%C3%BCrer.jpg&oldid=1106296151"
+        },
+        "rightsNotes": "File-specific Public Domain determination of the digital reproduction, with no attribution requirement. Commons file licensing and structured image metadata agree on Public Domain; faithful 2D reproduction, not a photograph of a 3D object. Photographer not identified.",
+        "evidenceRefs": [
+          "https://commons.wikimedia.org/w/index.php?title=File%3ASelf-portrait_by_Albrecht_D%C3%BCrer.jpg&oldid=1106296151",
+          "https://www.sammlung.pinakothek.de/en/artwork/Qlx2QpQ4Xq/albrecht-duerer/selbstbildnis-im-pelzrock",
+          "https://creativecommons.org/publicdomain/mark/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex source and pixel review",
+        "reviewedAt": "2026-10-14T07:41:14.657948+00:00",
+        "candidateIdentity": "artwork:pinakothek-537",
+        "collection": "Alte Pinakothek, Munich",
+        "version": "Original inventory 537 oil-on-panel self-portrait of 1500",
+        "identityEvidenceUrl": "https://www.sammlung.pinakothek.de/en/artwork/Qlx2QpQ4Xq/albrecht-duerer/selbstbildnis-im-pelzrock",
+        "rightsEvidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3ASelf-portrait_by_Albrecht_D%C3%BCrer.jpg&oldid=1106296151",
+        "rightsBasis": "File-specific Public Domain determination of the digital reproduction, with no attribution requirement. Commons file licensing and structured image metadata agree on Public Domain; faithful 2D reproduction, not a photograph of a 3D object. Photographer not identified.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "d63ede2918e1cfc3f6bc7d0f77f2c3807b54ba7968d33c82ae2e74a06c1850f4"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Eligible for local staging after source/identity/pixel review. Owned hosting, hosted-byte verification and final binding release review pending.",
+      "staged": {
+        "path": "assets/staged-art/pilot-006-4216a9f233f2.jpg",
+        "width": 939,
+        "height": 1280,
+        "sourceWidth": 960,
+        "sourceHeight": 1309,
+        "sha256": "4216a9f233f249f9f93144b183a1f241f33b114c0b237e211eae198b9517c446",
+        "sourceSha256": "d63ede2918e1cfc3f6bc7d0f77f2c3807b54ba7968d33c82ae2e74a06c1850f4",
+        "mimeType": "image/jpeg"
+      }
+    },
+    {
+      "imageId": "pilot-010",
+      "provenance": {
+        "candidateIdentity": "artwork:vatican-school-of-athens",
+        "source": "Wikimedia Commons / Rijksmuseum",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Fotoreproductie_van_het_fresco_De_school_van_Athene_door_Rafa%C3%ABl_The_School_of_Athens_by_Raphael%2C_Vatican_%28titel_op_object%29%2C_RP-F-F01143-BW.jpg",
+        "originalImageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/Fotoreproductie_van_het_fresco_De_school_van_Athene_door_Rafa%C3%ABl_The_School_of_Athens_by_Raphael%2C_Vatican_%28titel_op_object%29%2C_RP-F-F01143-BW.jpg/960px-Fotoreproductie_van_het_fresco_De_school_van_Athene_door_Rafa%C3%ABl_The_School_of_Athens_by_Raphael%2C_Vatican_%28titel_op_object%29%2C_RP-F-F01143-BW.jpg",
+        "creator": null,
+        "artworkCreator": "Raphael",
+        "retrievedAt": "2026-10-14T07:41:14.657948+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3AFotoreproductie_van_het_fresco_De_school_van_Athene_door_Rafa%C3%ABl_The_School_of_Athens_by_Raphael%2C_Vatican_%28titel_op_object%29%2C_RP-F-F01143-BW.jpg&oldid=1080945872",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "File-specific CC0 dedication of the actual photograph/digital scan; commercial copying, modification and distribution without attribution. Historical photograph digitized by Rijksmuseum and made available under CC0; anonymous photographer.",
+        "evidenceRefs": [
+          "https://commons.wikimedia.org/w/index.php?title=File%3AFotoreproductie_van_het_fresco_De_school_van_Athene_door_Rafa%C3%ABl_The_School_of_Athens_by_Raphael%2C_Vatican_%28titel_op_object%29%2C_RP-F-F01143-BW.jpg&oldid=1080945872",
+          "https://www.museivaticani.va/content/museivaticani/en/collezioni/musei/stanze-di-raffaello/stanza-della-segnatura/scuola-di-atene.html",
+          "https://creativecommons.org/publicdomain/zero/1.0/"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex source and pixel review",
+        "reviewedAt": "2026-10-14T07:41:14.657948+00:00",
+        "candidateIdentity": "artwork:vatican-school-of-athens",
+        "collection": "Original fresco: Vatican Stanza della Segnatura; historical photograph: Rijksmuseum RP-F-F01143-BW",
+        "version": "Anonymous circa 1860–1900 photograph of the original fresco, not the conflicting modern Vatican photograph",
+        "identityEvidenceUrl": "https://www.museivaticani.va/content/museivaticani/en/collezioni/musei/stanze-di-raffaello/stanza-della-segnatura/scuola-di-atene.html",
+        "rightsEvidenceUrl": "https://commons.wikimedia.org/w/index.php?title=File%3AFotoreproductie_van_het_fresco_De_school_van_Athene_door_Rafa%C3%ABl_The_School_of_Athens_by_Raphael%2C_Vatican_%28titel_op_object%29%2C_RP-F-F01143-BW.jpg&oldid=1080945872",
+        "rightsBasis": "File-specific CC0 dedication of the actual photograph/digital scan; commercial copying, modification and distribution without attribution. Historical photograph digitized by Rijksmuseum and made available under CC0; anonymous photographer.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "crop": {
+          "x": 129,
+          "y": 94,
+          "width": 691,
+          "height": 526,
+          "reason": "Remove photographic album mount and answer-bearing printed caption; retain the source photograph's depicted fresco."
+        },
+        "sourceSha256": "c6313ac8960b9f43d6056aafb68cefb253afbe6df9f4bdce77391c941e968bbb"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Eligible for local staging after source/identity/pixel review. Owned hosting, hosted-byte verification and final binding release review pending.",
+      "staged": {
+        "path": "assets/staged-art/pilot-010-999a1258562e.jpg",
+        "width": 691,
+        "height": 526,
+        "sourceWidth": 960,
+        "sourceHeight": 797,
+        "crop": {
+          "x": 129,
+          "y": 94,
+          "width": 691,
+          "height": 526,
+          "reason": "Remove photographic album mount and answer-bearing printed caption; retain the source photograph's depicted fresco."
+        },
+        "sha256": "999a1258562e4f2fd68a94f1209464e33ad4057b5a792c4e1027a4e306a2e250",
+        "sourceSha256": "c6313ac8960b9f43d6056aafb68cefb253afbe6df9f4bdce77391c941e968bbb",
+        "mimeType": "image/jpeg"
       }
     }
   ],
@@ -47,8 +289,84 @@
         "fill_blank",
         "matching"
       ],
+      "recognition": {
+        "answerId": "artwork:ng186",
+        "answerLeakageReviewed": true
+      },
       "reviewStatus": "needs-review",
-      "reviewReason": "Source identity and file license compared by Codex; optimized bytes visually inspected. Owned hosting and independent editorial release review pending. Review answer-bearing titles/source credits before recognition approval."
+      "reviewReason": "Source identity and no added answer-caption/alt-text leakage reviewed for recognition only. Not approved for runtime until owned hosting and release review."
+    },
+    {
+      "conceptId": "art_painting_l2_p1_ng1314",
+      "imageId": "pilot-004",
+      "candidateIdentity": "artwork:ng1314",
+      "altText": "A painted double portrait with scientific instruments.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:ng1314",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Source identity and no added answer-caption/alt-text leakage reviewed for recognition only. Not approved for runtime until owned hosting and release review."
+    },
+    {
+      "conceptId": "art_painting_l2_p1_ng665",
+      "imageId": "pilot-005",
+      "candidateIdentity": "artwork:ng665",
+      "altText": "A painted scene with several figures beside water.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:ng665",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Source identity and no added answer-caption/alt-text leakage reviewed for recognition only. Not approved for runtime until owned hosting and release review."
+    },
+    {
+      "conceptId": "art_painting_l2_p1_pinakothek-537",
+      "imageId": "pilot-006",
+      "candidateIdentity": "artwork:pinakothek-537",
+      "altText": "A frontal painted portrait of a man in a fur-trimmed coat.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:pinakothek-537",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Source identity and no added answer-caption/alt-text leakage reviewed for recognition only. Not approved for runtime until owned hosting and release review."
+    },
+    {
+      "conceptId": "art_painting_l2_p1_vatican-school-of-athens",
+      "imageId": "pilot-010",
+      "candidateIdentity": "artwork:vatican-school-of-athens",
+      "altText": "A historical monochrome photograph of a fresco with gathered figures.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "artwork:vatican-school-of-athens",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Source identity and no added answer-caption/alt-text leakage reviewed for recognition only. Not approved for runtime until owned hosting and release review."
     }
   ]
 }

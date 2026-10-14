@@ -155,7 +155,7 @@ test("duplicate semantic facts do not gain extra quiz weighting", () => {
 
 test("identification plans an approved image or independently verified description; failure removes every failed binding", () => {
   const f = targetFixture("identification_of_sculpture"), c = f.records[0];
-  const image = { imageId: "fixture-image", uri: "https://images.example.invalid/fixture.jpg", width: 100, height: 100, altText: "A synthetic test stimulus" };
+  const image = { licenseStatus: "CC0" as const, imageId: "fixture-image", uri: "https://images.example.invalid/fixture.jpg", width: 100, height: 100, altText: "A synthetic test stimulus" };
   const images: RuntimeImageRegistry = { schemaVersion: 1, ownedHosts: ["images.example.invalid"], bindings: {
     [c.id]: { conceptId: c.id, reviewStatus: "approved", allowedExerciseTypes: ["mcq", "fill_blank", "true_false", "matching"], recognition: { answerId: c.semantic!.value!.id!, answerLeakageReviewed: true }, image },
   } };
@@ -303,7 +303,7 @@ test("failed recognition assets deterministically replan a complete quiz using t
   const records = [first, ...f.records.slice(1)];
   const images: RuntimeImageRegistry = { schemaVersion: 1, ownedHosts: ["images.example.invalid"], bindings: {
     [first.id]: { conceptId: first.id, reviewStatus: "approved", recognition: { answerId: first.semantic!.value!.id!, answerLeakageReviewed: true },
-      allowedExerciseTypes: ["mcq", "true_false", "fill_blank", "matching"], image: { imageId: "failed-fixture", uri: "https://images.example.invalid/fixture.jpg", width: 100, height: 100, altText: "Reviewed synthetic stimulus" } },
+      allowedExerciseTypes: ["mcq", "true_false", "fill_blank", "matching"], image: { licenseStatus: "CC0", imageId: "failed-fixture", uri: "https://images.example.invalid/fixture.jpg", width: 100, height: 100, altText: "Reviewed synthetic stimulus" } },
   } };
   const context = createSemanticContext(records, { policies: targetRelationPolicies, evidence: f.evidence, images });
   expect(buildQuizResult({ concepts: records, context, variant: "A", seed: "image-original" }).status).toBe("ready");

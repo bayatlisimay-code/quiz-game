@@ -1,5 +1,6 @@
 // Offline curation projection; not imported by the app's runtime registry or screen.
-import { hasRequiredAttribution, isOwnedImageUrl } from "./resolveQuizImage";
+import { isOwnedImageUrl } from "./resolveQuizImage";
+import { imageLicenseIssue, stagingApprovalIssue } from "./licensePolicy";
 import type { ImageCurationDataset, RuntimeImageBinding, RuntimeImageRegistry } from "./types";
 
 export function createRuntimeRegistry(
@@ -20,7 +21,9 @@ export function createRuntimeRegistry(
     }
     if (asset.reviewStatus !== "approved") continue;
     const license = asset.provenance.license;
-    if (license.status === "unknown") continue;
+    if (license.status === "unknown") throw new Error(`Ineligible image ${asset.imageId}: unknown rights`);
+    const issue = imageLicenseIssue(license) ?? stagingApprovalIssue(asset);
+    if (issue) throw new Error(`Ineligible image ${asset.imageId}: ${issue}`);
     if (!binding.reviewedBy.trim() || !binding.reviewedAt.trim() ||
         !asset.reviewedBy.trim() || !asset.reviewedAt.trim() ||
         !asset.provenance.source.trim() || !asset.provenance.sourceUrl.trim() ||
@@ -34,8 +37,7 @@ export function createRuntimeRegistry(
         binding.allowedExerciseTypes.length === 0 ||
         binding.allowedExerciseTypes.some(type => !["mcq", "true_false", "fill_blank", "matching"].includes(type)) ||
         (binding.allowedExerciseTypes.includes("matching") && !binding.recognition) ||
-        (binding.recognition && (!binding.recognition.answerLeakageReviewed || binding.recognition.answerId !== binding.candidateIdentity || binding.recognition.answerId !== asset.provenance.candidateIdentity)) ||
-        (license.status === "CC-BY" && !hasRequiredAttribution(license.attribution))) {
+        (binding.recognition && (!binding.recognition.answerLeakageReviewed || binding.recognition.answerId !== binding.candidateIdentity || binding.recognition.answerId !== asset.provenance.candidateIdentity))) {
       throw new Error(`Incomplete approved image binding: ${binding.conceptId}`);
     }
     if (bindings[binding.conceptId]) throw new Error(`Duplicate approved concept binding: ${binding.conceptId}`);
@@ -45,9 +47,9 @@ export function createRuntimeRegistry(
       ...(binding.recognition ? { recognition: binding.recognition } : {}),
       allowedExerciseTypes: [...binding.allowedExerciseTypes],
       image: {
+        licenseStatus: license.status,
         imageId: asset.imageId, uri: asset.hosted.hostedUrl,
         width: asset.hosted.width, height: asset.hosted.height, altText: binding.altText,
-        ...(license.status === "CC-BY" ? { attribution: license.attribution } : {}),
       },
     };
   }

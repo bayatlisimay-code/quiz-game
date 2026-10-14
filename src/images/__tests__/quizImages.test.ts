@@ -14,6 +14,14 @@ const asset: ImageAssetRecord = {
     creator: null, retrievedAt: "2026-10-06T00:00:00Z", rightsNotes: "test only", evidenceRefs: [],
     license: { status: "public-domain", evidenceUrl: "https://source.example.test/rights" },
   },
+  stagingApproval: {
+    sourceSha256: "b".repeat(64),
+    reviewedBy: "test reviewer", reviewedAt: "2026-10-06T00:00:00Z", candidateIdentity: "test subject",
+    collection: "Synthetic test collection", version: "Synthetic original", identityEvidenceUrl: "https://source.example.test/identity",
+    rightsEvidenceUrl: "https://source.example.test/rights", rightsBasis: "Synthetic unrestricted digital-image evidence",
+    scope: "digital-image", commercialUse: true, modification: true, distribution: true, attributionRequired: false,
+    unresolvedRestrictions: [], visualReview: "reviewed-no-watermark-no-answer-caption",
+  },
   hosted: { hostedUrl: `https://${host}/test.jpg`, storageKey: "test.jpg", width: 400, height: 600,
     sha256: "a".repeat(64), mimeType: "image/jpeg" },
 };
@@ -104,23 +112,26 @@ it("projects display data without provenance and rejects duplicate approved keys
   expect(() => createRuntimeRegistry([{ ...dataset, bindings: [binding, binding] }], [host])).toThrow("Duplicate");
 });
 
-it("only publishes CC BY assets with complete required credits", () => {
-  const credit = { creator: "Test creator", source: "Test source", sourceUrl: "https://source.example.test/record",
-    licenseLabel: "CC BY 4.0", licenseUrl: "https://license.example.test/by", changes: "Resized" };
-  const ccAsset: ImageAssetRecord = { ...asset, provenance: { ...asset.provenance, license: {
-    status: "CC-BY", version: "4.0", licenseUrl: credit.licenseUrl,
-    evidenceUrl: "https://source.example.test/rights", attribution: credit,
+it.each(["CC-BY", "CC-BY-SA", "CC-BY-NC", "editorial-only", "unknown"])("rejects %s even if an asset claims release approval", status => {
+  const candidate = { ...asset, provenance: { ...asset.provenance, license: {
+    status, version: "4.0", licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+    evidenceUrl: "https://source.example.test/rights", attribution: { creator: "Complete credit" },
+  } } } as unknown as ImageAssetRecord;
+  expect(() => createRuntimeRegistry([{ ...dataset, assets: [candidate] }], [host])).toThrow("Ineligible image");
+});
+
+it("projects CC0 without legally required attribution", () => {
+  const cc0: ImageAssetRecord = { ...asset, provenance: { ...asset.provenance, license: {
+    status: "CC0", licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/", evidenceUrl: "https://source.example.test/rights",
   } } };
-  expect(createRuntimeRegistry([{ ...dataset, assets: [ccAsset] }], [host]).bindings.mapped.image.attribution).toEqual(credit);
-  const invalid: ImageAssetRecord = { ...ccAsset, provenance: { ...ccAsset.provenance, license: {
-    status: "CC-BY", version: "4.0", licenseUrl: credit.licenseUrl,
-    evidenceUrl: "https://source.example.test/rights", attribution: { ...credit, creator: "" },
-  } } };
-  expect(() => createRuntimeRegistry([{ ...dataset, assets: [invalid] }], [host])).toThrow("Incomplete");
+  const image = createRuntimeRegistry([{ ...dataset, assets: [cc0] }], [host]).bindings.mapped.image;
+  expect(image.licenseStatus).toBe("CC0");
+  expect(image.attribution).toBeUndefined();
 });
 
 // These intentionally bypass static types to exercise the runtime validation boundary.
 const malformedImageFields: readonly (readonly [string, unknown])[] = [
+  ["licenseStatus", undefined], ["licenseStatus", "CC-BY"], ["licenseStatus", "unknown"], ["licenseStatus", null],
   ["altText", undefined], ["altText", ""], ["altText", "   "], ["altText", 42],
   ["width", undefined], ["width", 0], ["width", -1], ["width", NaN], ["width", Infinity], ["width", "400"],
   ["height", undefined], ["height", 0], ["height", -1], ["height", NaN], ["height", Infinity], ["height", "600"],

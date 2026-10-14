@@ -1,57 +1,79 @@
-# Art image curation
+# Art image policy and delivery workflow
 
-Each subtopic JSON file is an empty `ImageCurationDataset` (schema version 1).
-Types live in `src/images/types.ts`; these files are never imported by the app.
-Keep asset provenance and per-concept identity approval separate. One approved
-asset may serve several independently reviewed concept bindings.
+## Final policy (2026-10-14)
 
-Record real source identity, source/page URL, image creator (explicit null if
-unknown), retrieval timestamp, rights/license evidence, archived evidence refs,
-and review decisions. Pending, needs-review, and rejected entries require a
-reason. Approved assets and bindings require reviewer and review timestamp.
-Review the image reproduction and underlying artwork rights; approval of a
-license does not establish that an image depicts the right subject.
+For every Art subtopic, only verified **CC0** or **Public Domain digital images**
+allowing commercial copying, modification and distribution without attribution
+obligations are eligible. CC BY, CC BY-SA, noncommercial, editorial-only and
+uncertain/conflicting rights are excluded. Artwork age alone never clears a
+photograph of sculpture. Commons' CC0 metadata footer is not an image license.
 
-Prefer Public Domain/CC0. CC BY requires stored and displayed credits, license
-link, change information, and any required notices. Review alt text and credits
-for answer leakage before enabling a binding for an exercise type.
+`src/images/licensePolicy.ts` is shared by offline ingestion and the production
+projection. `ImageLicense` permits only Public Domain, CC0 and unknown research
+candidates. Unknown candidates cannot be staged or published. A separate
+`stagingApproval` records the actual-image rights determination and reviewed source-byte hash, original-work
+identity/version, collection, evidence links, reviewer/time, commercial and
+modification/distribution permissions, no required attribution, absence of
+unresolved restrictions, and pixel/leakage review. Structural validation cannot
+prove historical truth or copyright ownership: the file-specific evidence must
+actually be inspected. Reviewer here is Codex; no independent human or legal
+endorsement is implied.
 
-No CDN has been selected. The runtime manifest and owned-host allowlist remain
-empty. Never put source delivery URLs in the runtime manifest. Once hosting is
-configured, upload approved derivatives to owned storage, record dimensions,
-MIME type, storage key and SHA-256, then use `createRuntimeRegistry` offline to
-project approved records. That helper expects typed/validated input, not arbitrary
-JSON. Schema parsing, timestamp/license evidence verification, concept existence
-checks, upload tooling, generation CLI, and release automation are deferred.
-The projection rejects incomplete approved bindings and duplicate approved keys.
+The reviewed licensing concerns the actual reproduction, not site-wide text or
+metadata licenses. Specific conflicting copyright notices or commercial-use
+restrictions block eligibility even when a Commons heading says Public Domain.
+Keep all provenance internally, including explicit null for unknown photographers.
+Do not imply institutional endorsement.
 
-Use immutable hosted URLs. Validate actual bytes and licenses before release.
-Recognition matching is supported only with an independently approved answer
-identity binding, reviewed leakage controls, and a safe pairing matrix. Optional
-illustrations remain presentation-only. Required recognition stimuli participate
-in planning: verified authored text may replace a missing/failed image; otherwise
-the ungraded quiz is replanned without that asset or reports a shortage.
-Replacing a binding never changes concept IDs. See `docs/art-engine-upgrade.md`.
+## Current pilot assets
 
-## Pilot ingestion workflow (2026-10-13)
+Eight optimized derivatives are eligible for **local staging**. No image is
+production-enabled: `src/images/runtimeRegistry.ts` still has zero bindings and
+zero owned hosts. Every pilot recognition question continues to have its verified
+text clue. Curation JSON and these derivatives are offline-only; there are no
+runtime `require` imports of the staging JPEGs and no third-party delivery URLs.
 
-Two locally staged derivatives now exist in `assets/staged-art/`. They are **not
-runtime-approved bindings**. The painting candidate depicts NG186 (Jan van Eyck's
-original oil-on-oak double portrait); its file-specific Commons page declares the
-reproduction Public Domain Mark. The sculpture photograph depicts a detail of
-the original Accademia marble David, not an exterior replica; photographer Jörg
-Bittner Unna licenses this photograph CC BY 3.0. Commons' site-wide CC0 metadata
-footer is not used as an image license. Source URLs, revision links, retrieval
-times, identity references and rights notes are in the subtopic JSON datasets.
-The sculpture's cultural-property/commercial reproduction clearance and its
-answer-bearing credit title still require release review. No museum permission
-or human editorial endorsement has been fabricated.
+| Asset | Work / digital source | Image rights | Derivative |
+|---|---|---|---|
+| pilot-001 | [artwork:ng186](https://commons.wikimedia.org/wiki/File:Arnolfini_Portrait.jpg) | public-domain | 950 × 1280; 210,598 bytes |
+| pilot-004 | [artwork:ng1314](https://commons.wikimedia.org/wiki/File:Holbein-ambassadors.jpg) | public-domain | 960 × 947; 253,794 bytes |
+| pilot-005 | [artwork:ng665](https://commons.wikimedia.org/wiki/File:Piero_della_Francesca_-_Battesimo_di_Cristo_%28National_Gallery%2C_London%29.jpg) | public-domain | 891 × 1280; 283,743 bytes |
+| pilot-006 | [artwork:pinakothek-537](https://commons.wikimedia.org/wiki/File:Self-portrait_by_Albrecht_D%C3%BCrer.jpg) | public-domain | 939 × 1280; 244,500 bytes |
+| pilot-010 | [artwork:vatican-school-of-athens](https://commons.wikimedia.org/wiki/File:Fotoreproductie_van_het_fresco_De_school_van_Athene_door_Rafa%C3%ABl_The_School_of_Athens_by_Raphael%2C_Vatican_%28titel_op_object%29%2C_RP-F-F01143-BW.jpg) | CC0 | 691 × 526; 105,760 bytes |
+| pilot-003 | [artwork:vatican-pieta-original](https://commons.wikimedia.org/wiki/File:La_Piet%C3%A0_de_Michel-Ange_%2825901652585%29.jpg) | CC0 | 960 × 961; 363,476 bytes |
+| pilot-008 | [artwork:opera-duomo-cantoria-messe](https://commons.wikimedia.org/wiki/File:Cantoria_Della_Robbia_OPA_Florence_10.jpg) | public-domain | 960 × 639; 174,512 bytes |
+| pilot-009 | [artwork:pisa-baptistery-pulpit](https://commons.wikimedia.org/wiki/File:Pisa_Pulpito_del_Battistero_di_N.Pisano%2C_RP-F-F16906.jpg) | CC0 | 548 × 701; 104,638 bytes |
 
-The earlier empty-dataset description above describes the original milestone;
-the runtime registry/owned-host allowlist are still empty. Both pilot artworks
-continue to use their verified authored identification clues in production.
+School of Athens and Pisa Pulpit use historical Rijksmuseum photographic scans,
+not modern museum photographs. Explicit source-pixel crops remove album mounts
+and printed answer captions, retaining the depicted works. These are not
+runtime crops, fabricated descriptions, or artwork retouching. The archival
+monochrome appearance is disclosed in provenance/alt text. Other derivatives
+retain their source frames; `contentFit="contain"` preserves aspect ratios.
+Image recognition bindings are limited to p1 identification records, so original
+artist/date inscriptions do not leak answers to creator/date questions.
 
-Run with the project's existing Expo tooling dependencies:
+The former CC BY 3.0 David asset, binding and derivative have been removed from
+the active pipeline. They remain recoverable from Git baseline
+`5ed73133324bbbf99e5b44de35cc309a92c56975`. A PD-self alternative was found,
+but Accademia's documented commercial-reproduction restrictions remain
+unresolved; it is not approved. Arnolfini's file-specific Public Domain Mark,
+structured image rights, identity NG186 and existing derivative were rechecked;
+it now has explicit staging approval, without runtime approval.
+
+Research of all 18 originals is recorded separately in
+`research/art-pilot-candidates.json` (22 candidate files). Excluded candidates
+are never passed to ingestion. Ten originals still have no eligible staged
+image: Birth of Venus, Last Supper, Venus of Urbino, Mantegna's Lamentation,
+Penitent Magdalene, Incredulity of Saint Thomas, David, Perseus, Saint Matthew
+and Orcagna's Tabernacle. Reasons include restricted/conflicting rights,
+unresolved commercial-reproduction clearance, replica identity or inadequate
+full-work recognition framing. This is not a claim that no eligible image
+exists anywhere. Verified text remains the production stimulus for all 18.
+
+## Ingestion and validation
+
+Use existing project dependencies; do not install an image library at runtime:
 
 ```sh
 node scripts/art-image-assets.cjs --check
@@ -59,33 +81,49 @@ node scripts/art-image-assets.cjs --ingest IMAGE_ID --source /path/to/reviewed-d
 node scripts/art-image-assets.cjs --build --hosts images.your-owned-domain --output /tmp/reviewed-image-registry.json
 ```
 
-Ingestion requires an existing candidate with an explicitly recorded file license;
-it does not search for images, infer rights, upload, or grant approval. It decodes
-the downloaded bytes, preserves the complete frame/aspect ratio, avoids upscaling,
-limits the longest side to 1280 pixels and re-encodes at JPEG quality 82. Fresh
-pixel encoding strips source EXIF/XMP (the decoder otherwise retains EXIF).
-Opaque, content-hashed derivative filenames contain no artwork/creator names.
-Original downloaded-byte and derivative SHA-256 values, original and output
-dimensions and MIME type are recorded. Originals are not bundled into the app.
-The script currently uses `jimp-compact`, already installed with Expo's image
-utilities; it fails rather than installing tools if that dependency is unavailable.
+Every subtopic dataset in `art/*.json` is discovered deterministically. Ingestion
+requires a prior source/pixel review, rejects restricted licenses and repeated
+staging, and never searches, uploads or grants runtime approval. It uses the
+existing Expo transitive `jimp-compact` dependency. Reviewed caption-removal
+coordinates are checked against the downloaded source dimensions. Images are
+never enlarged: longest side ≤1280, JPEG quality 82, ≤600,000 bytes per derivative.
+Fresh pixel encoding strips EXIF/XMP, with opaque content-hashed filenames.
+Input bytes must match the visual review’s source SHA-256 before decoding.
+Downloaded-source and derivative SHA-256, dimensions, MIME and any crop are
+recorded. Output bytes are checked before being written. Do not download huge
+originals when a bounded thumbnail suffices. Do not place names/captions or
+watermarks in recognition stimuli.
 
-`--check` validates recorded license/credit structure, timestamps, identities,
-concept bindings, actual derivative bytes/checksums, dimensions, metadata removal
-and the 600 KB budget. These checks detect inconsistency; they do not establish
-copyright or historical truth. Source and visual review remain necessary.
+`--check` verifies actual bytes, identity bindings against production concepts,
+rights-review structure, checksum, aspect ratio, explicit crop, metadata removal
+and size. These automated checks support, but do not replace, source review.
+Tests exercise the existing recognition component's contain sizing, load/error/
+15-second timeout behavior and verified text fallback; real pilot generation and
+matching are tested using **reserved-domain delivery fixtures**, never fake
+production uploads or approvals.
 
-For release: independently review identity, rights, required notices and the
-recognition leakage implications of alt text, credits, links and visible image
-inscriptions. Upload the checked derivative to immutable owned HTTPS storage;
-verify the downloaded hosted bytes against its SHA-256. Record `hosted` fields
-and explicit asset/binding review decisions. `--build` reuses the production
-`createRuntimeRegistry` projection, rejects missing/mismatched local derivatives
-and refuses an empty approved manifest. It writes only a new output file and
-never silently overwrites or activates the app registry. Review the manifest and
-wire it into `src/images/runtimeRegistry.ts` at release. Do not use Commons or
-museum delivery URLs as production URLs. No owned host has been provisioned in
-this task, and staged assets do not expand assessment capabilities.
+## What is needed to activate images
 
-Current optimized derivatives total about 325 KiB. The remaining 16 artwork
-recognition records continue to use verified text; no image approval is implied.
+1. Provide a controlled HTTPS storage/CDN host and an authorized upload method.
+   No hosting provider, credentials or owned host is configured in this project.
+2. Upload the eight checked derivatives unchanged under immutable opaque keys.
+   Verify downloaded hosted bytes against each staged SHA-256; check MIME,
+   dimensions, access and mobile connectivity.
+3. Record real `hosted` fields and final asset/binding review decisions and times.
+   Staging approval does not imply hosting or release approval. Review the final
+   hosted stimuli and historical monochrome choices on device.
+4. Build an offline manifest with the explicit owned-host allowlist. The builder
+   requires local/hosted checksum and dimensions to agree, validates the same
+   PD/CC0 policy and recognition identities, and refuses an empty manifest.
+5. Review and activate the generated manifest in `runtimeRegistry.ts`. Runtime
+   resolution requires the projected PD/CC0 status and owned HTTPS URL. Do not
+   use Commons, Flickr or museum hosts for production delivery.
+6. Run pilot coverage and on-device load/failure/timeout/matching tests against
+   the owned host. If loading fails, use the verified authored clue; if no valid
+   clue exists, replan the ungraded quiz or report a shortage. Never grade an
+   unavailable recognition stimulus.
+
+Resolve the recorded reproduction restrictions or source a separately eligible
+image before staging the remaining works. Do not enable attribution-requiring
+images to increase coverage. No curriculum, facts, IDs, scoring or progression
+changes are part of this licensing task.

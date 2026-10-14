@@ -53,7 +53,7 @@ export function resolveQuizImage(
       !binding.allowedExerciseTypes.includes(exerciseType)) return undefined;
   if (exerciseType === "matching" && !binding.recognition?.answerLeakageReviewed) return undefined;
   const image = binding.image;
-  if (!isRecord(image) || !isNonEmptyString(image.imageId) || !isNonEmptyString(image.altText) ||
+  if (!isRecord(image) || !["public-domain", "CC0"].includes(image.licenseStatus) || !isNonEmptyString(image.imageId) || !isNonEmptyString(image.altText) ||
       typeof image.width !== "number" || !Number.isFinite(image.width) || image.width <= 0 ||
       typeof image.height !== "number" || !Number.isFinite(image.height) || image.height <= 0 ||
       !isOwnedImageUrl(image.uri, registry.ownedHosts) ||
