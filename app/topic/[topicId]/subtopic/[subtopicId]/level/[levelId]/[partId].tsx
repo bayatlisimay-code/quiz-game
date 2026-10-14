@@ -28,6 +28,7 @@ import type { MatchingPair } from "../../../../../../../src/quizEngine/conceptTy
 import { enrichConcepts } from "../../../../../../../src/quizEngine/enrichConcepts";
 import { saveLastLocation } from "../../../../../../../src/state/lastLocation";
 import { loadProgress, getCompletedQuizVariants, markQuizVariantCompleted } from "../../../../../../../src/state/progress";
+import { completionReceipt } from "../../../../../../../src/state/completionReceipt";
 import { useStreak } from "../../../../../../../src/state/useStreak";
 import { useTotalXp } from "../../../../../../../src/state/useTotalXp";
 
@@ -559,13 +560,10 @@ export default function PartQuizScreen() {
     const score = correctCount;
     const percent = Math.round((score / Math.max(1, total)) * 100);
 
-    // placeholder XP for now
-    const xp = Math.round(percent * 0.5);
-
-    let partCompleted = false;
+    const before = await loadProgress();
 
     if (topicId && subtopicId && levelId && partId && quizVariant) {
-      partCompleted = await markQuizVariantCompleted(
+      await markQuizVariantCompleted(
         String(topicId),
         String(subtopicId),
         String(levelId),
@@ -573,6 +571,10 @@ export default function PartQuizScreen() {
         String(quizVariant)
       );
     }
+    const receipt = completionReceipt(before, await loadProgress(), {
+      topicId: String(topicId), subtopicId: String(subtopicId), levelId: String(levelId), partId: String(partId),
+      totalParts: subtopic?.levels.find(level => level.id === String(levelId))?.parts.length ?? 0,
+    });
 
     router.replace({
       pathname: "/quizResult",
@@ -580,9 +582,9 @@ export default function PartQuizScreen() {
         score: String(score),
         total: String(total),
         percent: String(percent),
-        xp: String(xp),
-        partCompleted: String(partCompleted),
-        levelCompleted: "false",
+        xp: String(receipt.xp),
+        partCompleted: String(receipt.partCompleted),
+        levelCompleted: String(receipt.levelCompleted),
 
         retrySet: String(set ?? "A"),
         retryTopicId: String(topicId),

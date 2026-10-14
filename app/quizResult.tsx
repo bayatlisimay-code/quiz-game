@@ -71,9 +71,19 @@ export default function QuizResultScreen() {
       }
     };
 
-    const onContinue = () => {
-    router.back();
-    };
+  const onContinue = () => {
+    // A cold deep link has no previous navigator entry. Return explicitly to
+    // the guarded quiz chooser instead of leaving the result screen stranded.
+    if (params.retryTopicId && params.retrySubtopicId && params.retryLevelId && params.retryPartId) {
+      router.replace({
+        pathname: "/topic/[topicId]/subtopic/[subtopicId]/level/[levelId]/[partId]",
+        params: { topicId: params.retryTopicId, subtopicId: params.retrySubtopicId,
+          levelId: params.retryLevelId, partId: params.retryPartId },
+      });
+    } else {
+      router.replace("/");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -89,9 +99,6 @@ export default function QuizResultScreen() {
       <View style={styles.card}>
         <Text style={styles.label}>XP gained</Text>
         <Text style={styles.big}>⭐ +{xp} XP</Text>
-        <Text style={styles.hint}>
-          (We’ll plug in the real XP rules later. For now this screen just shows the value it receives.)
-        </Text>
       </View>
 
       <View style={styles.card}>
