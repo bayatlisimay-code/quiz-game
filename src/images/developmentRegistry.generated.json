@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "ownedHosts": [
+    "pub-a72f4936681e4dce8a6a120c82b56187.r2.dev"
+  ],
+  "bindings": {
+    "art_painting_l2_p1_ng186": {
+      "reviewStatus": "approved",
+      "conceptId": "art_painting_l2_p1_ng186",
+      "recognition": {
+        "answerId": "artwork:ng186",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "public-domain",
+        "imageId": "pilot-001",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/pilot-001/92eeeabc155f4a6fdb39e9a0fd99783c2db5a8ce3cc3378dd79571679957c431.jpg",
+        "width": 950,
+        "height": 1280,
+        "altText": "A painted double portrait in an interior."
+      }
+    },
+    "art_painting_l2_p1_ng1314": {
+      "reviewStatus": "approved",
+      "conceptId": "art_painting_l2_p1_ng1314",
+      "recognition": {
+        "answerId": "artwork:ng1314",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "public-domain",
+        "imageId": "pilot-004",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/pilot-004/2814915973c255f0d5588f722a666168c80415fd5e64c46dcdf98ef5a776413d.jpg",
+        "width": 960,
+        "height": 947,
+        "altText": "A painted double portrait with scientific instruments."
+      }
+    },
+    "art_painting_l2_p1_ng665": {
+      "reviewStatus": "approved",
+      "conceptId": "art_painting_l2_p1_ng665",
+      "recognition": {
+        "answerId": "artwork:ng665",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "public-domain",
+        "imageId": "pilot-005",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/pilot-005/d612aac45936604560302ffc3e83d899d41ff4bff6f5ff7413fd6f4981f00311.jpg",
+        "width": 891,
+        "height": 1280,
+        "altText": "A painted scene with several figures beside water."
+      }
+    },
+    "art_painting_l2_p1_pinakothek-537": {
+      "reviewStatus": "approved",
+      "conceptId": "art_painting_l2_p1_pinakothek-537",
+      "recognition": {
+        "answerId": "artwork:pinakothek-537",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "public-domain",
+        "imageId": "pilot-006",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/pilot-006/4216a9f233f249f9f93144b183a1f241f33b114c0b237e211eae198b9517c446.jpg",
+        "width": 939,
+        "height": 1280,
+        "altText": "A frontal painted portrait of a man in a fur-trimmed coat."
+      }
+    },
+    "art_painting_l2_p1_vatican-school-of-athens": {
+      "reviewStatus": "approved",
+      "conceptId": "art_painting_l2_p1_vatican-school-of-athens",
+      "recognition": {
+        "answerId": "artwork:vatican-school-of-athens",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "pilot-010",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/pilot-010/999a1258562e4f2fd68a94f1209464e33ad4057b5a792c4e1027a4e306a2e250.jpg",
+        "width": 691,
+        "height": 526,
+        "altText": "A historical monochrome photograph of a fresco with gathered figures."
+      }
+    },
+    "art_sculpture_l3_p1_vatican-pieta-original": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l3_p1_vatican-pieta-original",
+      "recognition": {
+        "answerId": "artwork:vatican-pieta-original",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "pilot-003",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/pilot-003/002ac570f8295f9c1a781882a00f03a911b65ce55ba22d2fccd0576d34c594bb.jpg",
+        "width": 960,
+        "height": 961,
+        "altText": "A marble group of a seated woman holding a reclining man."
+      }
+    },
+    "art_sculpture_l3_p1_opera-duomo-cantoria-messe": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l3_p1_opera-duomo-cantoria-messe",
+      "recognition": {
+        "answerId": "artwork:opera-duomo-cantoria-messe",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "public-domain",
+        "imageId": "pilot-008",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/pilot-008/cf68047fbffbd7205cb8c38febd97aee502b8dfc76a776487c0b6a2d0f139ef3.jpg",
+        "width": 960,
+        "height": 639,
+        "altText": "A marble balcony with relief panels of children."
+      }
+    },
+    "art_sculpture_l3_p1_pisa-baptistery-pulpit": {
+      "reviewStatus": "approved",
+      "conceptId": "art_sculpture_l3_p1_pisa-baptistery-pulpit",
+      "recognition": {
+        "answerId": "artwork:pisa-baptistery-pulpit",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "pilot-009",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/pilot-009/00a9de580592000f75110da9481867c67b642dd61ae23a25b50e50602d808fdf.jpg",
+        "width": 548,
+        "height": 701,
+        "altText": "A carved pulpit raised on columns."
+      }
+    }
+  }
+}

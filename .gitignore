@@ -42,3 +42,7 @@ app-example
 /ios
 /android
 node_modules/
+
+# Offline R2 credentials and upload receipts (never mobile app configuration)
+.r2.env.local
+.art-r2-upload/

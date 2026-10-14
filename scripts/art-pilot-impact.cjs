@@ -8,7 +8,11 @@ require.extensions[".ts"] = (module, filename) => module._compile(ts.transpileMo
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true },
 }).outputText, filename);
 const root = path.resolve(__dirname, "..");
-const { ACTIVE_CONCEPT_SETS, activeSemanticContext: context, activeRegisteredConcepts } = require(path.join(root, "src/quizEngine/contentSnapshot.ts"));
+const { ACTIVE_CONCEPT_SETS, activeSemanticContext: baseContext, activeRegisteredConcepts } = require(path.join(root, "src/quizEngine/contentSnapshot.ts"));
+const developmentImages = process.argv.includes('--development-images');
+const developmentRegistry = developmentImages ? require('../src/images/developmentRegistry.generated.json') : undefined;
+if (developmentImages && !Object.keys(developmentRegistry.bindings).length) throw new Error('No verified development image bindings; complete the R2 upload first');
+const context = developmentImages ? baseContext.withImages(developmentRegistry) : baseContext;
 const { getCurriculumPool } = require(path.join(root, "src/quizEngine/curriculumPool.ts"));
 const { measureGenerationCoverage } = require(path.join(root, "src/quizEngine/generationCoverage.ts"));
 const { validateContent } = require(path.join(root, "src/quizEngine/contentValidation.ts"));
@@ -32,6 +36,6 @@ const validation = validateContent(activeRegisteredConcepts(), context.policies,
 const samples = cases.filter(entry => entry.variant === "A" && /_p[124]$/.test(entry.id)).map(entry => ({ id: entry.id,
   result: buildQuizResult({ ...entry, context, seed: `pilot-inspection:${entry.id}` }) }));
 console.log(JSON.stringify({ attempts, records: activeRegisteredConcepts().length, evidence: context.evidence.length,
-  imageBindings: Object.keys(context.images.bindings).length, coverage, terminology, reverseCoverage, reverse, samples, validation }, null, 2));
+  deliveryMode: developmentImages ? "development-r2" : "production", imageBindings: Object.keys(context.images.bindings).length, coverage, terminology, reverseCoverage, reverse, samples, validation }, null, 2));
 if (coverage.counts.failures || terminology.counts.failures || coverage.counts.insufficient || terminology.counts.insufficient || reverseCoverage.counts.failures || reverseCoverage.counts.insufficient ||
     reverse.some(entry => entry.result.status !== "ready") || validation.some(issue => issue.severity === "error")) process.exitCode = 1;

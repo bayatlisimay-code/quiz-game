@@ -134,5 +134,5 @@ async function main() {
     console.log(JSON.stringify({assets:assets.size, staged:[...assets.values()].filter(a=>a.staged).length, approved:[...assets.values()].filter(a=>a.reviewStatus==='approved').length, stagingApproved:[...assets.values()].filter(a=>a.stagingApproval).length}));
   }
 }
-module.exports = { validate, checkBytes, validateSourceBytes };
+module.exports = { load, validate, checkBytes, validateSourceBytes };
 if (require.main === module) main().catch(error => { console.error(error.message); process.exitCode=1; });

@@ -28,9 +28,10 @@ Do not imply institutional endorsement.
 ## Current pilot assets
 
 Eight optimized derivatives are eligible for **local staging**. No image is
-production-enabled: `src/images/runtimeRegistry.ts` still has zero bindings and
-zero owned hosts. Every pilot recognition question continues to have its verified
-text clue. Curation JSON and these derivatives are offline-only; there are no
+production-enabled: release selection still has zero bindings and zero owned
+hosts. The R2 development manifest now has eight verified public bindings, used
+only when `__DEV__` is true. Every pilot recognition question retains its verified
+text clue. See `docs/art-r2-development.md` for uploads and executed native tests. Curation JSON and these derivatives are offline-only; there are no
 runtime `require` imports of the staging JPEGs and no third-party delivery URLs.
 
 | Asset | Work / digital source | Image rights | Derivative |
@@ -69,7 +70,8 @@ Penitent Magdalene, Incredulity of Saint Thomas, David, Perseus, Saint Matthew
 and Orcagna's Tabernacle. Reasons include restricted/conflicting rights,
 unresolved commercial-reproduction clearance, replica identity or inadequate
 full-work recognition framing. This is not a claim that no eligible image
-exists anywhere. Verified text remains the production stimulus for all 18.
+exists anywhere. Verified text remains the production stimulus for all 18; development testing
+uses the eight verified R2 images with their text fallbacks.
 
 ## Ingestion and validation
 
@@ -102,10 +104,11 @@ Tests exercise the existing recognition component's contain sizing, load/error/
 matching are tested using **reserved-domain delivery fixtures**, never fake
 production uploads or approvals.
 
-## What is needed to activate images
+## What is needed to activate production images
 
 1. Provide a controlled HTTPS storage/CDN host and an authorized upload method.
-   No hosting provider, credentials or owned host is configured in this project.
+   R2 development delivery is configured locally; a production custom domain
+   and production release approval are still pending.
 2. Upload the eight checked derivatives unchanged under immutable opaque keys.
    Verify downloaded hosted bytes against each staged SHA-256; check MIME,
    dimensions, access and mobile connectivity.
@@ -115,7 +118,8 @@ production uploads or approvals.
 4. Build an offline manifest with the explicit owned-host allowlist. The builder
    requires local/hosted checksum and dimensions to agree, validates the same
    PD/CC0 policy and recognition identities, and refuses an empty manifest.
-5. Review and activate the generated manifest in `runtimeRegistry.ts`. Runtime
+5. Review and activate a separate production manifest in `selectRuntimeRegistry.ts`.
+   Keep the `__DEV__` R2 manifest separate. Runtime
    resolution requires the projected PD/CC0 status and owned HTTPS URL. Do not
    use Commons, Flickr or museum hosts for production delivery.
 6. Run pilot coverage and on-device load/failure/timeout/matching tests against
