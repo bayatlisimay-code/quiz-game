@@ -2,6 +2,7 @@ import type { Concept } from "../../src/quizEngine/conceptTypes";
 import type { SemanticEvidence } from "../../src/quizEngine/assessmentTypes";
 import { authorDefinitions, type MeaningContrast } from "./definitions";
 import { contentReview } from "./review";
+import { scopeWording } from "./learnerWording";
 const ng = "https://www.nationalgallery.org.uk/paintings/glossary/early-renaissance";
 const imp = "https://www.moma.org/momaorg/shared/flattened_pages/moma_learning/glossary/";
 const cub = "https://www.moma.org/collection/terms/cubism/what-is-cubism";
@@ -43,6 +44,7 @@ for (const partId of ["p2", "p4"] as const) {
       object: partId === "p2" ? m.work : m.pioneer, difficulty: 2, answerKind: "short", introducedIn: "A", tags: ["verified-art-content", "historical-movements"],
       semantic: { subject: { id: `movement:${m.id}`, entityType: "category", caseSensitive: false }, value: { id: value(m), entityType: partId === "p2" ? "work" : "person", caseSensitive: false }, qualifiers },
       assessment: { reviewStatus: "verified", answerLeakageReviewed: true, evidenceIds: [evidenceId], subjectType: "category", valueType: partId === "p2" ? "work" : "person",
+        presentation: { scope: scopeWording("The movement's original historical development; not later revivals, influences or appropriations. For Cubism, include foundational experiments.", "Original historical development, including foundational Cubist experiments.", [evidenceId]) },
         scope: { text: "The movement's original historical development; not later revivals, influences or appropriations. For Cubism, include foundational experiments.", qualifierKeys: ["assessmentScope"] } },
     });
   }

@@ -152,7 +152,7 @@ test("True capability alone cannot be planned, generated, or forced as MCQ fallb
   expect(buildQuizResult({ concepts: records, context: ctx, seed: "blocked", variant: "A" })).toMatchObject({ status: "insufficient-content", exercises: [] });
 });
 
-test("replanning is deterministic, respects curriculum stages, and replaces blocked facts with eligible feasible facts", () => {
+test("replanning is deterministic and reports fewer than six eligible facts instead of recycling them", () => {
   const blocked = fact("blocked", "Open", "Uncertain", { relation: "main_authors_of_movement" });
   const futureStage = fact("future", "Future", "E", { introducedIn: "C" });
   const records = [...pool, blocked, futureStage];
@@ -160,12 +160,9 @@ test("replanning is deterministic, respects curriculum stages, and replaces bloc
   const request = { concepts: records, context: ctx, seed: "replan", variant: "A" as const };
   const result = buildQuizResult(request);
   expect(result).toEqual(buildQuizResult(request));
-  expect(result.status).toBe("ready");
-  expect(result.diagnostics.generatedOrdinary).toBe(7);
-  for (const q of result.exercises) if (q.type !== "matching") expect(["blocked", "future"]).not.toContain(q.conceptId);
-  const tf = result.exercises.filter((q) => q.type === "true_false");
-  expect(tf.some((q) => q.type === "true_false" && q.correctAnswer)).toBe(true);
-  expect(tf.some((q) => q.type === "true_false" && !q.correctAnswer)).toBe(true);
+  expect(result.status).toBe("insufficient-content");
+  expect(result.exercises).toEqual([]);
+  expect(result.diagnostics.shortages.some(s=>s.code === "distinct-facts")).toBe(true);
 });
 
 test("options-only and typed-only blanks are independent capabilities and explicit UI contracts", () => {

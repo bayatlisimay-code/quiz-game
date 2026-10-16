@@ -8,9 +8,9 @@ import { getCurriculumPool } from "../curriculumPool";
 import { catalogCoverageCases, coverageRegressions, measureGenerationCoverage } from "../generationCoverage";
 import { CONCEPT_SETS } from "../../../data/conceptSets";
 
-const fixture = Array.from({ length: 6 }, (_, i): Concept => ({
+const fixture = Array.from({ length: 11 }, (_, i): Concept => ({
   id: `safe${i}`, subject: `Work ${i}`, object: `Creator ${i}`, relation: "painted_by", topicId: "art", subtopicId: "fixture",
-  levelId: "l1", partId: "p1", answerKind: "short", difficulty: 1, introducedIn: "A",
+  levelId: "l1", partId: "p1", answerKind: "short", difficulty: 1, introducedIn: i < 6 ? "A" : i < 9 ? "B" : "C", learning: { reinforcementPriority: 3, rationale: "Synthetic review priority" },
 }));
 test("reviewed safe-count baseline remains full across variants; shortages are structured and detected", () => {
   const cases = (["A", "B", "C"] as const).map((variant) => ({ id: "safe-fixture", concepts: fixture, variant }));
@@ -46,7 +46,7 @@ test("catalogue diagnostics use the same canonical IDs as the actual quiz route"
 // Reviewed exact-contract baseline. The prior legacy baseline remains in the
 // repository as historical evidence, but allowed uncertified negatives and zero
 // TF questions and therefore cannot define release-ready availability.
-test("actual Art ordinary-count baseline detects new availability regressions", () => {
+test("historical baseline identifies deliberate six-fact and prior-stage incompatibilities", () => {
   const cases = catalogCoverageCases(TOPIC_BY_ID.art, CONCEPT_SETS);
   const result = measureGenerationCoverage(cases, registeredSemanticContext, 1);
   const baseline = Object.entries(artBaseline).flatMap(([id, counts]) => (["A", "B", "C"] as const).map((variant, index) => ({
@@ -54,5 +54,5 @@ test("actual Art ordinary-count baseline detects new availability regressions", 
     minOrdinary: counts[index], maxOrdinary: counts[index],
   })));
   expect(result.violations).toEqual([]);
-  expect(coverageRegressions(result.rows, baseline)).toEqual([]);
+  expect(coverageRegressions(result.rows, baseline)).toEqual(["art_design_l1_p4","art_design_l1_p5","art_design_l10_p4","art_design_l10_p5"].flatMap(id=>["A","B","C"].map(v=>`${id}:${v}: assessable question availability decreased`)));
 });

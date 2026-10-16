@@ -1,6 +1,7 @@
 import type { Concept } from "../../src/quizEngine/conceptTypes";
 import type { SemanticEvidence } from "../../src/quizEngine/assessmentTypes";
 import { pilotReview } from "./authoring";
+import { definitionWording } from "../artContent/learnerWording";
 
 // The distinction is between defining operations, not mutually exclusive
 // techniques within an artwork. A single sculpture can use all four processes.
@@ -32,7 +33,7 @@ export const terminologyPilotEvidence: readonly SemanticEvidence[] = [
   ...sculpturePilotTerms.map(term => definitionEvidence(term.id, term.id, "valid", "Positive paraphrase of this named guide section")),
   ...definitionContrasts.flatMap(([left, right, rationale]) => [definitionEvidence(left, right, "invalid", rationale), definitionEvidence(right, left, "invalid", rationale)]),
 ];
-export const terminologyPilotConcepts: readonly Concept[] = sculpturePilotTerms.map(term => ({
+export const terminologyPilotConcepts: readonly Concept[] = sculpturePilotTerms.map(term => definitionWording({
   id: `art_sculpture_l5_p1_${term.id}`, topicId: "art", subtopicId: "sculpture", levelId: "l5", partId: "p1",
   subject: term.term, object: term.definition, relation, answerKind: "long", difficulty: 1, introducedIn: "A",
   semantic: { subject: { id: `technique:${term.id}`, entityType: "term", caseSensitive: false,
@@ -40,4 +41,4 @@ export const terminologyPilotConcepts: readonly Concept[] = sculpturePilotTerms.
   assessment: { reviewStatus: "verified", answerLeakageReviewed: true, subjectType: "term", valueType: "meaning",
     evidenceIds: [`source-check:sculpture-operation:${term.id}:${term.id}`],
     scope: { text: "Definitions in the National Gallery of Art's technique guide; distinguish the defining operation, not all processes used in a work.", qualifierKeys: ["sense"] } },
-}));
+}, term.id));

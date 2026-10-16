@@ -1,6 +1,7 @@
 import type { Concept, QualifierValue, SemanticIdentity } from "../../src/quizEngine/conceptTypes";
 import type { EntityType, SemanticEvidence } from "../../src/quizEngine/assessmentTypes";
 import type { PilotArtwork } from "./types";
+import { scopeWording, sourceLabel, dateContextLabel } from "../artContent/learnerWording";
 
 export const pilotReview = Object.freeze({
   reviewStatus: "verified" as const,
@@ -52,6 +53,9 @@ export function authorArtworkPilot(works: readonly PilotArtwork[], subtopicId: "
       assessment: { reviewStatus: "verified", answerLeakageReviewed: true,
         evidenceIds: [evidenceId], subjectType: subjectIdentity.entityType!, valueType: valueIdentity.entityType!,
         factId: `${workId}:${relation}`, scope: { text: scope, qualifierKeys: Object.keys(qualifiers) },
+        ...(partId !== "p1" ? { presentation: { scope: scopeWording(scope, partId === "p2"
+          ? `${sourceLabel(work.source)}; principal ${role} credit.`
+          : `${sourceLabel(work.source)}; full dating label.${work.dateContext ? ` ${dateContextLabel(work.dateContext)}.` : ""}`, [evidenceId]) } } : {}),
         ...(partId === "p1" ? { identification: { description: { text: work.clue, evidenceIds: [evidenceId], answerLeakageReviewed: true as const } } } : {}),
         ...(partId === "p2" ? { attribution: { role, status: "certain" as const, ...(work.creatorVerb ? { verb: work.creatorVerb } : {}) }, response: { complete: true as const, forms },
           inverse: { enabled: true as const, answerLeakageReviewed: true as const,

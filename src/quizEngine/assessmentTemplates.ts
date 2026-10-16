@@ -3,6 +3,46 @@ import type { Concept } from "./conceptTypes";
 import { getRelationTemplate } from "./templates";
 import type { RelationTemplate } from "./templates";
 
+/** Definition scopes describe validation of meanings, not extra instructions
+ * for learners. Other scopes stay visible conservatively: they can qualify a
+ * source, event, version, role or historical interpretation. Never strip text
+ * based on parentheses or its contents. */
+export function getVisibleAssessmentScope(concept: Concept): string | undefined {
+  if (relationDefinitions[concept.relation]?.family === "definition" && concept.assessment?.scope?.visibility !== "learner") return undefined;
+  const wording = concept.assessment?.presentation?.scope;
+  if (wording?.reviewStatus === "verified" && wording.canonicalText === concept.assessment?.scope?.text) return wording.text;
+  return concept.assessment?.scope?.text.trim() || undefined;
+}
+
+/** Card labels are facts/entities, not interrogative question stems. Keep the
+ * authored subject (including version qualifiers) and retain necessary scoped
+ * distinctions. Recognition continues to use its independently authored stimulus. */
+export function getMatchingLabel(concept: Concept): string {
+  const definition = relationDefinitions[concept.relation];
+  if (!definition || !concept.assessment) return getAssessmentTemplate(concept).question(concept.subject);
+  const scope = getVisibleAssessmentScope(concept);
+  const details: string[] = [];
+  // This explicit semantic contract already names the assessed field. Render
+  // its meaning compactly; unknown/custom scopes retain their authored text.
+  const principalCredit = definition.family === "creator" && concept.assessment.attribution?.status === "certain" &&
+    concept.semantic?.qualifiers?.assessmentScope === "principal-catalogue-credit";
+  if (concept.assessment.direction !== "reverse") {
+    if (concept.assessment.catalogueField) details.push(`Catalogue ${concept.assessment.catalogueField}`);
+    else if (definition.family === "date") details.push(concept.assessment.event ? `${concept.assessment.event} date` : "Date or period");
+    if (definition.family === "creator") {
+      const credit = concept.assessment.attribution;
+      if (!(principalCredit && concept.assessment.presentation?.scope)) details.push(credit?.status === "attributed" ? `Attributed ${credit.role}` : credit?.status === "disputed" ? `Disputed ${credit.role} credit` : `${principalCredit ? "Principal " : ""}${credit?.role ?? definition.creatorRole ?? "Creator"} credit`);
+    }
+    if (definition.family === "first-work" && concept.assessment.firstWork) details.push(concept.assessment.firstWork.criterion.replaceAll("-", " "));
+    if (definition.family === "association" && concept.assessment.association) details.push(concept.assessment.association.kind);
+  }
+  if (principalCredit && concept.assessment.direction === "reverse") details.push(`Principal ${concept.assessment.attribution!.role} credits`);
+  if (definition.family === "country") details.push("Present-day country");
+  if (principalCredit) details.push(concept.assessment.presentation?.scope ? scope! : "collection entry");
+  else if (scope) details.push(scope);
+  return details.length ? `${concept.subject} — ${details.join("; ")}` : concept.subject;
+}
+
 export function getAssessmentTemplate(concept: Concept): RelationTemplate {
   const definition = relationDefinitions[concept.relation];
   if (!definition || !concept.assessment) return getRelationTemplate(concept.relation);
@@ -46,7 +86,7 @@ export function getAssessmentTemplate(concept: Concept): RelationTemplate {
   const attributionWording = qualified ?? creatorWording;
   const wording = concept.assessment.direction === "reverse" ? attributionWording?.inverse ?? definition.inverse : attributionWording ?? dateWording;
   if (!wording) throw new Error(`Unsupported inverse wording: ${concept.relation}`);
-  const scope = concept.assessment.scope?.text.trim();
+  const scope = getVisibleAssessmentScope(concept);
   const render = (text: string, subject: string, answer: string) => {
     const sentence = text.replaceAll("{s}", subject).replaceAll("{a}", answer).replace(/([.!?])\.$/, "$1");
     return scope ? `${sentence} (${scope})` : sentence;
@@ -65,6 +105,6 @@ export function reverseConcept(concept: Concept): Concept | undefined {
     semantic: { ...concept.semantic, subject: concept.semantic.value, value: concept.semantic.subject,
       predicateId: `inverse:${concept.semantic.predicateId ?? concept.relation}`, acceptedAnswers: [] },
     assessment: { ...concept.assessment, direction: "reverse", answerLeakageReviewed: concept.assessment.inverse.answerLeakageReviewed, scope: concept.assessment.inverse.scope, subjectType: concept.assessment.valueType, valueType: concept.assessment.subjectType,
-      response: concept.assessment.inverse.response, factId: concept.assessment.factId ?? concept.id },
+      response: concept.assessment.inverse.response, presentation: undefined, factId: concept.assessment.factId ?? concept.id },
   };
 }

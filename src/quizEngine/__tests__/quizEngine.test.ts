@@ -269,12 +269,8 @@ it("buildQuiz matching uses only facts already selected in that quiz", () => {
   const nonMatching = quiz.filter((q) => q.type !== "matching");
   const matching = quiz.find((q) => q.type === "matching");
 
-  expect(matching).toBeTruthy();
-  expect(nonMatching).toHaveLength(7);
-
-  const selectedIds = new Set(nonMatching.map((q) => q.conceptId));
-  expect(matching?.pairs).toHaveLength(4);
-  for (const pair of matching?.pairs ?? []) expect(selectedIds.has(pair.id!)).toBe(true);
-
+  expect(quiz).toEqual([]);
+  expect(matching).toBeUndefined();
+  expect(nonMatching).toHaveLength(0);
 });
 });

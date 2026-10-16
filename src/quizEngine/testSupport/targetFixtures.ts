@@ -5,7 +5,7 @@ import { targetRelationPolicies } from "../relationPolicies";
 import { createSemanticContext } from "../semanticValidation";
 
 /** SYNTHETIC closed worlds only. This never qualifies or registers real Art facts. */
-export function targetFixture(relation = "painter_of_painting", count = 5) {
+export function targetFixture(relation = "painter_of_painting", count = 11) {
   const definition = artRelationDefinitions[relation];
   const family = definition.family;
   const required = targetRelationPolicies[relation].strategyMetadata?.requiredContract;
@@ -45,7 +45,7 @@ export function targetFixture(relation = "painter_of_painting", count = 5) {
       valueIds: [`${id}:value`], valueType, sourceUrl: "https://example.invalid/synthetic-fixture", locator: "Explicit test-only complete set",
       reviewStatus: "verified", reviewedBy: "synthetic-test-author", reviewedAt: "2026-10-13T00:00:00Z" });
     return { id, topicId: "art", subtopicId: "painting", levelId: "l2", partId: "p2", relation, subject, object,
-      answerKind: "short", difficulty: 1, introducedIn: "A",
+      answerKind: "short", difficulty: 1, introducedIn: i < 6 ? "A" : i < 9 ? "B" : "C", learning: { reinforcementPriority: 5 - i % 5, rationale: "Explicit synthetic educational priority" },
       semantic: { subject: { id: `${id}:subject`, entityType: subjectType }, value: { id: `${id}:value`, entityType: valueType, aliases: [`Alias ${i}`] }, qualifiers },
       assessment: { reviewStatus: "verified", answerLeakageReviewed: true, evidenceIds: [evidenceId], subjectType, valueType,
         scope: Object.keys(qualifiers).length ? { text: `Synthetic fixture scope: ${Object.values(qualifiers).join(", ")}.`, qualifierKeys: Object.keys(qualifiers) } : undefined,

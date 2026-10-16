@@ -20,6 +20,22 @@ export type SemanticEvidence =
   | (ScopedEvidence & { readonly kind: "date-bound"; readonly subjectId: string; readonly start: number; readonly end: number; readonly calendar: "gregorian-proleptic" });
 
 export type TemporalValue = Readonly<{ start: number; end: number; calendar: "gregorian-proleptic" }>;
+export type ReviewedWording = Readonly<{
+  text: string;
+  canonicalText: string;
+  evidenceIds: readonly string[];
+  reviewStatus: "verified" | "pending";
+  reviewedBy: string;
+  reviewedAt: string;
+  rationale: string;
+}>;
+export type AssessmentScope = Readonly<{
+  text: string;
+  qualifierKeys: readonly string[];
+  // Definition scopes default to internal meaning-validation notes. Explicit
+  // learner visibility preserves an essential qualified terminology sense.
+  visibility?: "learner";
+}>;
 export type AssessmentContract = Readonly<{
   reviewStatus: "verified" | "pending";
   answerLeakageReviewed: true;
@@ -27,12 +43,17 @@ export type AssessmentContract = Readonly<{
   subjectType: EntityType;
   valueType: EntityType;
   direction?: "forward" | "reverse";
-  inverse?: Readonly<{ enabled: true; answerLeakageReviewed: true; scope?: Readonly<{ text: string; qualifierKeys: readonly string[] }>; response?: Readonly<{ complete: true; forms: readonly { text: string; caseSensitive: boolean }[] }> }>;
+  inverse?: Readonly<{ enabled: true; answerLeakageReviewed: true; scope?: AssessmentScope; response?: Readonly<{ complete: true; forms: readonly { text: string; caseSensitive: boolean }[] }> }>;
   // Stable learning fact identity; reverse views never create another learned fact.
   factId?: string;
   // Explicit source-field assessment; not an unqualified exclusive membership.
   catalogueField?: "cultural attribution" | "dating label";
-  scope?: Readonly<{ text: string; qualifierKeys: readonly string[] }>;
+  scope?: AssessmentScope;
+  // Presentation never changes claim identity, negative evidence or typed forms.
+  presentation?: Readonly<{
+    answer?: ReviewedWording & Readonly<{ valueId: string; matchingText?: string }>;
+    scope?: ReviewedWording;
+  }>;
   response?: Readonly<{ complete: true; forms: readonly { text: string; caseSensitive: boolean }[] }>;
   attribution?: Readonly<{ role: string; status: "certain" | "attributed" | "disputed"; verb?: "created" | "credited" }>;
   event?: string;

@@ -1,7 +1,12 @@
 import { matchingCandidates } from '../exerciseFactory';
 import { activeSemanticContext } from '../contentSnapshot';
 import { approvedArtContent } from '../../../data/activeArtContent';
-import { getAssessmentTemplate, reverseConcept } from '../assessmentTemplates';
+import { getAssessmentTemplate, getMatchingLabel, getVisibleAssessmentScope, reverseConcept } from '../assessmentTemplates';
+import { buildQuizResult, quizCompositionViolations } from '../buildQuiz';
+import { exerciseValidityViolations } from '../generationCoverage';
+import { isMatchingPairCorrect } from '../answerValidation';
+import type { Concept } from '../conceptTypes';
+import { getAnswerLabel } from '../learnerText';
 import { familyDefinitions } from '../relationDefinitions';
 
 const creator = approvedArtContent.find(c => c.subject === 'The Arnolfini Portrait' && c.partId === 'p2')!;
@@ -13,7 +18,7 @@ test('certain creator questions use natural active and passive verbs, preserving
   expect(t.statement(creator.subject, creator.object)).toMatch(/^Jan van Eyck painted “The Arnolfini Portrait”\./);
   expect(t.blank(creator.subject)).toMatch(/^“The Arnolfini Portrait” was painted by _____\./);
   for (const text of [t.question(creator.subject),t.statement(creator.subject,creator.object),t.blank(creator.subject)]) {
-    expect(text).toContain(creator.assessment!.scope!.text);
+    expect(text).toContain(getVisibleAssessmentScope(creator)!);
   }
   expect(getAssessmentTemplate(sculpture).statement(sculpture.subject,sculpture.object)).toMatch(/^Michelangelo Buonarroti sculpted “David \(Accademia marble\)”\./);
 });
@@ -47,7 +52,9 @@ test('all pilot prompts retain qualifier scope, uncertainty and clean punctuatio
     const t=getAssessmentTemplate(c);
     for (const text of [t.question(c.subject),t.statement(c.subject,c.object),t.blank(c.subject)]) {
       expect(text).not.toMatch(/\{[sa]\}|\.\.|\?\./);
-      if(c.assessment?.scope) expect(text).toContain(c.assessment.scope.text);
+      const visibleScope = getVisibleAssessmentScope(c);
+      if(visibleScope) expect(text).toContain(visibleScope);
+      else if(c.assessment?.scope) expect(text).not.toContain(c.assessment.scope.text);
     }
     if(c.assessment?.dateInterpretation === 'catalogue-label') {
       expect(t.statement(c.subject,c.object)).toContain('collection entry lists');
@@ -58,7 +65,7 @@ test('all pilot prompts retain qualifier scope, uncertainty and clean punctuatio
   const definition=approvedArtContent.find(c=>c.relation==='definition_of_sculpture_technique')!;
   const t=getAssessmentTemplate(definition);
   expect(t.question(definition.subject)).toContain('What does');
-  expect(t.statement(definition.subject,definition.object)).toContain('has this definition: Removing');
+  expect(t.statement(definition.subject,definition.object)).toContain('means: Removing');
   expect(t.blank(definition.subject)).toContain('refers to _____');
 });
 
@@ -67,10 +74,73 @@ test('real matching labels expose the same event and attribution scope as ordina
   const groups=[...matchingCandidates(dates,'wording-regression',activeSemanticContext,{examined:0,limit:2000,exhausted:false})];
   expect(groups.length).toBeGreaterThan(0);
   const supper=groups.flatMap(g=>g.exercise.pairs).find(p=>p.id===dates.find(c=>c.subject==='The Last Supper')!.id)!;
-  expect(supper.left).toContain('completion date or range');
-  expect(supper.left).toContain('Dating given by Museo del Cenacolo Vinciano');
+  expect(supper.left).toContain('completion date');
+  expect(supper.left).toContain('Museo del Cenacolo Vinciano');
   for(const group of groups) for(const pair of group.exercise.pairs) {
     const c=dates.find(c=>c.id===pair.id)!;
-    expect(pair.left).toBe(getAssessmentTemplate(c).question(c.subject));
+    expect(pair.left).toBe(getMatchingLabel(c));
+    expect(pair.left).not.toMatch(/^(What|Who|Which)/);
   }
+});
+
+test('actual Painting l1/p1 removes internal instructions in every ordinary format and matches names to definitions', () => {
+  const concepts = approvedArtContent.filter(c => c.subtopicId === 'painting' && c.levelId === 'l1' && c.partId === 'p1');
+  const pop = concepts.find(c => c.subject === 'Pop art')!;
+  const originalScope = pop.assessment!.scope!;
+  expect(getAssessmentTemplate(pop).blank(pop.subject)).toBe('In painting, “Pop art” refers to _____.');
+  for (const c of concepts) {
+    const t = getAssessmentTemplate(c);
+    for (const text of [t.question(c.subject), t.statement(c.subject, c.object), t.blank(c.subject)]) expect(text).not.toContain(c.assessment!.scope!.text);
+    expect(getMatchingLabel(c)).toBe(c.subject);
+  }
+  for (const variant of ['A', 'B', 'C'] as const) {
+    const result = buildQuizResult({ concepts, context: activeSemanticContext, variant, mode: 'teaching', seed: `learner-text:${variant}` });
+    expect(result.status).toBe('ready');
+    expect(quizCompositionViolations(result.exercises, variant)).toEqual([]);
+    for (const ex of result.exercises) expect(exerciseValidityViolations(ex, concepts, activeSemanticContext)).toEqual([]);
+    const group = [...matchingCandidates(concepts, 'compact-labels', activeSemanticContext, {examined:0,limit:2000,exhausted:false})][0];
+    expect(group).toBeDefined();
+    for (const ex of [group!.exercise]) {
+      expect(exerciseValidityViolations(ex, concepts, activeSemanticContext)).toEqual([]);
+      if (ex.type === 'matching') for (const pair of ex.pairs) {
+        const source = concepts.find(c => c.id === pair.id)!;
+        expect(pair.left).toBe(source.subject);
+        expect(pair.right).toBe(getAnswerLabel(source, 'matching'));
+        expect(isMatchingPairCorrect(pair, pair)).toBe(true);
+        const wrong = ex.pairs.find(p => p.id !== pair.id)!;
+        expect(isMatchingPairCorrect(pair, wrong)).toBe(false);
+      }
+
+    }
+  }
+  expect(pop.assessment!.scope).toBe(originalScope);
+  expect(originalScope.text).toContain('Compare the defining meaning');
+  expect(originalScope.qualifierKeys).toEqual(['sense']);
+});
+
+test('compact labels retain artist role, uncertain attribution, version and source/event distinctions', () => {
+  expect(getMatchingLabel(creator)).toBe('The Arnolfini Portrait — National Gallery; principal painter credit.');
+  expect(getMatchingLabel(sculpture)).toContain('David (Accademia marble)');
+  const attributed: Concept = { ...creator, assessment: { ...creator.assessment!, attribution: { role: 'painter', status: 'attributed' } } };
+  expect(getMatchingLabel(attributed)).toContain('Attributed painter');
+  const cast = approvedArtContent.find(c => c.id === 'art_sculpture_l7_p4_moma-231-1948')!;
+  expect(getMatchingLabel(cast)).toContain('Unique Forms of Continuity in Space (MoMA cast)');
+  expect(getMatchingLabel(cast)).toContain('creation date');
+  expect(getMatchingLabel(cast)).toContain(getVisibleAssessmentScope(cast)!);
+  const character: Concept = { ...creator, relation: 'book_of_character', subject: 'Elizabeth Bennet', object: 'Pride and Prejudice', assessment: { ...creator.assessment!, subjectType: 'character', valueType: 'work', scope: undefined } };
+  expect(getMatchingLabel(character)).toBe('Elizabeth Bennet');
+  const reverse = reverseConcept(creator)!;
+  expect(getMatchingLabel(reverse)).toMatch(/^Jan van Eyck — Principal painter credits/);
+  const custom: Concept = { ...creator, assessment: { ...creator.assessment!, presentation: undefined }, semantic: { ...creator.semantic!, qualifiers: { assessmentScope: 'version-specific-workshop-credit' } } };
+  expect(getMatchingLabel(custom)).toContain(custom.assessment!.scope!.text);
+  const first: Concept = { ...creator, relation: 'first_published_novel_of_author', assessment: { ...creator.assessment!, scope: undefined, firstWork: { criterion: 'first-published-novel', wellEstablished: true } } };
+  expect(getMatchingLabel(first)).toContain('first published novel');
+});
+
+test('explicitly essential definition qualifiers remain visible; parentheses in artwork titles are preserved', () => {
+  const definition = approvedArtContent.find(c => c.relation === 'definition_of_sculpture_material')!;
+  const qualified: Concept = { ...definition, assessment: { ...definition.assessment!, scope: { ...definition.assessment!.scope!, text: 'Use the copper–tin sense.', visibility: 'learner' } } };
+  expect(getAssessmentTemplate(qualified).question(qualified.subject)).toContain('Use the copper–tin sense.');
+  expect(getMatchingLabel(qualified)).toContain('Use the copper–tin sense.');
+  expect(getAssessmentTemplate(sculpture).question(sculpture.subject)).toContain('(Accademia marble)');
 });

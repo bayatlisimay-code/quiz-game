@@ -58,6 +58,7 @@ export type Concept = {
 
     // Which quiz variant introduces this concept
   introducedIn?: "A" | "B" | "C";
+  learning?: Readonly<{ reinforcementPriority: number; rationale: string }>;
 
   entity?: string;
   factType?: string;
@@ -105,6 +106,7 @@ export type MatchingExercise = {
     factId?: string;
     conceptId: string;
     statement: string;
+    correctStatement?: string;
     correctAnswer: boolean;
     answerText: string;
   };

@@ -6,6 +6,7 @@ import { buildQuizResult, prepareQuizSession, quizCompositionViolations } from "
 import type { QuizGenerationResult } from "./buildQuiz";
 import type { SemanticContext } from "./semanticValidation";
 import { getAssessmentTemplate, reverseConcept } from "./assessmentTemplates";
+import { getAnswerLabel } from "./learnerText";
 import { isPermanentlyLockable, hasIndistinguishableAnswers } from "./matchingSafety";
 import { isMatchingPairCorrect, getExerciseCapabilities } from "./exerciseFactory";
 
@@ -17,7 +18,7 @@ export function catalogCoverageCases(topic: Topic, sets: ConceptSets): CoverageC
     return (["A", "B", "C"] as const).map((variant) => ({ id: part.questionSetId, concepts, variant, mode: levelId === "l10" || partId === "p3" || partId === "p5" ? "review" : "teaching" }));
   })));
 }
-export type CoverageRow = { id: string; variant: "A" | "B" | "C"; attempts: number; ready: number; empty: number; minOrdinary: number; maxOrdinary: number };
+export type CoverageRow = { id: string; variant: "A" | "B" | "C"; attempts: number; ready: number; empty: number; minOrdinary: number; maxOrdinary: number; matchingCombinations?: number };
 export function measureGenerationCoverage(cases: readonly CoverageCase[], context: SemanticContext, attempts = 20) {
   const counts = { requests: 0, ready: 0, insufficient: 0, empty: 0, ordinary: 0, mcq: 0, true: 0, false: 0, blank: 0, matching: 0, duplicateMatching: 0, failures: 0 };
   const presented = { quizzes: 0, ordinary: 0, mcq: 0, true: 0, false: 0, blank: 0, matching: 0 };
@@ -26,6 +27,7 @@ export function measureGenerationCoverage(cases: readonly CoverageCase[], contex
   const shortageCounts: Record<string, number> = {};
   for (const entry of cases) {
     const row: CoverageRow = { id: entry.id, variant: entry.variant, attempts, ready: 0, empty: 0, minOrdinary: 7, maxOrdinary: 0 };
+    const matchingSelections = new Set<string>();
     const session = prepareQuizSession({ ...entry, context });
     for (let attempt = 1; attempt <= attempts; attempt++) {
       const seed = `${entry.id}_quiz${entry.variant}_attempt${attempt}`;
@@ -36,6 +38,13 @@ export function measureGenerationCoverage(cases: readonly CoverageCase[], contex
         shortageCounts[code] = (shortageCounts[code] ?? 0) + 1;
       }
       if (result.status === "ready") {
+        const stageCounts = { A:0, B:0, C:0 };
+        const usedIds = new Set(result.exercises.flatMap(e=>e.type === "matching" ? [] : [e.conceptId]));
+        for (const id of usedIds) { const c=entry.concepts.find(c=>c.id===id); if (c) stageCounts[c.introducedIn ?? "A"]++; }
+        const expected = entry.variant === "A" ? {A:6,B:0,C:0} : entry.variant === "B" ? {A:3,B:3,C:0} : {A:2,B:2,C:2};
+        const progressionErrors = entry.mode === "review" ? result.diagnostics.introducedFactIds?.length ? ["Review introduced new facts"] : []
+          : (["A","B","C"] as const).some(stage=>stageCounts[stage] !== expected[stage]) ? ["Teaching progression quota violation"] : [];
+        for (const error of progressionErrors) { counts.failures++; if (violations.length < 50) violations.push(`${seed}: ${error}`); }
         for (const error of quizCompositionViolations(result.exercises, entry.variant)) {
           counts.failures++; if (violations.length < 50) violations.push(`${seed}: ${error}`);
         }
@@ -53,12 +62,14 @@ export function measureGenerationCoverage(cases: readonly CoverageCase[], contex
         const errors = exerciseValidityViolations(exercise, entry.concepts, context);
         for (const error of errors) { counts.failures++; if (violations.length < 50) violations.push(`${seed}: ${error}`); }
         if (exercise.type === "matching") {
+          matchingSelections.add(exercise.pairs.map(p=>p.id).sort().join("|"));
           counts.matching++;
           if (new Set(exercise.pairs.map((p) => p.right)).size < exercise.pairs.length) counts.duplicateMatching++;
         } else if (exercise.type === "true_false") counts[exercise.correctAnswer ? "true" : "false"]++;
         else counts[exercise.type === "mcq" ? "mcq" : "blank"]++;
       }
     }
+    row.matchingCombinations = matchingSelections.size;
     rows.push(row);
   }
   return { counts, presented, rows, violations, shortageCounts };
@@ -90,14 +101,15 @@ export function exerciseValidityViolations(exercise: Exercise, pool: readonly Co
   if (exercise.type === "fill_blank" && exercise.allowedInputModes?.includes("input") && !caps.forms.blank_typed.available) errors.push("Typed blank lacks a finite reviewed response contract");
   if (!policy || !policy.allowedExerciseTypes.includes(exercise.type) || policy.status === "blocked-pending-metadata") errors.push("Unsupported form escaped policy");
   if (exercise.type === "true_false" && exercise.correctAnswer &&
-      exercise.statement !== getAssessmentTemplate(concept).statement(concept.subject, concept.object, concept.context)) errors.push("Unsupported true assertion");
+      exercise.statement !== getAssessmentTemplate(concept).statement(concept.subject, getAnswerLabel(concept), concept.context)) errors.push("Unsupported true assertion");
   if (exercise.type === "fill_blank") {
     if (exercise.allowedInputModes?.includes("input") && !policy?.allowTypedBlank) errors.push("Typed blank escaped policy");
     if (exercise.allowedInputModes?.includes("options") && !policy?.allowOptionsBlank) errors.push("Options blank escaped policy");
   }
   if (exercise.type === "true_false" && !exercise.correctAnswer) {
     const template = getAssessmentTemplate(concept);
-    const shown = pool.filter((candidate) => template.statement(concept.subject, candidate.object, concept.context) === exercise.statement);
+    if (exercise.correctStatement !== template.statement(concept.subject,getAnswerLabel(concept),concept.context)) errors.push("False assertion lacks its certified positive teaching correction");
+    const shown = pool.filter((candidate) => template.statement(concept.subject, getAnswerLabel(candidate), concept.context) === exercise.statement);
     const certified = shown.filter((c) => context.evaluate(concept, c).verdict === "invalid");
     const certifiedIdentities = new Set(certified.map((c) => context.claim(c).answer.identity));
     if (!certified.length || shown.some((c) => context.evaluate(concept, c).verdict === "valid" || !certifiedIdentities.has(context.claim(c).answer.identity))) errors.push("False statement lacks negative certification");
@@ -107,7 +119,7 @@ export function exerciseValidityViolations(exercise: Exercise, pool: readonly Co
     if (exercise.options && new Set(exercise.options.map((s) => s.normalize("NFC").trim())).size !== exercise.options.length) errors.push("Duplicate visible options");
     for (const [i, option] of (exercise.options ?? []).entries()) {
       if (i === exercise.correctIndex) continue;
-      const candidates = pool.filter((c) => c.object === option);
+      const candidates = pool.filter((c) => getAnswerLabel(c) === option);
       const certificates = candidates.filter((c) => context.evaluate(concept, c).verdict === "invalid");
       const identities = new Set(certificates.map((c) => context.claim(c).answer.identity));
       if (!certificates.length || candidates.some((c) => context.evaluate(concept, c).verdict === "valid" || !identities.has(context.claim(c).answer.identity))) errors.push("Option lacks negative certification");

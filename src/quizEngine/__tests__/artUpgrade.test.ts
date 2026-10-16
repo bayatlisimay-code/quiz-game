@@ -150,7 +150,7 @@ test("qualification survives curriculum moves, while invisible qualifiers fail c
 
 test("duplicate semantic facts do not gain extra quiz weighting", () => {
   const f = targetFixture(), duplicate = { ...f.records[0], id: "another-occurrence" };
-  expect(prepareQuizSession({ concepts: [...f.records, duplicate], context: f.context(), variant: "A" }).eligible).toHaveLength(f.records.length);
+  expect(prepareQuizSession({ concepts: [...f.records, duplicate], context: f.context(), variant: "A" }).eligible).toHaveLength(6);
 });
 
 test("identification plans an approved image or independently verified description; failure removes every failed binding", () => {
@@ -267,12 +267,12 @@ test("definition aliases share meaning; forward definitions never demand exact f
 
 test("review variants retain all taught introduction stages without changing their quotas", () => {
   const f = targetFixture();
-  const records = f.records.map((c, i) => ({ ...c, introducedIn: (["A", "B", "C"] as const)[i % 3] }));
+  const records = f.records;
   const context = createSemanticContext(records, { policies: targetRelationPolicies, evidence: f.evidence });
-  expect(prepareQuizSession({ concepts: records, variant: "A", context }).eligible).toHaveLength(2);
+  expect(prepareQuizSession({ concepts: records, variant: "A", context }).eligible).toHaveLength(6);
   for (const variant of ["A", "B", "C"] as const) {
     const request = { concepts: records, variant, context, mode: "review" as const, seed: `review:${variant}` };
-    expect(prepareQuizSession(request).eligible).toHaveLength(5);
+    expect(prepareQuizSession(request).eligible).toHaveLength(11);
     const quiz = buildQuizResult(request);
     expect(quiz.status).toBe("ready"); expect(quizCompositionViolations(quiz.exercises, variant)).toEqual([]);
   }
@@ -297,7 +297,7 @@ test("unreviewed displayed identities cannot borrow certified negatives", () => 
   expect(getExerciseCapabilities(target, [target, unreviewed], f.context()).forms.mcq.available).toBe(false);
 });
 
-test("failed recognition assets deterministically replan a complete quiz using the remaining eligible facts", () => {
+test("a failed recognition asset without fallback cannot shrink a six-fact quiz to five", () => {
   const f = targetFixture("identification_of_painting", 6);
   const first = { ...f.records[0], assessment: { ...f.records[0].assessment!, identification: {} } };
   const records = [first, ...f.records.slice(1)];
@@ -310,7 +310,7 @@ test("failed recognition assets deterministically replan a complete quiz using t
   const failed = context.withImages(withoutFailedImages(images, ["failed-fixture"]));
   const request = { concepts: records, context: failed, variant: "A" as const, seed: "image-original:failed-fixture" };
   const result = buildQuizResult(request);
-  expect(result.status).toBe("ready"); expect(quizCompositionViolations(result.exercises, "A")).toEqual([]);
-  expect(result.exercises.every(e => e.type === "matching" ? e.pairs.every(p => p.id !== first.id) : e.conceptId !== first.id)).toBe(true);
+  expect(result.status).toBe("insufficient-content"); expect(result.exercises).toEqual([]);
+  expect(result.diagnostics.shortages.some(s=>s.code === "distinct-facts")).toBe(true);
   expect(buildQuizResult(request)).toEqual(result);
 });

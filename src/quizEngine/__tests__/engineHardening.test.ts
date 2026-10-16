@@ -16,9 +16,9 @@ import { exerciseValidityViolations } from "../generationCoverage";
 
 function fact(i: number, changes: Partial<Concept> = {}): Concept {
   return { id: `fact-${i}`, topicId: "science", subtopicId: "fixture", levelId: "l1", partId: "p1",
-    subject: `Subject ${i}`, object: `Value ${i}`, relation: "created_in_decade", answerKind: "short", difficulty: 1, introducedIn: "A", ...changes };
+    subject: `Subject ${i}`, object: `Value ${i}`, relation: "created_in_decade", answerKind: "short", difficulty: 1, introducedIn: i < 6 ? "A" : i < 9 ? "B" : "C", learning: { reinforcementPriority: 3, rationale: "Fixture review priority" }, ...changes };
 }
-const safe = Array.from({ length: 7 }, (_, i) => fact(i));
+const safe = Array.from({ length: 11 }, (_, i) => fact(i));
 const safeContext = certifiedFixtureContext(safe);
 
 test.each(["A", "B", "C"] as const)("%s has exactly eight exercises and its fixed quotas across attempts", (variant) => {
@@ -67,14 +67,14 @@ test("missing matching cannot be marked ready even with all seven ordinary capab
 test("joint planning can reject a safe matching group that starves ordinary quotas and use another", () => {
   // Four typed-only facts form a certified matching group but cannot all fit
   // into the two blank slots. The other group supports the full composition.
-  const typed = Array.from({ length: 4 }, (_, i) => fact(i + 10, { relation: "definition_of_film_term" }));
+  const typed = Array.from({ length: 6 }, (_, i) => fact(i + 10, { relation: "definition_of_film_term", partId: "p2", introducedIn: "A" }));
   const records = [...typed, ...safe];
   const closed = certifiedFixtureContext(records);
   const context = createSemanticContext(records, { policies: { ...closed.policies,
     definition_of_film_term: { ...closed.policies.definition_of_film_term,
       allowedExerciseTypes: ["fill_blank"], allowOptionsBlank: false } } });
   for (let i = 0; i < 20; i++) {
-    const result = buildQuizResult({ concepts: records, context, variant: "A", seed: `joint-${i}` });
+    const result = buildQuizResult({ concepts: records, context, variant: "A", mode: "review", seed: `joint-${i}` });
     expect(result.status).toBe("ready");
     expect(quizCompositionViolations(result.exercises, "A")).toEqual([]);
     const matching = result.exercises.find((q) => q.type === "matching");
@@ -106,7 +106,7 @@ test("joint planner agrees with exhaustive feasibility on small heterogeneous po
       const slots = types.flatMap((type) => Array.from({ length: quizComposition(variant)[type] }, () => type));
       const used = Array.from({ length: withIds.length }, () => new Set<string>());
       const feasible = (index: number): boolean => {
-        if (index === slots.length) return used.filter((s) => s.size).length >= 4 && used.slice(0, 4).every((s) => s.size > 0);
+        if (index === slots.length) return used.filter((s) => s.size).length === 6 && used.filter(s=>s.size === 2).every(s=>s.has("true_false")) && used.slice(0, 4).every((s) => s.size > 0);
         const type = slots[index];
         for (let i = 0; i < withIds.length; i++) {
           const supported = type === "mcq" ? caps[i].forms.mcq.available : type === "true_false" ? caps[i].forms.true.available && caps[i].forms.false.available
@@ -116,7 +116,7 @@ test("joint planner agrees with exhaustive feasibility on small heterogeneous po
         }
         return false;
       };
-      expect(buildQuizResult({ concepts: withIds, context, variant, seed: `oracle-${mask}-${variant}` }).status === "ready").toBe(feasible(0));
+      expect(buildQuizResult({ concepts: withIds, context, variant, mode: "review", seed: `oracle-${mask}-${variant}` }).status === "ready").toBe(feasible(0));
     }
   }
 });
@@ -253,12 +253,13 @@ test("a bounded search reports undetermined feasibility rather than claiming a p
   expect(result.diagnostics.shortages).toContainEqual(expect.objectContaining({ code: "search-limit" }));
 });
 
-test("four safe facts can support all eight exercises without same-family duplicates", () => {
+test("four safe facts report an explicit six-fact shortage", () => {
   const records = safe.slice(0, 4), context = certifiedFixtureContext(records);
   for (const variant of ["A", "B", "C"] as const) {
     const result = buildQuizResult({ concepts: records, context, variant, seed: "thin" });
-    expect(result.status).toBe("ready");
-    expect(quizCompositionViolations(result.exercises, variant)).toEqual([]);
+    expect(result.status).toBe("insufficient-content");
+    expect(result.exercises).toEqual([]);
+    expect(result.diagnostics.shortages.some(s=>s.code === "distinct-facts")).toBe(true);
   }
 });
 

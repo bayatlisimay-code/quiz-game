@@ -22,7 +22,7 @@ const creatorVerbs: Readonly<Record<string, { active: string; passive: string }>
   architect: { active: "designed", passive: "designed" },
 };
 export const familyDefinitions = {
-  definition: (domain: string) => spec("definition", `What does “{s}” mean in ${domain}?`, `In ${domain}, “{s}” has this definition: {a}.`, `In ${domain}, “{s}” refers to _____.`,
+  definition: (domain: string) => spec("definition", `What does “{s}” mean in ${domain}?`, `In ${domain}, “{s}” means: {a}.`, `In ${domain}, “{s}” refers to _____.`,
     { question: `Which term in ${domain} matches this definition: “{s}”?`, statement: `In ${domain}, “{a}” matches this definition: “{s}”.`, blank: `In ${domain}, the term matching “{s}” is _____.` }),
   identification: (noun: string) => spec("identification", `Which ${noun} is shown or described?`, `The ${noun} shown or described is “{a}”.`, `The ${noun} shown or described is _____.`),
   creator: (role: string, work: string): RelationDefinition => {

@@ -1,5 +1,6 @@
 import type { SemanticEvidence, EvidenceScope } from "./assessmentTypes";
 import type { SemanticClaim, SemanticContext, SemanticDecision, SemanticStrategy } from "./semanticValidation";
+import { presentationProblems } from "./learnerText";
 
 export function scopeKey(value: EvidenceScope): string {
   const sorted = (v: unknown): unknown => Array.isArray(v) ? v.map(sorted) : v && typeof v === "object"
@@ -100,6 +101,7 @@ export const reviewedEvidenceStrategy: SemanticStrategy = Object.freeze({
     if (claim.answer.entityType !== a.valueType || claim.subjectEntityType !== a.subjectType) errors.push("Entity types must agree with the assessment contract");
     if (!supportsAnchor(claim, context)) errors.push("No reviewed positive evidence for the exact qualified claim");
     if (a.evidenceIds.some(id => context.evidenceForId(id)?.reviewStatus !== "verified")) errors.push("Unreviewed or missing assessment evidence");
+    errors.push(...presentationProblems(claim, context));
     const ownDate = claim.answer.temporal;
     if (ownDate && applicable(claim, context).some(e => e.kind === "date-bound" && e.subjectId === subjectId(claim) && e.calendar === ownDate.calendar && (ownDate.end < e.start || ownDate.start > e.end))) errors.push("Positive answer contradicts reviewed temporal bounds");
     const qualifierKeys = Object.keys(claim.qualifiers);

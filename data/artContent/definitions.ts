@@ -1,6 +1,7 @@
 import type { Concept } from "../../src/quizEngine/conceptTypes";
 import type { SemanticEvidence } from "../../src/quizEngine/assessmentTypes";
 import { contentReview } from "./review";
+import { definitionWording } from "./learnerWording";
 export type DefinitionEntry = Readonly<{ id: string; term: string; definition: string; url: string; locator: string; aliases?: readonly string[] }>;
 export type MeaningContrast = readonly [left: string, right: string, rationale: string];
 /** Negatives require explicitly reviewed meaning contrasts. A new term adds
@@ -20,7 +21,7 @@ export function authorDefinitions(subtopic: "painting" | "sculpture", level: str
     if (!left || !right || left === right || !rationale.trim()) throw new Error(`Invalid authored contrast: ${relation}:${leftId}:${rightId}`);
     evidence.push(assertion(left, right, "invalid", rationale), assertion(right, left, "invalid", rationale));
   }
-  const concepts: Concept[] = terms.map(term => ({
+  const concepts: Concept[] = terms.map(term => definitionWording({
     id: `art_${subtopic}_${level}_${part}_${term.id}`, topicId: "art", subtopicId: subtopic, levelId: level, partId: part, relation,
     subject: term.term, object: term.definition, answerKind: "long", difficulty: 2, introducedIn: "A", tags: ["verified-art-content", "terminology"],
     semantic: { subject: { id: `term:${sense}:${term.id}`, entityType: "term", aliases: term.aliases ?? [], caseSensitive: false },
@@ -28,6 +29,6 @@ export function authorDefinitions(subtopic: "painting" | "sculpture", level: str
     assessment: { reviewStatus: "verified", answerLeakageReviewed: true, subjectType: "term", valueType: "meaning",
       evidenceIds: [`meaning-check:${relation}:${sense}:${term.id}:${term.id}`],
       scope: { text: "Compare the defining meaning in this art terminology sense, not every feature or process that can occur in a work.", qualifierKeys: ["sense"] } },
-  }));
+  }, term.id));
   return { concepts, evidence };
 }

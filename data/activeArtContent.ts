@@ -6,14 +6,20 @@ import { sculpturePilotWorks } from "./artPilot/sculpture";
 import { paintingPilotWorks } from "./artPilot/painting";
 import { terminologyPilotConcepts, terminologyPilotEvidence } from "./artPilot/terminology";
 import { expandedArtConcepts, expandedArtEvidence } from "./artContent";
+import { progressionMovementSet } from "./artContent/progressionMovements";
+import { progressionPaintingTermSets } from "./artContent/progressionPaintingTerms";
+import { progressionSculptureTermSets } from "./artContent/progressionSculptureTerms";
+import { progressionWorkConcepts, progressionWorkEvidence } from "./artContent/progressionWorks";
+import { scheduleArtLearning } from "./artContent/learningPriorities";
 
 // Production authoring boundary. Source-checked teaching facts, including preserved pilot originals;
 // synthetic engine fixtures never enter this list. No image approvals implied.
 // Original authored content remains intact in conceptSets.ts as reusable source material.
+const termSets = [progressionMovementSet, ...progressionPaintingTermSets, ...progressionSculptureTermSets];
 const sculpture = authorArtworkPilot(sculpturePilotWorks, "sculpture", "l3");
 const painting = authorArtworkPilot(paintingPilotWorks, "painting", "l2");
-export const approvedArtContent: readonly Concept[] = Object.freeze([...sculpture.concepts, ...painting.concepts, ...terminologyPilotConcepts, ...expandedArtConcepts]);
-export const approvedArtEvidence: readonly SemanticEvidence[] = Object.freeze([...sculpture.evidence, ...painting.evidence, ...terminologyPilotEvidence, ...expandedArtEvidence]);
+export const approvedArtContent: readonly Concept[] = Object.freeze(scheduleArtLearning([...sculpture.concepts, ...painting.concepts, ...terminologyPilotConcepts, ...expandedArtConcepts, ...progressionWorkConcepts, ...termSets.flatMap(set => set.concepts)]));
+export const approvedArtEvidence: readonly SemanticEvidence[] = Object.freeze([...sculpture.evidence, ...painting.evidence, ...terminologyPilotEvidence, ...expandedArtEvidence, ...progressionWorkEvidence, ...termSets.flatMap(set => set.evidence)]);
 
 export function createActiveArtSets(records: readonly Concept[]) {
   const sets: Record<string, { id: string; concepts: Concept[] }> = {};

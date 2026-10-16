@@ -258,6 +258,7 @@ export default function PartQuizScreen() {
   const [fillMode, setFillMode] = useState<"input" | "options">("input");
   const [typedAnswer, setTypedAnswer] = useState("");
   const [checked, setChecked] = useState(false);
+  const introducedFacts = useRef<readonly string[]>([]);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
 
@@ -482,11 +483,16 @@ export default function PartQuizScreen() {
     variant,
     seed,
     context,
+    learnedFactIds: progress.learnedFactIds ?? [],
   });
 
-  setShortage(result.status === "insufficient-content"
-    ? "This quiz needs more verified content to provide all eight required exercises. Please choose another quiz." : null);
+  const introductionShortage = result.diagnostics.shortages.find(s=>s.code === "introduction-stage");
+  setShortage(result.status === "insufficient-content" ? result.diagnostics.shortages.some(s=>s.code === "prior-learning")
+    ? "Replay the earlier teaching quizzes to learn the required facts. Your XP and previous completions are preserved."
+    : introductionShortage ? `Quiz ${introductionShortage.stage} needs ${introductionShortage.needed} new facts; ${introductionShortage.available} are available. More verified content is needed.`
+    : "This quiz needs more verified content to assess six distinct facts safely." : null);
   const presented = attachQuizImages(result.status === "ready" ? result.exercises : []);
+  introducedFacts.current = result.status === "ready" ? result.diagnostics.introducedFactIds ?? [] : [];
   setExercises(presented);
   setReadyScope(result.status === "ready" ? generationScope : null);
   setLoading(false);
@@ -568,7 +574,8 @@ export default function PartQuizScreen() {
         String(subtopicId),
         String(levelId),
         String(partId),
-        String(quizVariant)
+        String(quizVariant),
+        introducedFacts.current
       );
     }
     const receipt = completionReceipt(before, await loadProgress(), {
@@ -824,6 +831,10 @@ if (exercises.length === 0) {
             </Pressable>
           );
         })}
+
+      {checked && q.type === "true_false" && !q.correctAnswer && q.correctStatement && (
+        <Text style={styles.body}>Correct fact: {q.correctStatement}</Text>
+      )}
 
       {q.type === "fill_blank" && (
         <View>

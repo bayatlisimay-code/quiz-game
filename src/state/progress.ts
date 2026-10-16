@@ -6,6 +6,7 @@ const STORAGE_KEY = "quizgame_progress_v2"; // Changed version to avoid conflict
 
 export type Progress = {
   curriculumVersion?: string;
+  learnedFactIds?: readonly string[];
   totalXP: number;
   completedParts: Record<string, Record<string, Record<string, string[]>>>; // topicId -> subtopicId -> levelId -> partIds[]
   streakCount: number;
@@ -63,6 +64,7 @@ function normalize(progress: Partial<Progress>): Progress {
 
   return {
     curriculumVersion: progress.curriculumVersion ?? ART_CURRICULUM_VERSION,
+    ...(Array.isArray(progress.learnedFactIds) ? { learnedFactIds: [...new Set(progress.learnedFactIds.filter(id=>typeof id === "string"))] } : {}),
     totalXP: Number.isFinite(progress.totalXP) ? progress.totalXP! : 0,
     completedParts,
     streakCount: Number.isFinite(progress.streakCount) ? progress.streakCount! : 0,
@@ -208,7 +210,8 @@ export async function markQuizVariantCompleted(
   subtopicId: string,
   levelId: string,
   partId: string,
-  variant: string
+  variant: string,
+  introducedFactIds: readonly string[] = []
 ): Promise<boolean> {
   const progress = await loadProgress();
   const access = lessonAccess(progress, { topicId, subtopicId, levelId, partId, variant });
@@ -240,6 +243,7 @@ export async function markQuizVariantCompleted(
 
   const nextProgress = {
     ...progress,
+    ...(introducedFactIds.length ? { learnedFactIds: [...new Set([...(progress.learnedFactIds ?? []), ...introducedFactIds])] } : {}),
     completedQuizVariants: nextCompletedQuizVariants,
   };
 

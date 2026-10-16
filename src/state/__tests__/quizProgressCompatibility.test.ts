@@ -70,3 +70,14 @@ test("Design availability can be deliberately enabled without changing shared cu
   expect(lessonAccess(await progress.loadProgress(), request).allowed).toBe(false);
   expect(lessonAccess(await progress.loadProgress(), request, { design: "available" }).allowed).toBe(true);
 });
+
+test('new taught-fact receipts survive save/reload without clearing old completion history, XP or streak', async () => {
+  const taught = Array.from({length:6},(_,i)=>`fixture-fact:${i}`);
+  await progress.markQuizVariantCompleted('art','painting','1','1','A',taught);
+  const current = await progress.loadProgress();
+  expect(current).toEqual({...saved(),learnedFactIds:taught});
+  await progress.markQuizVariantCompleted('art','painting','1','1','A',taught);
+  expect((await progress.loadProgress()).learnedFactIds).toEqual(taught);
+  jest.resetModules(); progress = await import('../progress');
+  expect(await progress.loadProgress()).toEqual({...saved(),learnedFactIds:taught});
+});

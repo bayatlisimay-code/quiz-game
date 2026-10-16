@@ -1,6 +1,77 @@
 # Sculpture and Painting teaching content
 
 Baseline: `64c6e297efebf75a06616541250210fa221bd785`.
+
+> The original expansion report below is retained as historical context. The
+> current six-fact content totals and validation are documented in the completion
+> section immediately below and in `quiz-learning-progression.md`.
+
+## Eleven-fact progression completion — 2026-10-15
+
+Added 184 source-checked concepts without replacing existing facts: 96 Painting
+and 88 Sculpture. Total registered content is 598 facts (297 Painting, 301
+Sculpture). Every teaching placement supports eleven introductions; p3/p5 and
+all l10 parts reuse original taught identities, without review clones.
+
+| Subtopic / level | Added p1 | Added p2 | Added p4 | Added total |
+|---|---:|---:|---:|---:|
+| Painting l1 | 6 | 6 | 6 | 18 |
+| Painting l2, l3, l4, l6, l7, l8 (each) | 2 | 2 | 2 | 6 |
+| Painting l5, l9 (each) | 7 | 7 | 7 | 21 |
+| Sculpture l1 | 4 | 4 | 4 | 12 |
+| Sculpture l2, l3, l4, l6, l7, l8 (each) | 2 | 2 | 2 | 6 |
+| Sculpture l5 | 7 | 7 | 7 | 21 |
+| Sculpture l9 | 5 | 7 | 7 | 19 |
+| Both l10 | 0 | 0 | 0 | cumulative review |
+
+The p1/p2/p4 relation IDs remain exactly those in `data/artCurriculum.ts`.
+There are 28 added historical work entries (84 facts) and six added movement
+examples; two example identities are shared with historical lessons and one
+historical work was already a movement example. The total is 32 additional
+canonical work identities (153 overall), not 34 unrelated objects.
+
+Historical additions are in `progressionWorks.ts`; sources include National
+Gallery, Met, MoMA, Louvre, Vatican Museums, Getty and the relevant collection
+foundations. Technical vocabulary uses National Gallery, MoMA, V&A, Getty and
+MFA CAMEO dictionaries and teaching resources. Individual URLs, accession/version
+identities and locators are retained with every fact. The tooling review label
+explicitly disclaims independent human approval.
+
+Dates preserve current catalogue precision: Van Dyck's Charles I is about
+1638–1639; Rubens's NG194 is probably 1632–1635; Manet's London Maximilian is the
+specific fragmentary version. Diana distinguishes creation from casting; William
+is the Met faience hippopotamus; Seated Scribe is the Louvre limestone original.
+The Gates of Paradise are original museum-held doors. Omero's Donatello source
+is assessed via its original-work metadata, never as the date of its plaster copy.
+
+New terminology has concise source-compared definitions and short matching
+labels. Meaning contrasts concern the definition of a named term, not an
+assertion that artistic processes or styles cannot coexist. Hierarchical or
+plausibly overlapping comparisons remain unknown, including relief/low relief,
+shape/geometric shape and chasing/metal chiseling. Getty's source-specific
+brazing/soldering terminology retains visible qualifiers; casting from life is
+explicitly distinguished from burnout life-casting. New terms do not acquire
+negatives automatically.
+
+Movement examples and pioneers retain their original-formative-context scope.
+Negative chronology comparisons include both positive source references.
+Contemporary or overlapping associations remain unknown: Matisse and Ernst are
+not excluded from Pop merely because their primary movements differ.
+
+Twenty attempts across all 300 combinations pass in both delivery modes:
+6,000/6,000 text requests and 6,000/6,000 development-image requests. Fresh-learner
+sequential sweeps independently pass another 6,000/6,000 per mode, with zero
+prerequisite blocks, zero new review introductions and zero detected violations.
+This is finite deterministic coverage, not a proof about all possible seeds or
+independent external historical certification.
+
+No image assets or bindings were added. Existing approved-for-staging assets
+remain staging-only; existing development delivery stays development-only.
+New recognition facts use source-checked authored descriptions, not runtime
+summaries. No production image approval is implied by content readiness.
+
+## Original expansion report (pre-six-fact progression)
+
 The approved curriculum configuration and its version are unchanged.
 
 ## Registration and coverage

@@ -1,6 +1,7 @@
 import { typedResponseIsSafe } from "./semanticEvidence";
 import { planAssessmentStimulus } from "../images/assessmentImages";
-import { getAssessmentTemplate } from "./assessmentTemplates";
+import { getAssessmentTemplate, getMatchingLabel } from "./assessmentTemplates";
+import { getAnswerLabel, presentationProblems } from "./learnerText";
 import { isPermanentlyLockable } from "./matchingSafety";
 import type { Concept, Exercise, MatchingExercise } from "./conceptTypes";
 import { hasRelationTemplate } from "./templates";
@@ -30,7 +31,7 @@ function uniqueCandidates(candidates: readonly Concept[], context: SemanticConte
   const forms = new Set<string>();
   return candidates.filter((candidate) => {
     const answer = context.claim(candidate).answer;
-    const display = normalizeSemanticText(answer.text);
+    const display = normalizeSemanticText(getAnswerLabel(candidate)).toLowerCase();
     const exact = answer.forms.map((text) => `exact:${normalizeSemanticText(text)}`);
     const folded = answer.caseSensitive ? [] : answer.forms.map((text) => `fold:${normalizeSemanticText(text).toLowerCase()}`);
     // Conservative alias deduplication is linear in the number of display forms.
@@ -44,25 +45,25 @@ function uniqueCandidates(candidates: readonly Concept[], context: SemanticConte
 export function getExerciseCapabilities(concept: Concept, pool: readonly Concept[], context: SemanticContext, optionCount = 3): ExerciseCapabilities {
   const policy = getRelationPolicy(concept.relation, context.policies);
   const claim = context.claim(concept);
-  const metadataErrors = context.strategies[policy.semanticStrategy]?.validateMetadata(claim, context) ?? ["Unknown semantic strategy"];
+  const metadataErrors = [...new Set([...(context.strategies[policy.semanticStrategy]?.validateMetadata(claim, context) ?? ["Unknown semantic strategy"]), ...presentationProblems(claim, context)])];
   const enabled = policy.status !== "blocked-pending-metadata" && metadataErrors.length === 0 && hasRelationTemplate(concept.relation) && !!concept.object.trim();
   const candidates = pool.filter((candidate) => candidate.id !== concept.id &&
-    normalizeSemanticText(candidate.object) !== normalizeSemanticText(concept.object));
+    normalizeSemanticText(getAnswerLabel(candidate)).toLowerCase() !== normalizeSemanticText(getAnswerLabel(concept)).toLowerCase());
   const decisions = new Map(candidates.map((c) => [c, context.evaluate(concept, c)]));
   const accepted = context.acceptedAnswers(concept);
   const displayIsAccepted = (candidate: Concept) => accepted.some((answer) => answer.forms.some((text) => {
-    const display = normalizeSemanticText(candidate.object), form = normalizeSemanticText(text);
+    const display = normalizeSemanticText(getAnswerLabel(candidate)), form = normalizeSemanticText(text);
     return answer.caseSensitive ? display === form : display.toLowerCase() === form.toLowerCase();
   }));
   const displays = new Map<string, Concept[]>();
   for (const c of candidates) {
-    const key = normalizeSemanticText(c.object);
+    const key = normalizeSemanticText(getAnswerLabel(c)).toLowerCase();
     const group = displays.get(key) ?? []; group.push(c); displays.set(key, group);
   }
   const allowed = candidates.filter((c) => {
     const verdict = decisions.get(c)!.verdict;
     return verdict === "invalid" && !displayIsAccepted(c) &&
-      displays.get(normalizeSemanticText(c.object))!.every((other) =>
+      displays.get(normalizeSemanticText(getAnswerLabel(c)).toLowerCase())!.every((other) =>
         context.claim(other).answer.identity === context.claim(c).answer.identity || decisions.get(other)!.verdict === "invalid");
   });
   // Filtering and deduplication precede sampling within each preferred bucket.
@@ -123,7 +124,8 @@ export function generateExercise(
   const type = form === "true" || form === "false" ? "true_false" : form === "mcq" ? "mcq" : "fill_blank";
   const presentation = planAssessmentStimulus(concept, context, type);
   if (!presentation.available) return { status: "unavailable", reason: presentation.reason, conceptId: concept.id };
-  const base = { conceptId: concept.id, answerText: concept.object, direction: concept.assessment?.direction ?? "forward" as const,
+  const answerText = getAnswerLabel(concept);
+  const base = { conceptId: concept.id, answerText, direction: concept.assessment?.direction ?? "forward" as const,
     factId: concept.assessment?.factId ?? concept.id, ...(presentation.stimulus ? { stimulus: presentation.stimulus } : {}) };
   if (form === "true" || form === "false") {
     const substitute = form === "false" ? seededShuffle(capabilities.falseCandidates, `${seed}:false`)[0] : undefined;
@@ -131,16 +133,17 @@ export function generateExercise(
       return { status: "unavailable", conceptId: concept.id, reason: "False assertion lost semantic certification" };
     }
     return { status: "generated", form, exercise: { ...base, type: "true_false", correctAnswer: form === "true",
-      statement: template.statement(concept.subject, substitute?.object ?? concept.object, concept.context) } };
+      ...(form === "false" ? { correctStatement: template.statement(concept.subject, answerText, concept.context) } : {}),
+      statement: template.statement(concept.subject, substitute ? getAnswerLabel(substitute) : answerText, concept.context) } };
   }
   const picked = seededShuffle(capabilities.optionCandidates, `${seed}:negatives`).slice(0, optionCount - 1);
   if ((form === "mcq" || form === "blank_options") && (picked.length !== optionCount - 1 ||
       picked.some((c) => context.evaluate(concept, c).verdict !== "invalid"))) {
     return { status: "unavailable", conceptId: concept.id, reason: "Options lost semantic certification" };
   }
-  const distractors = picked.map((c) => c.object);
-  const options = seededShuffle([concept.object, ...distractors], `${seed}:options`);
-  const correctIndex = options.indexOf(concept.object);
+  const distractors = picked.map((c) => getAnswerLabel(c));
+  const options = seededShuffle([answerText, ...distractors], `${seed}:options`);
+  const correctIndex = options.indexOf(answerText);
   if (form === "mcq") return { status: "generated", form, exercise: { ...base, type: "mcq",
     prompt: template.question(concept.subject, concept.context), options, correctIndex } };
   const allowedInputModes = [
@@ -192,7 +195,7 @@ export function* matchingCandidates(
   for (const concept of concepts) {
     const policy = getRelationPolicy(concept.relation, context.policies);
     if (!planAssessmentStimulus(concept, context, "matching").available) continue;
-    if (policy.status === "blocked-pending-metadata" || !policy.allowMatching || !hasRelationTemplate(concept.relation) ||
+    if (presentationProblems(context.claim(concept), context).length || policy.status === "blocked-pending-metadata" || !policy.allowMatching || !hasRelationTemplate(concept.relation) ||
         !context.strategies[policy.semanticStrategy] || context.strategies[policy.semanticStrategy].validateMetadata(context.claim(concept), context).length) continue;
     const group = groups.get(concept.relation) ?? [];
     if (!group.some((c) => c.id === concept.id)) group.push(concept);
@@ -212,7 +215,8 @@ export function* matchingCandidates(
       const secondText = second?.kind === "text" ? second.text : second?.fallbackText;
       const indistinguishable = (firstText && secondText && normalizeSemanticText(firstText) === normalizeSemanticText(secondText)) || first && second && ((first.kind === "text" && second.kind === "text" && normalizeSemanticText(first.text) === normalizeSemanticText(second.text)) ||
         (first.kind === "image" && second.kind === "image" && (first.image.imageId === second.image.imageId || first.image.uri === second.image.uri)));
-      const result = !indistinguishable && context.claim(a).subjectIdentity !== context.claim(b).subjectIdentity &&
+      const result = !indistinguishable && normalizeSemanticText(getAnswerLabel(a, "matching")).toLowerCase() !== normalizeSemanticText(getAnswerLabel(b, "matching")).toLowerCase() &&
+        normalizeSemanticText(getMatchingLabel(a)).toLowerCase() !== normalizeSemanticText(getMatchingLabel(b)).toLowerCase() && context.claim(a).subjectIdentity !== context.claim(b).subjectIdentity &&
         normalizeSemanticText(a.subject) !== normalizeSemanticText(b.subject) && (normalizeSemanticText(aa.text) !== normalizeSemanticText(bb.text) && ((aa.caseSensitive && bb.caseSensitive) || normalizeSemanticText(aa.text).toLowerCase() !== normalizeSemanticText(bb.text).toLowerCase())) && !equivalentAnswers(aa, bb) &&
         context.evaluate(a, b).verdict !== "unknown" && context.evaluate(b, a).verdict !== "unknown";
       compatibility.set(key, result);
@@ -225,9 +229,9 @@ export function* matchingCandidates(
         const matrix = selected.map(left => selected.map(right => context.evaluate(left, right).verdict === "valid"));
         if (!isPermanentlyLockable(matrix)) return;
         const pairs = selected.map((concept) => ({
-          // The same scoped question must govern matching and ordinary forms.
-          // A bare title loses role/event qualifiers (e.g. completion vs creation).
-          id: concept.id, left: getAssessmentTemplate(concept).question(concept.subject), right: concept.object,
+          // Compact display is independent of the unchanged semantic claim and
+          // compatibility matrix; essential role/event/version scope is retained.
+          id: concept.id, left: getMatchingLabel(concept), right: getAnswerLabel(concept, "matching"),
           stimulus: planAssessmentStimulus(concept, context, "matching").stimulus,
           answerIdentity: context.claim(concept).answer.identity, caseSensitive: context.claim(concept).answer.caseSensitive,
           acceptedAnswerIdentities: [...new Set(selected.filter((candidate) => context.evaluate(concept, candidate).verdict === "valid")

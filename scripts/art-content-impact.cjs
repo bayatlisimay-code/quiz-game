@@ -9,6 +9,7 @@ const { ACTIVE_CONCEPT_SETS, activeSemanticContext: baseContext, activeRegistere
 const { catalogCoverageCases, measureGenerationCoverage } = require('../src/quizEngine/generationCoverage.ts');
 const { validateContent } = require('../src/quizEngine/contentValidation.ts');
 const { buildQuizResult } = require('../src/quizEngine/buildQuiz.ts');
+const { learnerTextDiagnostics } = require('../src/quizEngine/learnerText.ts');
 const arg = process.argv.find(a => a.startsWith('--attempts='));
 const attempts = arg ? Number(arg.split('=')[1]) : 20;
 if (!Number.isInteger(attempts) || attempts < 1) throw new Error('Positive integer attempts required');
@@ -18,6 +19,7 @@ const cases = catalogCoverageCases({ ...art, subtopics: art.subtopics.filter(s =
 const coverage = measureGenerationCoverage(cases, context, attempts);
 const validation = validateContent(activeRegisteredConcepts(), context.policies, undefined, { evidence: context.evidence, images: context.images });
 const samples = cases.filter(c => c.variant === 'A' && /_p[124]$/.test(c.id)).map(c => ({ id: c.id, result: buildQuizResult({ ...c, context, seed: `content-inspection:${c.id}` }) }));
-console.log(JSON.stringify({ attempts, records: activeRegisteredConcepts().length, imageBindings: Object.keys(context.images.bindings).length, coverage, validation, samples }, null, 2));
+const readability = samples.flatMap(sample => sample.result.exercises.flatMap(exercise => learnerTextDiagnostics(exercise).map(warning => ({ quizId: sample.id, type: exercise.type, ...warning }))));
+console.log(JSON.stringify({ attempts, records: activeRegisteredConcepts().length, imageBindings: Object.keys(context.images.bindings).length, coverage, validation, readability: { sampleQuizzes: samples.length, warnings: readability.length, longest: [...readability].sort((a,b) => b.words-a.words).slice(0,10) }, samples }, null, 2));
 // Shortages are reported, never hidden. Release gate optionally requires all ready.
 if (coverage.counts.failures || validation.some(i => i.severity === 'error') || (process.argv.includes('--require-ready') && coverage.counts.insufficient)) process.exitCode = 1;
