@@ -230,6 +230,18 @@ export function buildQuizResult(request: QuizRequest): QuizGenerationResult {
                 message: `${type}: needs ${required[type]} distinct eligible facts, has ${available[type]} (negative evidence and form policy required)` });
     if (session.assessable.length < 6)
         shortages.push({ code: "distinct-facts", message: `Six assessable facts required; has ${session.assessable.length}` });
+    // The ordinary planner already requires review questions from at least two
+    // teaching groups when the review covers several groups. If only one group
+    // has assessable facts, no matching selection or ordinary permutation can
+    // satisfy that rule. Report the proven shortage before bounded search rather
+    // than exhaust its budget and incorrectly leave feasibility undetermined.
+    if (session.mode === "review") {
+        const requiredGroups = Math.min(2, new Set(session.source.map(teachingGroup)).size);
+        const availableGroups = new Set(session.assessable.map(teachingGroup)).size;
+        if (availableGroups < requiredGroups)
+            shortages.push({ code: "joint-composition", needed: requiredGroups, available: availableGroups,
+                message: `Review requires assessable facts from ${requiredGroups} teaching groups; only ${availableGroups} have safe exercise forms` });
+    }
     if (shortages.length)
         return failure();
     if (request.learnedFactIds !== undefined) {

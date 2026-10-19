@@ -1,5 +1,77 @@
 {
   "schemaVersion": 1,
-  "assets": [],
-  "bindings": []
+  "assets": [
+    {
+      "imageId": "architecture-201",
+      "provenance": {
+        "candidateIdentity": "architecture:colosseum",
+        "source": "Metropolitan Museum of Art Open Access",
+        "sourceUrl": "https://www.metmuseum.org/art/collection/search/268995",
+        "originalImageUrl": "https://images.metmuseum.org/CRDImages/ph/web-large/DP356054.jpg",
+        "creator": null,
+        "retrievedAt": "2026-10-16T09:28:32.497033+00:00",
+        "license": {
+          "status": "CC0",
+          "evidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "rightsNotes": "The specific Met photograph 46.1.51 is marked Public Domain; its API record has isPublicDomain=true. The Met Open Access policy releases this digital image under CC0 for unrestricted commercial use, modification and distribution without attribution obligations. This is an 1850s photograph of ancient ruins, not a claim that all modern architectural photographs are unrestricted.",
+        "evidenceRefs": [
+          "https://www.metmuseum.org/art/collection/search/268995",
+          "https://www.metmuseum.org/policies/image-resources",
+          "https://collectionapi.metmuseum.org/public/collection/v1/objects/268995"
+        ]
+      },
+      "stagingApproval": {
+        "reviewedBy": "Codex institutional metadata and downloaded-pixel comparison (not independent human editorial approval)",
+        "reviewedAt": "2026-10-16T09:28:32.497033+00:00",
+        "candidateIdentity": "architecture:colosseum",
+        "collection": "Metropolitan Museum of Art",
+        "version": "Met46.1.51; unknown British photographer,1850s; surviving Colosseum ruins",
+        "identityEvidenceUrl": "https://www.metmuseum.org/art/collection/search/268995",
+        "rightsEvidenceUrl": "https://www.metmuseum.org/policies/image-resources",
+        "rightsBasis": "The specific Met photograph 46.1.51 is marked Public Domain; its API record has isPublicDomain=true. The Met Open Access policy releases this digital image under CC0 for unrestricted commercial use, modification and distribution without attribution obligations. This is an 1850s photograph of ancient ruins, not a claim that all modern architectural photographs are unrestricted.",
+        "scope": "digital-image",
+        "commercialUse": true,
+        "modification": true,
+        "distribution": true,
+        "attributionRequired": false,
+        "unresolvedRestrictions": [],
+        "visualReview": "reviewed-no-watermark-no-answer-caption",
+        "sourceSha256": "ab7a6a50977463b60262a318617e4b8639ea98d04fc17ad327035409dd3cc388"
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Verified CC0 historical photograph prepared for development staging; no production approval.",
+      "staged": {
+        "path": "assets/staged-art/architecture-201-7d936f64dd14.jpg",
+        "width": 599,
+        "height": 478,
+        "sourceWidth": 599,
+        "sourceHeight": 478,
+        "sha256": "7d936f64dd14668c5bf08d343a235dba5b18ded22bb12b279514bd4ef9f7cdb8",
+        "sourceSha256": "ab7a6a50977463b60262a318617e4b8639ea98d04fc17ad327035409dd3cc388",
+        "mimeType": "image/jpeg"
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "conceptId": "art_architecture_l3_p1_colosseum",
+      "imageId": "architecture-201",
+      "candidateIdentity": "architecture:colosseum",
+      "altText": "A historic photograph shows tiered arcades around an ancient amphitheatre’s ruins.",
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "recognition": {
+        "answerId": "architecture:colosseum",
+        "answerLeakageReviewed": true
+      },
+      "reviewStatus": "needs-review",
+      "reviewReason": "Historic ruin identity and no answer caption checked; development hosting only after byte verification."
+    }
+  ]
 }

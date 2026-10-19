@@ -10,7 +10,8 @@ import { createSemanticContext } from '../semanticValidation';
 import { validateContent } from '../contentValidation';
 import type { Concept } from '../conceptTypes';
 
-const definitions = approvedArtContent.filter(c => c.assessment?.presentation?.answer);
+// Preserve the 143 reviewed baseline forms; new subtopics have their own content regressions.
+const definitions = approvedArtContent.filter(c => ['painting','sculpture'].includes(c.subtopicId) && c.assessment?.presentation?.answer);
 const movements = approvedArtContent.filter(c => c.subtopicId === 'painting' && c.levelId === 'l1' && c.partId === 'p1');
 
 test('reviewed short definitions retain their canonical facts, positive evidence and discriminating features', () => {

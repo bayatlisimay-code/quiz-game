@@ -1,4 +1,4 @@
-import type { Concept, Exercise } from "./conceptTypes";
+import type { Concept, Exercise, MatchingPair } from "./conceptTypes";
 import type { SemanticClaim, SemanticContext } from "./semanticValidation";
 
 /** Common to every semantic strategy: declaring a short label cannot bypass
@@ -29,6 +29,13 @@ export function getAnswerLabel(concept: Concept, form: "ordinary" | "matching" =
   return form === "matching" ? wording.matchingText ?? wording.text : wording.text;
 }
 
+/** Recognition is assessed from the reviewed clue/image itself. Its internal
+ * subject label can contain a work key and must never become a caption. Other
+ * matching families retain their compact labels and historical qualifiers. */
+export function getMatchingCardLabel(pair: MatchingPair): string | undefined {
+  return pair.stimulus ? undefined : pair.left;
+}
+
 export type TextLengthDiagnostic = Readonly<{ field: string; words: number; target: number; text: string }>;
 export function wordCount(text: string): number {
   return text.trim().split(/\s+/u).filter(word => /[\p{L}\p{N}]/u.test(word)).length;
@@ -36,7 +43,13 @@ export function wordCount(text: string): number {
 /** Editorial warnings, never eligibility limits. Retain essential long text. */
 export function learnerTextDiagnostics(exercise: Exercise): TextLengthDiagnostic[] {
   const fields: { field: string; text: string; target: number }[] = exercise.type === "matching"
-    ? exercise.pairs.flatMap((pair, i) => [{ field: `pairs[${i}].left`, text: pair.left, target: 8 }, { field: `pairs[${i}].right`, text: pair.right, target: 8 }])
+    ? exercise.pairs.flatMap((pair, i) => {
+      const label = getMatchingCardLabel(pair);
+      const clue = pair.stimulus?.kind === "text" ? pair.stimulus.text : pair.stimulus?.fallbackText;
+      return [...(label ? [{ field: `pairs[${i}].left`, text: label, target: 8 }] : []),
+        ...(clue ? [{ field: `pairs[${i}].stimulus`, text: clue, target: 18 }] : []),
+        { field: `pairs[${i}].right`, text: pair.right, target: 8 }];
+    })
     : exercise.type === "true_false" ? [{ field: "statement", text: exercise.statement, target: 20 }]
     : [{ field: "prompt", text: exercise.prompt, target: 18 }, ...(exercise.options ?? []).map((text, i) => ({ field: `options[${i}]`, text, target: 15 }))];
   if (exercise.type !== "matching" && exercise.stimulus) {

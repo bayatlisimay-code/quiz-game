@@ -22,7 +22,7 @@ test('184 additional sourced facts complete 54 placements without duplicate IDs 
   const works = progressionWorkConcepts;
   const terms = [...progressionPaintingTermSets,...progressionSculptureTermSets].flatMap(s=>s.concepts);
   expect(works).toHaveLength(84); expect(terms).toHaveLength(82); expect(progressionMovementSet.concepts).toHaveLength(18);
-  expect(approvedArtContent).toHaveLength(598);
+  expect(approvedArtContent.filter(c=>['painting','sculpture'].includes(c.subtopicId))).toHaveLength(598);
   for(const subtopic of ['painting','sculpture']) for(let level=1;level<=9;level++) for(const part of ['p1','p2','p4']) {
     const teaching=pool(subtopic,`l${level}`,part);
     expect(new Set(teaching.map(c=>factIdentity(c,context))).size).toBe(teaching.length);

@@ -10,6 +10,7 @@ import { ACTIVE_CONCEPT_SETS as CONCEPT_SETS, activeSemanticContext } from "../.
 import { lessonAccess } from "../../../../../../../src/state/lessonAccess";
 import { withoutFailedImages } from "../../../../../../../src/images/assessmentImages";
 import { AssessmentStimulus } from "../../../../../../../components/quiz/AssessmentStimulus";
+import { getMatchingCardLabel } from "../../../../../../../src/quizEngine/learnerText";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -900,6 +901,7 @@ if (exercises.length === 0) {
         <View style={styles.matchingWrap}>
           <View style={styles.matchingColumn}>
             {shuffledMatchingLefts.map((leftItem, leftIndex) => {
+              const displayLabel = getMatchingCardLabel(leftItem.pair);
               const isSelected = selectedLeft === leftIndex;
               const isMatched = matchedPairs[leftIndex] !== undefined;
 
@@ -930,14 +932,14 @@ if (exercises.length === 0) {
                   ]}
                 >
                   {leftItem.pair.stimulus && <AssessmentStimulus stimulus={leftItem.pair.stimulus} onUnavailable={imageUnavailable} />}
-                  <Text
+                  {displayLabel && <Text
                     style={[
                       styles.matchingItemText,
                       isMatchCorrect && styles.matchingItemTextFaded,
                     ]}
                   >
-                    {leftItem.text}
-                  </Text>
+                    {displayLabel}
+                  </Text>}
                 </Pressable>
               );
             })}

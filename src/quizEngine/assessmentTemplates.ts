@@ -21,6 +21,8 @@ export function getMatchingLabel(concept: Concept): string {
   const definition = relationDefinitions[concept.relation];
   if (!definition || !concept.assessment) return getAssessmentTemplate(concept).question(concept.subject);
   const scope = getVisibleAssessmentScope(concept);
+  const focus = concept.assessment.focus;
+  if (focus) return `${concept.subject} — ${focus.kind === "project-credit" ? `${focus.action ?? "designed"} ` : ""}${focus.label}${scope ? ` — ${scope}` : ""}`;
   const details: string[] = [];
   // This explicit semantic contract already names the assessed field. Render
   // its meaning compactly; unknown/custom scopes retain their authored text.
@@ -54,6 +56,10 @@ export function getAssessmentTemplate(concept: Concept): RelationTemplate {
     question: `Which ${concept.assessment.catalogueField} is listed for “{s}”?`,
     statement: `The collection account lists the ${concept.assessment.catalogueField} of “{s}” as {a}.`,
     blank: `The collection account lists the ${concept.assessment.catalogueField} of “{s}” as _____.`,
+  } : definition.family === "date" && concept.semantic?.qualifiers?.datePrecision === "decade" ? {
+    question: `In which decade did the ${concept.assessment.event} of “{s}” take place?`,
+    statement: `The ${concept.assessment.event} of “{s}” took place in the {a}.`,
+    blank: `The ${concept.assessment.event} of “{s}” took place in the _____.`,
   } : definition.family === "date" && concept.assessment.event ? concept.assessment.dateInterpretation === "catalogue-label" ? {
     question: `Which ${concept.assessment.event} date or range is listed for “{s}”?`,
     statement: `The collection entry lists the ${concept.assessment.event} date or range of “{s}” as {a}.`,
@@ -84,7 +90,27 @@ export function getAssessmentTemplate(concept: Concept): RelationTemplate {
     },
   } : undefined;
   const attributionWording = qualified ?? creatorWording;
-  const wording = concept.assessment.direction === "reverse" ? attributionWording?.inverse ?? definition.inverse : attributionWording ?? dateWording;
+  const focus = concept.assessment.focus;
+  const creditAction = focus?.action === "founded" ? "founding" : focus?.action === "developed" ? "developing" : "designing";
+  const contributor = focus?.collectiveCredit ? "team" : "contributor";
+  const focused = focus?.kind === "example-credit" ? {
+    question: `Which {s} example is credited to ${focus.label}?`,
+    statement: `“{a}” exemplifies {s} and is credited to ${focus.label}.`,
+    blank: `An example of {s} credited to ${focus.label} is _____.`,
+  } : focus?.kind === "project-credit" ? {
+    question: `Which {s} ${contributor} is credited with ${creditAction} “${focus.label}”?`,
+    statement: `{a} is credited with ${creditAction} “${focus.label}”, contributing to {s}.`,
+    blank: `The {s} ${contributor} credited with ${creditAction} “${focus.label}” was _____.`,
+  } : focus?.kind === "project-field" ? {
+    question: `Which field describes {s}’s work on “${focus.label}”?`,
+    statement: `{s}’s work on “${focus.label}” demonstrates {a}.`,
+    blank: `{s}’s work on “${focus.label}” demonstrates _____.`,
+  } : focus?.kind === "project-period" ? {
+    question: `Which period is documented for {s}’s “${focus.label}”?`,
+    statement: `{s}’s “${focus.label}” has this documented dating: {a}.`,
+    blank: `{s}’s “${focus.label}” has this documented dating: _____.`,
+  } : undefined;
+  const wording = concept.assessment.direction === "reverse" ? attributionWording?.inverse ?? definition.inverse : focused ?? attributionWording ?? dateWording;
   if (!wording) throw new Error(`Unsupported inverse wording: ${concept.relation}`);
   const scope = getVisibleAssessmentScope(concept);
   const render = (text: string, subject: string, answer: string) => {

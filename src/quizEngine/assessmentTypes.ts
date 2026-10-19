@@ -14,7 +14,7 @@ export type EvidenceReview = Readonly<{
 type ScopedEvidence = EvidenceReview & { readonly predicateId: string; readonly qualifiers: EvidenceScope };
 export type SemanticEvidence =
   | (ScopedEvidence & { readonly kind: "assertion"; readonly subjectId: string; readonly valueId: string; readonly verdict: "valid" | "invalid" })
-  | (ScopedEvidence & { readonly kind: "complete-set"; readonly subjectId: string; readonly valueIds: readonly string[]; readonly valueType: EntityType })
+  | (ScopedEvidence & { readonly kind: "complete-set"; readonly subjectId: string; readonly valueIds: readonly string[]; readonly valueType: EntityType; readonly valueTypes?: readonly EntityType[] })
   | (ScopedEvidence & { readonly kind: "disjoint-values"; readonly leftId: string; readonly rightId: string })
   | (ScopedEvidence & { readonly kind: "broader-value"; readonly childId: string; readonly parentId: string })
   | (ScopedEvidence & { readonly kind: "date-bound"; readonly subjectId: string; readonly start: number; readonly end: number; readonly calendar: "gregorian-proleptic" });
@@ -48,6 +48,9 @@ export type AssessmentContract = Readonly<{
   factId?: string;
   // Explicit source-field assessment; not an unqualified exclusive membership.
   catalogueField?: "cultural attribution" | "dating label";
+  // A sourced project narrows an otherwise open association. This never grants
+  // exclusivity: negatives still require evidence for the exact qualified claim.
+  focus?: Readonly<{ kind: "example-credit" | "project-credit" | "project-field" | "project-period"; identity: string; label: string; action?: "designed" | "founded" | "developed"; collectiveCredit?: true }>;
   scope?: AssessmentScope;
   // Presentation never changes claim identity, negative evidence or typed forms.
   presentation?: Readonly<{

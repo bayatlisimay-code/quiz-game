@@ -11,7 +11,7 @@ const datasets: ImageCurationDataset[] = readdirSync('data/imageCuration/art').f
 
 test('actual staged derivatives pass offline identity, license, byte, metadata, size and concept checks', () => {
   const result=execFileSync(process.execPath,['scripts/art-image-assets.cjs','--check'],{encoding:'utf8'});
-  expect(JSON.parse(result)).toEqual({assets:18,staged:18,approved:0,stagingApproved:18});
+  expect(JSON.parse(result)).toEqual({assets:19,staged:19,approved:0,stagingApproved:19});
   for (const dataset of datasets) for(const asset of dataset.assets) {
     const bytes=readFileSync(asset.staged!.path);
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(asset.staged!.sha256);

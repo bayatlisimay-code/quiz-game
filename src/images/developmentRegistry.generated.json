@@ -4,6 +4,28 @@
     "pub-a72f4936681e4dce8a6a120c82b56187.r2.dev"
   ],
   "bindings": {
+    "art_architecture_l3_p1_colosseum": {
+      "reviewStatus": "approved",
+      "conceptId": "art_architecture_l3_p1_colosseum",
+      "recognition": {
+        "answerId": "architecture:colosseum",
+        "answerLeakageReviewed": true
+      },
+      "allowedExerciseTypes": [
+        "mcq",
+        "true_false",
+        "fill_blank",
+        "matching"
+      ],
+      "image": {
+        "licenseStatus": "CC0",
+        "imageId": "architecture-201",
+        "uri": "https://pub-a72f4936681e4dce8a6a120c82b56187.r2.dev/art/v1/architecture-201/7d936f64dd14668c5bf08d343a235dba5b18ded22bb12b279514bd4ef9f7cdb8.jpg",
+        "width": 599,
+        "height": 478,
+        "altText": "A historic photograph shows tiered arcades around an ancient amphitheatre’s ruins."
+      }
+    },
     "art_painting_l2_p1_ng186": {
       "reviewStatus": "approved",
       "conceptId": "art_painting_l2_p1_ng186",

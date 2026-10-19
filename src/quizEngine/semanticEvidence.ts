@@ -16,6 +16,7 @@ export function evidenceProblems(evidence: readonly SemanticEvidence[]): string[
     if (!/^https:\/\//.test(item.sourceUrl) || !item.locator.trim()) errors.push(`Missing source locator: ${item.id}`);
     if (item.reviewStatus === "verified" && (!item.reviewedBy?.trim() || !item.reviewedAt || !Number.isFinite(Date.parse(item.reviewedAt)))) errors.push(`Missing evidence review: ${item.id}`);
     if (item.kind === "complete-set" && (!item.valueIds.length || new Set(item.valueIds).size !== item.valueIds.length)) errors.push(`Invalid complete set: ${item.id}`);
+    if (item.kind === "complete-set" && item.valueTypes && (!item.valueTypes.includes(item.valueType) || new Set(item.valueTypes).size !== item.valueTypes.length)) errors.push(`Invalid complete-set type domain: ${item.id}`);
     if (item.kind === "date-bound" && (!Number.isSafeInteger(item.start) || !Number.isSafeInteger(item.end) || item.start > item.end)) errors.push(`Invalid temporal bound: ${item.id}`);
     if (item.kind === "disjoint-values" && item.leftId === item.rightId) errors.push(`Self-disjoint value: ${item.id}`);
     return errors;
@@ -66,7 +67,7 @@ function applicable(claim: SemanticClaim, context: SemanticContext): readonly Se
   const source: readonly SemanticEvidence[] = claim.predicate.startsWith("inverse:") ? context.evidence.flatMap((item): SemanticEvidence[] => {
     if (item.predicateId !== claim.predicate.slice(8)) return [];
     if (item.kind === "assertion") return [{ ...item, predicateId: claim.predicate, subjectId: item.valueId, valueId: item.subjectId }];
-    if (item.kind === "complete-set" && item.valueType === claim.assessment?.subjectType && subjectId(claim)) {
+    if (item.kind === "complete-set" && (item.valueType === claim.assessment?.subjectType || !!claim.assessment?.subjectType && !!item.valueTypes?.includes(claim.assessment.subjectType)) && subjectId(claim)) {
       return [{ ...item, kind: "assertion", predicateId: claim.predicate, subjectId: subjectId(claim)!, valueId: item.subjectId,
         verdict: item.valueIds.includes(subjectId(claim)!) ? "valid" : "invalid" }];
     }
@@ -108,10 +109,16 @@ export const reviewedEvidenceStrategy: SemanticStrategy = Object.freeze({
     if (qualifierKeys.length && (!a.scope?.text.trim() || qualifierKeys.some(k => !a.scope?.qualifierKeys.includes(k)))) errors.push("Every truth qualifier must be covered by authored visible scope wording");
     if ((a.direction === "reverse") !== claim.predicate.startsWith("inverse:")) errors.push("Question direction must agree with its oriented semantic predicate");
     const family = claim.metadata.family;
+    if (a.focus && (!a.focus.label.trim() || !a.focus.identity.trim() || a.direction === "reverse" ||
+      ({"example-credit":"example", "project-credit":"representative", "project-field":"membership", "project-period":"period"}[a.focus.kind] !== family) ||
+      (a.focus.kind === "example-credit" ? claim.qualifiers.creditId !== a.focus.identity : claim.qualifiers.projectId !== a.focus.identity))) errors.push("Project focus must agree with the qualified claim and supported direction/family");
+    if (a.focus?.kind === "project-credit" && claim.qualifiers.creditAction !== (a.focus.action ?? "designed")) errors.push("Credit wording must retain the evidenced project role");
+    if (a.focus?.collectiveCredit && (a.focus.kind !== "project-credit" || a.valueType !== "group" || claim.qualifiers.creditBasis !== "named-collective-project-credit")) errors.push("A collective credit must assess the named group, not all individual participants");
     if (family === "date" && a.direction !== "reverse" && !["date", "period"].includes(a.valueType)) errors.push("Date questions require a temporal value identity");
     if (family === "creator" && (!a.attribution || a.attribution.role !== claim.metadata.creatorRole || a.attribution.status === "disputed" || claim.qualifiers.role !== a.attribution.role || claim.qualifiers.attributionStatus !== a.attribution.status)) errors.push("Qualified role and non-disputed attribution required");
     if (family === "date" && (!a.event || !(claim.metadata.allowedEvents as readonly string[] | undefined)?.includes(a.event) || claim.qualifiers.event !== a.event)) errors.push("Qualified historical event required");
     if (family === "date" && ((a.dateInterpretation === "catalogue-label") !== (claim.qualifiers.dateBasis === "catalogue-label"))) errors.push("Catalogue dating identity requires explicit source-qualified wording");
+    if (family === "date" && claim.qualifiers.datePrecision === "decade" && (!ownDate || ownDate.start % 10 !== 0 || ownDate.end !== ownDate.start + 9 || a.valueType !== "period")) errors.push("Decade assessment requires a reviewed ten-year calendar interval");
     if (a.event === "casting" && !claim.qualifiers.versionId) errors.push("Casting dates require the exact cast/version identity");
     if (family === "country" && (a.geography !== "present-day" || claim.qualifiers.countryConvention !== "present-day" || a.valueType !== "country")) errors.push("Present-day country convention required");
     if (family === "first-work" && (!a.firstWork?.wellEstablished || claim.qualifiers.firstWorkCriterion !== a.firstWork.criterion)) errors.push("Well-established first-work criterion required");
@@ -147,13 +154,23 @@ export const reviewedEvidenceStrategy: SemanticStrategy = Object.freeze({
     // temporal bounds have not themselves passed the reviewed content contract.
     if (reviewedEvidenceStrategy.validateMetadata(candidate, context).length) return decision("unknown", "Candidate identity is not independently qualified");
     const id = candidate.answer.stableId;
-    if (!id || candidate.answer.entityType !== claim.assessment?.valueType) return decision("unknown", "Unresolved or incompatible answer type");
+    if (!id) return decision("unknown", "Unresolved answer identity");
     const facts = applicable(claim, context);
+    // A complete, qualified field can explicitly contain heterogeneous entities
+    // (e.g. a person or a credited studio). Never infer this domain from a family
+    // name, and never use a group ID to erase its individually valid members.
+    const inDeclaredDomain = facts.some(e => e.kind === "complete-set" && !!candidate.answer.entityType && e.valueTypes?.includes(candidate.answer.entityType));
     const direct = facts.filter(e => e.kind === "assertion" && e.subjectId === subjectId(claim) && e.valueId === id);
     const positive = direct.filter(e => e.kind === "assertion" && e.verdict === "valid");
     const negative = direct.filter(e => e.kind === "assertion" && e.verdict === "invalid");
     if (positive.length && negative.length) return decision("unknown", "Conflicting evidence; assessment quarantined", direct.map(e => e.id));
     if (positive.length) return decision("valid", "Reviewed positive assertion", positive.map(e => e.id));
+    // An explicit contradiction names this exact stable value, including its
+    // independently validated identity. A type mismatch alone proves nothing.
+    if (candidate.answer.entityType !== claim.assessment?.valueType && !inDeclaredDomain) return context.acceptedAnswersForClaim(claim).some(v => v.stableId === id)
+      ? decision("unknown", "Stored accepted alternative requires qualification; never a negative") : negative.length
+      ? decision("invalid", "Reviewed explicit cross-type contradiction", negative.map(e => e.id))
+      : decision("unknown", "Incompatible answer type without reviewed contradiction evidence");
     // Every edge is scoped and reviewed. Hierarchy proves positives, never sibling exclusion.
     const ancestors = (value: string): Set<string> => {
       const result = new Set([value]), pending = [value];
@@ -165,7 +182,7 @@ export const reviewedEvidenceStrategy: SemanticStrategy = Object.freeze({
     };
     const memberships = facts.filter(e => e.kind === "assertion" && e.subjectId === subjectId(claim) && e.verdict === "valid");
     if (memberships.some(e => e.kind === "assertion" && ancestors(e.valueId).has(id))) return negative.length ? decision("unknown", "Conflicting hierarchy evidence") : decision("valid", "Reviewed positive containment/membership", facts.map(e => e.id));
-    const complete = facts.find(e => e.kind === "complete-set" && e.subjectId === subjectId(claim) && e.valueType === candidate.answer.entityType);
+    const complete = facts.find(e => e.kind === "complete-set" && e.subjectId === subjectId(claim) && (e.valueType === candidate.answer.entityType || !!candidate.answer.entityType && !!e.valueTypes?.includes(candidate.answer.entityType)));
     if (complete?.kind === "complete-set" && complete.valueIds.includes(id)) return decision("valid", "Reviewed complete qualified answer set", [complete.id]);
     // Known registered alternatives always block a negative, even if evidence is incomplete.
     if (context.acceptedAnswersForClaim(claim).some(v => v.stableId === id)) return decision("unknown", "Stored accepted alternative requires qualification; never a negative");
