@@ -1,0 +1,36 @@
+import { classicNovels } from './literatureClassics';
+import { modernNovels } from './literatureModernNovels';
+import { literaryFact, literarySource as s, pg, type LiteraryWork } from './literaryAuthoring';
+import { joinSets } from './sourceAuthoring';
+import { reviewedDefinitions, reviewedCohort } from './reviewedDefinitions';
+
+const mw=(word:string,locator:string)=>s(`https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`,locator,'Merriam-Webster');
+const osu=(slug:string)=>s(`https://liberalarts.oregonstate.edu/wlf/${slug}`,'Definition and literary examples; authored instructional article','Oregon State University');
+const work=(id:string)=>[...classicNovels,...modernNovels].find(w=>w.id===id)!;
+const swift:LiteraryWork={id:'gullivers-travels',title:'Gulliver’s Travels',author:'Jonathan Swift',authorId:'person:jonathan-swift',source:pg(829),priority:3};
+type Genre=Readonly<{id:string;name:string;meaning:string;definition:ReturnType<typeof s>;example:LiteraryWork;classification:ReturnType<typeof s>}>;
+export const literaryGenreStudies:readonly Genre[]=[
+ {id:'bildungsroman',name:'Bildungsroman',meaning:'A novel tracing a young person’s formation and growth toward maturity.',definition:osu('what-bildungsroman-definition-examples'),example:work('jane-eyre'),classification:osu('what-bildungsroman-definition-examples')},
+ {id:'epistolary',name:'Epistolary fiction',meaning:'Fiction told through letters or other documents.',definition:osu('what-epistolary-novel'),example:work('dracula'),classification:pg(345)},
+ {id:'gothic',name:'Gothic fiction',meaning:'Fiction characterised by remote settings and mysterious or violent events.',definition:mw('Gothic','Adjective sense 3, the literary rather than architectural sense'),example:work('wuthering-heights'),classification:s('https://www.bronte.org.uk/the-lives-of-the-brontes/the-bronte-novels','Wuthering Heights: nightmarish Gothic elements; publication date not taken from this page','Brontë Parsonage Museum')},
+ {id:'science-fiction',name:'Science fiction',meaning:'Fiction in which real or imagined science centrally shapes people or society.',definition:mw('science fiction','Noun definition: impact of actual or imagined science'),example:work('frankenstein'),classification:pg(84)},
+ {id:'fantasy',name:'Fantasy',meaning:'Imaginative fiction featuring strange worlds or extraordinary beings.',definition:mw('fantasy','Noun sense 2b: fantasy fiction'),example:work('wonderful-wizard-oz'),classification:pg(55)},
+ {id:'historical',name:'Historical fiction',meaning:'Fiction set in an earlier period, often involving historical people or events.',definition:mw('historical novel','Noun definition; past setting distinguished from date of writing'),example:work('scarlet-letter'),classification:pg(25344)},
+ {id:'adventure',name:'Adventure fiction',meaning:'Fiction centred on exciting and dangerous experiences.',definition:s('https://dictionary.cambridge.org/us/dictionary/english/adventure','Adventure: exciting, unusual and sometimes dangerous experience; applied to a narrative form','Cambridge Dictionary'),example:work('huckleberry-finn'),classification:pg(76)},
+ {id:'picaresque',name:'Picaresque fiction',meaning:'An episodic story of the adventures of a usually roguish protagonist.',definition:mw('picaresque','Adjective: episodic adventures of a usually roguish protagonist'),example:work('don-quixote'),classification:pg(996)},
+ {id:'satire',name:'Satire',meaning:'Writing that uses humour or irony to expose human vice or folly.',definition:mw('satire','Noun: literary criticism of vice or folly, not humour alone'),example:swift,classification:pg(829)},
+ {id:'detective',name:'Detective fiction',meaning:'A story in which a detective investigates a murder or another crime.',definition:s('https://www.oxfordlearnersdictionaries.com/us/definition/english/detective-story','Noun definition, indexed source excerpt: crime and a detective trying to solve it','Oxford University Press'),example:work('maltese-falcon'),classification:work('maltese-falcon').genre!.source},
+ {id:'western',name:'Western',meaning:'Fiction about life in the American West, especially in the later 19th century.',definition:mw('western','Noun sense 2: literature or film about the western United States'),example:work('riders-purple-sage'),classification:work('riders-purple-sage').genre!.source},
+];
+const terms=literaryGenreStudies.map((g,i)=>({id:g.id,term:g.name,meaning:g.meaning,source:g.definition,priority:i<6?5:i<9?4:3}));
+const definitions=reviewedDefinitions('literature','l2','p1',terms,reviewedCohort(terms.map(t=>t.id),'The supplied defining meanings distinguish narrative form, organising subject and literary purpose. They do not assert mutually exclusive membership of individual books.',[
+ 'fantasy|science-fiction','fantasy|gothic','adventure|picaresque','historical|western','adventure|western','adventure|fantasy','gothic|historical',
+]));
+const examples=joinSets(literaryGenreStudies.map((g,i)=>literaryFact({subtopic:'literature',level:'l2',part:'p2',id:g.id,subject:g.name,subjectId:`literary-genre:${g.id}`,subjectType:'category',answer:g.example.title,answerId:`work:${g.example.id}`,answerType:'work',source:g.classification,qualifiers:{creditId:g.example.authorId,creditBasis:'original-text-author'},scope:'Original novel.',contract:{focus:{kind:'example-credit',identity:g.example.authorId,label:g.example.author}},priority:i<6?5:i<9?4:3,priorityReason:'Connect a genre with a named writer’s documented example.'})));
+// These negatives contradict the visible author constraint, never genre membership.
+for(const [i,target] of examples.concepts.entries())for(const [j,candidate] of examples.concepts.entries())if(i!==j&&literaryGenreStudies[i].example.authorId!==literaryGenreStudies[j].example.authorId){
+ const w=literaryGenreStudies[j].example;
+ examples.evidence.push({id:`genre-byline:${target.id}:${candidate.id}`,kind:'assertion',predicateId:target.relation,subjectId:target.semantic!.subject!.id!,valueId:candidate.semantic!.value!.id!,qualifiers:target.semantic!.qualifiers??{},verdict:'invalid',sourceUrl:w.source.url,locator:`${w.source.locator}. The original writer is ${w.author}, rather than ${literaryGenreStudies[i].example.author}. This contradicts the question’s named writer, not the genre.`,reviewStatus:'verified',reviewedBy:'Codex — source-byline comparison (not independent human editorial approval)',reviewedAt:'2026-10-19'});
+}
+const writers=joinSets(literaryGenreStudies.map((g,i)=>literaryFact({subtopic:'literature',level:'l2',part:'p4',id:g.id,subject:g.name,subjectId:`literary-genre:${g.id}`,subjectType:'category',answer:g.example.author,answerId:g.example.authorId,answerType:'person',source:g.example.source,qualifiers:{projectId:`work:${g.example.id}`,creditAction:'wrote'},scope:'Original novel.',contract:{focus:{kind:'project-credit',identity:`work:${g.example.id}`,label:g.example.title,action:'wrote'}},completeField:{valueIds:[g.example.authorId],reason:'The source identifies the original writer of this specific novel, not every writer working in the genre.'},priority:i<6?5:i<9?4:3,priorityReason:'Remember a writer through a named work, without closing the genre’s membership.'})));
+export const literaryGenreSets=[definitions,examples,writers];

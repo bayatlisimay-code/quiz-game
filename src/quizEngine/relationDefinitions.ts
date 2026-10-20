@@ -37,7 +37,7 @@ export const familyDefinitions = {
   },
   date: (event: string) => spec("date", `What is the ${event} of “{s}”?`, `The ${event} of “{s}” is {a}.`, `The ${event} of “{s}” is _____.`,
     { question: `Which work has the ${event} “{s}”?`, statement: `“{a}” has the ${event} “{s}”.`, blank: `A work with the ${event} “{s}” is _____.` }),
-  membership: (label: string) => spec("membership", `Which ${label} describes “{s}”?`, `A ${label} describing “{s}” is {a}.`, `A ${label} describing “{s}” is _____.`),
+  membership: (label: string, choices = `${label} labels`) => spec("membership", `Which of these ${choices} describes “{s}”?`, `A ${label} describing “{s}” is {a}.`, `A ${label} describing “{s}” is _____.`),
   example: (noun: string, criterion: string) => spec("example", `Which ${noun} is ${criterion} “{s}”?`, `“{a}” is ${criterion} “{s}”.`, `One ${noun} that is ${criterion} “{s}” is _____.`),
   representative: (noun: string, criterion: string) => spec("representative", `Which ${noun} was ${criterion} “{s}”?`, `{a} was ${criterion} “{s}”.`, `One ${noun} who was ${criterion} “{s}” is _____.`),
   country: (event: "birth" | "formation" | "location" | "base") => {

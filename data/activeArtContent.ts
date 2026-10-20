@@ -1,3 +1,4 @@
+import { applyApprovedGenrePrimaries } from './artContent/approvedGenrePrimaries';
 import { designIdentitySet } from './artContent/designIdentity';
 import { designMovementSets } from './artContent/designMovements';
 import { designPeopleSets } from './artContent/designPeople';
@@ -32,16 +33,32 @@ import { architectureEarlyModernSet, architectureNineteenthSet } from "./artCont
 import { architectureModernSet } from "./artContent/architectureModern";
 import { architectureContemporarySet } from "./artContent/architectureContemporary";
 import { scheduleArtLearning } from "./artContent/learningPriorities";
+import { theatreTerminologySets } from './artContent/theatreTerminology';
+import { literatureClassicsSet } from './artContent/literatureClassics';
+import { literatureAncientSet } from './artContent/literatureAncient';
+import { literatureCharacterSet } from './artContent/literatureCharacters';
+import { theatreCharacterSet } from './artContent/theatreCharacters';
+import { literaryGenreSets } from './artContent/literaryGenres';
+import { literatureShortFictionSet } from './artContent/literatureShortFiction';
+import { theatrePlaySets } from './artContent/theatrePlays';
+import { theatreGenreSets } from './artContent/theatreGenres';
+import { theatrePlaywrightSets } from './artContent/theatrePlaywrights';
+import { literatureClassicNovelistsSet } from './artContent/literatureClassicNovelists';
+import { literatureModernNovelistsSet } from './artContent/literatureModernNovelists';
+import { literatureModernNovelsSet } from './artContent/literatureModernNovels';
+import { literaturePoetrySet } from './artContent/literaturePoetry';
+import { theatreVenueSet } from './artContent/theatreVenues';
 
 // Production authoring boundary. Source-checked teaching facts, including preserved pilot originals;
 // synthetic engine fixtures never enter this list. No image approvals implied.
 // Original authored content remains intact in conceptSets.ts as reusable source material.
 const architectureDesignSets = [designIdentitySet,...designMovementSets,...designPeopleSets,designVisualSet,...designFieldSets,...designTypefaceSets,...architectureStyleSets,designFamousSet,architectureDesignTermSet,architectureFormSet,architectureConstructionSet,architectureStructureSet, designTypographySet,architectureElementSet,architectureMaterialSet,...designPrincipleSets, designProductSet,...architectureWorldSets, architectureEarlyModernSet, architectureNineteenthSet, architectureModernSet, architectureContemporarySet];
 const termSets = [progressionMovementSet, ...progressionPaintingTermSets, ...progressionSculptureTermSets];
+const literatureTheatreSets = [literatureClassicsSet,literatureAncientSet,literatureCharacterSet,theatreCharacterSet,...literaryGenreSets,literatureShortFictionSet,...theatrePlaySets,...theatreGenreSets,...theatrePlaywrightSets,literatureClassicNovelistsSet,literatureModernNovelistsSet,literatureModernNovelsSet,literaturePoetrySet,theatreVenueSet, ...theatreTerminologySets].map(applyApprovedGenrePrimaries);
 const sculpture = authorArtworkPilot(sculpturePilotWorks, "sculpture", "l3");
 const painting = authorArtworkPilot(paintingPilotWorks, "painting", "l2");
-export const approvedArtContent: readonly Concept[] = Object.freeze(scheduleArtLearning([...sculpture.concepts, ...painting.concepts, ...terminologyPilotConcepts, ...expandedArtConcepts, ...progressionWorkConcepts, ...termSets.flatMap(set => set.concepts), ...architectureDesignSets.flatMap(set => set.concepts)]));
-export const approvedArtEvidence: readonly SemanticEvidence[] = Object.freeze([...sculpture.evidence, ...painting.evidence, ...terminologyPilotEvidence, ...expandedArtEvidence, ...progressionWorkEvidence, ...termSets.flatMap(set => set.evidence), ...architectureDesignSets.flatMap(set => set.evidence)]);
+export const approvedArtContent: readonly Concept[] = Object.freeze(scheduleArtLearning([...sculpture.concepts, ...painting.concepts, ...terminologyPilotConcepts, ...expandedArtConcepts, ...progressionWorkConcepts, ...termSets.flatMap(set => set.concepts), ...architectureDesignSets.flatMap(set => set.concepts), ...literatureTheatreSets.flatMap(set => set.concepts)]));
+export const approvedArtEvidence: readonly SemanticEvidence[] = Object.freeze([...sculpture.evidence, ...painting.evidence, ...terminologyPilotEvidence, ...expandedArtEvidence, ...progressionWorkEvidence, ...termSets.flatMap(set => set.evidence), ...architectureDesignSets.flatMap(set => set.evidence), ...literatureTheatreSets.flatMap(set => set.evidence)]);
 
 export function createActiveArtSets(records: readonly Concept[]) {
   const sets: Record<string, { id: string; concepts: Concept[] }> = {};

@@ -50,7 +50,7 @@ export type AssessmentContract = Readonly<{
   catalogueField?: "cultural attribution" | "dating label";
   // A sourced project narrows an otherwise open association. This never grants
   // exclusivity: negatives still require evidence for the exact qualified claim.
-  focus?: Readonly<{ kind: "example-credit" | "project-credit" | "project-field" | "project-period"; identity: string; label: string; action?: "designed" | "founded" | "developed"; collectiveCredit?: true }>;
+  focus?: Readonly<{ kind: "example-credit" | "project-credit" | "project-field" | "project-period"; identity: string; label: string; action?: "designed" | "founded" | "developed" | "wrote"; collectiveCredit?: true }>;
   scope?: AssessmentScope;
   // Presentation never changes claim identity, negative evidence or typed forms.
   presentation?: Readonly<{

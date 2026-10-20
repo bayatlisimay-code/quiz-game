@@ -56,6 +56,10 @@ export function getAssessmentTemplate(concept: Concept): RelationTemplate {
     question: `Which ${concept.assessment.catalogueField} is listed for “{s}”?`,
     statement: `The collection account lists the ${concept.assessment.catalogueField} of “{s}” as {a}.`,
     blank: `The collection account lists the ${concept.assessment.catalogueField} of “{s}” as _____.`,
+  } : definition.family === "date" && concept.assessment.event === "first publication" && concept.semantic?.value?.temporal?.start === concept.semantic?.value?.temporal?.end && concept.semantic?.value?.temporal ? {
+    question: "In which year was “{s}” first published?",
+    statement: "“{s}” was first published in {a}.",
+    blank: "“{s}” was first published in _____.",
   } : definition.family === "date" && concept.semantic?.qualifiers?.datePrecision === "decade" ? {
     question: `In which decade did the ${concept.assessment.event} of “{s}” take place?`,
     statement: `The ${concept.assessment.event} of “{s}” took place in the {a}.`,
@@ -91,8 +95,8 @@ export function getAssessmentTemplate(concept: Concept): RelationTemplate {
   } : undefined;
   const attributionWording = qualified ?? creatorWording;
   const focus = concept.assessment.focus;
-  const creditAction = focus?.action === "founded" ? "founding" : focus?.action === "developed" ? "developing" : "designing";
-  const contributor = focus?.collectiveCredit ? "team" : "contributor";
+  const creditAction = focus?.action === "founded" ? "founding" : focus?.action === "developed" ? "developing" : focus?.action === "wrote" ? "writing" : "designing";
+  const contributor = focus?.collectiveCredit ? "team" : focus?.action === "wrote" ? "writer" : "contributor";
   const focused = focus?.kind === "example-credit" ? {
     question: `Which {s} example is credited to ${focus.label}?`,
     statement: `“{a}” exemplifies {s} and is credited to ${focus.label}.`,

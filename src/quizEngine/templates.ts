@@ -294,10 +294,9 @@ function example(kind: string): RelationTemplate {
     `An example of {s} is “{a}”.`, `An example of {s} is _____.`,
     { subject: term, answer: description });
 }
-function genre(kind: string): RelationTemplate {
-  const label = kind === "music" ? "musical" : kind === "theatre" ? "theatrical" : kind;
-  return wording(`What genre of ${kind} is {s}?`, `The ${label} genre of {s} is {a}.`,
-    `The ${label} genre of {s} is _____.`, { answer: term });
+function genre(_kind: string): RelationTemplate {
+  return wording("Which of these genres describes {s}?", "One genre describing {s} is {a}.",
+    "One genre describing {s} is _____.", { answer: term });
 }
 function known(kind: string): RelationTemplate {
   return wording(`Which ${kind} {be} {s} known for?`, `{s} {be} known for {a}.`,
@@ -513,7 +512,7 @@ const semanticFamilies = {
   sculptureTechniqueExample: wording("Which sculpture was created using {s}?", "A sculpture created using {s} is “{a}”.", "A sculpture created using {s} is _____.", { subject: term, answer: description }),
   characteristic: feature("characteristic"),
   culture: wording("Which civilization or cultural tradition produced {s}?", "{s} {belong} to the {a} tradition.", "{s} {belong} to the _____ tradition."),
-  artStyle: wording("Which artistic style does {s} exemplify?", "The artistic style of {s} is {a}.", "The artistic style of {s} is _____."),
+  artStyle: wording("Which of these styles does {s} exemplify?", "An artistic style of {s} is {a}.", "An artistic style of {s} is _____."),
   genreOrStyle: known("literary genre or style"),
   movement: wording("Which artistic tradition is reflected in the work of {s}?", "The work of {s} reflects {a}.", "The work of {s} reflects _____.", { answer: movementName }),
   designMovement: wording("Which design movement does {s} exemplify?", "{s} exemplifies {a} design.", "{s} exemplifies _____ design."),
@@ -524,7 +523,7 @@ const semanticFamilies = {
   representativePerson: representative("writer", " literature"),
   representativeWork: representativeWork("literary work", " literature"),
   designType: wording("Which design category best describes {s}?", "{s} is an example of {a}.", "{s} is an example of _____.", { answer: term }),
-  designStyle: wording("Which style or design category best describes {s}?", "The style or design category of {s} is {a}.", "The style or design category of {s} is _____.", { answer: term }),
+  designStyle: wording("Which of these styles or design categories describes {s}?", "A style or design category of {s} is {a}.", "A style or design category of {s} is _____.", { answer: term }),
   instrumentType: instrumentTemplate,
   prize: wording("Which major prize or award category is linked to {s}?", "A major prize or award category linked to {s} is {a}.", "A major prize or award category linked to {s} is _____."),
   theme: wording("Which theme is associated with {s}?", "A theme associated with {s} is {a}."),
@@ -538,10 +537,10 @@ const semanticFamilies = {
   definitionSculpture: definition("sculpture"),
   definitionSinging: definition("singing"),
   filmGenre: genre("film"),
-  paintingGenre: wording("What genre of painting {be} {s}?", "{s} {be} {a}.", "{s} {be} a _____.", { answer: (a) => lookup(paintingClasses, a) === a ? `classified in the genre “${description(a)}”` : lookup(paintingClasses, a) }),
+  paintingGenre: wording("Which of these genres describes {s}?", "{s} {be} {a}.", "{s} {be} a _____.", { answer: (a) => lookup(paintingClasses, a) === a ? `classified in the genre “${description(a)}”` : lookup(paintingClasses, a) }),
   playGenre: genre("theatre"),
   musicGenre: genre("music"),
-  bookClassification: wording("Which literary genre or classification describes {s}?", "A literary genre or classification of {s} is {a}.", "A literary genre or classification of {s} is _____.", { answer: term }),
+  bookClassification: wording("Which of these genres or classifications describes {s}?", "A literary genre or classification of {s} is {a}.", "A literary genre or classification of {s} is _____.", { answer: term }),
   architecturalFeature: feature("architectural feature"),
   designFeature: feature("design feature"),
   sculpturalFeature: feature("sculptural feature"),

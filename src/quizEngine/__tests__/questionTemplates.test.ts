@@ -81,9 +81,9 @@ const cases =
     "art_style",
     "Mona Lisa",
     "Renaissance",
-    "Which artistic style does Mona Lisa exemplify?",
-    "The artistic style of Mona Lisa is Renaissance.",
-    "The artistic style of Mona Lisa is _____."
+    "Which of these styles does Mona Lisa exemplify?",
+    "An artistic style of Mona Lisa is Renaissance.",
+    "An artistic style of Mona Lisa is _____."
   ],
   [
     "definition_of_music_term",
@@ -267,9 +267,9 @@ const naturalCases = [
   ["housed_in", "Mona Lisa", "Louvre Museum", "Where is Mona Lisa housed?", "Mona Lisa is housed in the Louvre Museum.", "Mona Lisa is housed in _____."],
   ["location_of_sculpture", "Statue of Liberty", "Liberty Island, New York City", "Where is the Statue of Liberty located?", "The location of the Statue of Liberty is Liberty Island, New York City.", "The location of the Statue of Liberty is _____."],
   ["definition_of_music_term", "Melody", "The main tune of a piece of music.", "What does “Melody” mean in music?", "In music, “Melody” means “The main tune of a piece of music”.", "In music, “Melody” means _____."],
-  ["genre_of_movie", "The Godfather", "Crime", "What genre of film is The Godfather?", "The film genre of The Godfather is crime.", "The film genre of The Godfather is _____."],
-  ["genre_of_painting", "Mona Lisa", "portrait", "What genre of painting is Mona Lisa?", "Mona Lisa is a portrait.", "Mona Lisa is a _____."],
-  ["genre_of_song", "Symphony No. 5", "Classical", "What genre of music is Symphony No. 5?", "The musical genre of Symphony No. 5 is classical.", "The musical genre of Symphony No. 5 is _____."],
+  ["genre_of_movie", "The Godfather", "Crime", "Which of these genres describes The Godfather?", "One genre describing The Godfather is crime.", "One genre describing The Godfather is _____."],
+  ["genre_of_painting", "Mona Lisa", "portrait", "Which of these genres describes Mona Lisa?", "Mona Lisa is a portrait.", "Mona Lisa is a _____."],
+  ["genre_of_song", "Symphony No. 5", "Classical", "Which of these genres describes Symphony No. 5?", "One genre describing Symphony No. 5 is classical.", "One genre describing Symphony No. 5 is _____."],
   ["type_of_instrument", "Guitar", "String instrument", "What type of instrument is the guitar?", "The guitar is a string instrument.", "The guitar is _____."],
   ["type_of_instrument", "Drums", "Percussion instrument", "What type of instrument are drums?", "Drums are percussion instruments.", "Drums are _____."],
   ["role_in_filmmaking", "Director", "Guides the creative vision of a film", "What does a director do in filmmaking?", "The role of a director in filmmaking is to guide the creative vision of a film.", "In filmmaking, a director _____."],
