@@ -1,5 +1,8 @@
 # Final Literature and Theatre genre implementation and validation
 
+> **Update, 20 October 2026 (user-approved R1 re-staging).** In Literature l1/p2 only the *genre* facts of Wuthering Heights (A→B) and The Scarlet Letter (B→A) changed stage, so Literature l1 A holds a single Gothic primary (Dracula). Their author and publication facts keep their stages. In Literature l5/p2, Riders of the Purple Sage moved B→A and The House on Mango Street A→B (genre facts only; their author and publication stages are unchanged). Sixteen new work-specific negative assertions (reviewer: Claude Code) were also added in `genreCompatibility.ts`; see [AI_HANDOFF.md](AI_HANDOFF.md). All 12 failing combinations are unchanged, and counts below that predate this note (evidence totals, stage columns elsewhere) are otherwise as originally reported.
+
+
 **20 October 2026 — primary corrections implemented; generation completion remains blocked.**
 
 All 44 approved active primary answers have been applied. Literature and Theatre each remain **144/150 ready combinations**, rather than the requested 150/150. All twelve remaining failures are the four genre teaching placements, A/B/C. Fresh learners still stop at l1/p2/A. This report does not claim release readiness or manufacture passing coverage.
@@ -22,11 +25,11 @@ Each row below is the current active answer, with the existing introduction stag
 | --- | --- | --- | --- |
 | Pride and Prejudice | A | Novel of manners | [Source](https://shop.bl.uk/products/pride-and-prejudice-signature-gilded-edition) — Synopsis explicitly identifies a novel of manners, with courtship and social judgements. |
 | Jane Eyre | A | Bildungsroman (coming-of-age fiction) | [Source](https://www.gutenberg.org/ebooks/1260) — About this eBook: Author, Title and Subject fields (not the automatically generated summary) |
-| Wuthering Heights | A | Gothic fiction | [Source](https://www.bronte.org.uk/about-the-brontes/the-bronte-novels) — Emily Brontë section: nightmarish Gothic elements; genre-defining classic. Psychological fiction remains valid. |
+| Wuthering Heights | B (moved from A, R1) | Gothic fiction | [Source](https://www.bronte.org.uk/about-the-brontes/the-bronte-novels) — Emily Brontë section: nightmarish Gothic elements; genre-defining classic. Psychological fiction remains valid. |
 | Frankenstein | A | Science fiction | [Source](https://www.gutenberg.org/ebooks/84) — About this eBook: Author, Title and Subject fields (not the automatically generated summary) |
 | Dracula | A | Gothic fiction | [Source](https://www.gutenberg.org/ebooks/345) — About this eBook, Subject Gothic fiction alongside Horror tales and Epistolary fiction. Not the generated summary. |
 | Moby-Dick | A | Adventure fiction | [Source](https://assets.penguinrandomhouse.com/book-resumes/MelvilleHerman_MobyDick_20241031.pdf) — Book description: adventure, whaling lore and social commentary. Sea story remains valid. |
-| The Scarlet Letter | B | Historical fiction | [Source](https://www.gutenberg.org/ebooks/25344) — About this eBook: Author, Title and Subject fields (not the automatically generated summary) |
+| The Scarlet Letter | A (moved from B, R1) | Historical fiction | [Source](https://www.gutenberg.org/ebooks/25344) — About this eBook: Author, Title and Subject fields (not the automatically generated summary) |
 | Adventures of Huckleberry Finn | B | Adventure fiction | [Source](https://www.gutenberg.org/ebooks/76) — About this eBook: Author, Title and Subject fields (not the automatically generated summary) |
 | Little Women (Part One) | B | Coming-of-age fiction | [Source](https://www.gutenberg.org/ebooks/514) — About this eBook, Subject Bildungsromans and Domestic fiction; Part One maturation is assessed, not later Part Two events. |
 | Don Quixote (Part One) | C | Satirical fiction | [Source](https://cvc.cervantes.es/ensenanza/quijote_aula/unidad_02/construir_10.asp) — Literary parody of chivalric books and its social critical purpose; Part One. Satirical fiction describes the sustained comic/parodic mode, not a claim that all other genre readings are false. |
@@ -41,10 +44,10 @@ Each row below is the current active answer, with the existing introduction stag
 | Their Eyes Were Watching God | A | Bildungsroman (coming-of-age fiction) | [Source](https://www.arts.gov/initiatives/nea-big-read/their-eyes-were-watching-god) — Byline; first published 1937; discussion question 4 calls it a bildungsroman |
 | The Joy Luck Club | A | Family saga | [Source](https://www.arts.gov/initiatives/nea-big-read/joy-luck-club) — Byline; published 1989; overview: mother-daughter saga, interlocking stories read as a novel |
 | The Maltese Falcon | A | Detective fiction | [Source](https://www.arts.gov/initiatives/nea-big-read/maltese-falcon) — Byline; published 1930; detective novel; introduction and author biography distinguish earlier serial stories |
-| The House on Mango Street | A | Bildungsroman (coming-of-age fiction) | [Source](https://www.arts.gov/initiatives/nea-big-read/house-mango-street) — Byline, Published 1984, coming-of-age classic and author’s novels list |
+| The House on Mango Street | B (moved from A, l5 rank 1) | Bildungsroman (coming-of-age fiction) | [Source](https://www.arts.gov/initiatives/nea-big-read/house-mango-street) — Byline, Published 1984, coming-of-age classic and author’s novels list |
 | My Ántonia | B | Bildungsroman (coming-of-age fiction) | [Source](https://www.arts.gov/initiatives/nea-big-read/my-antonia) — By Willa Cather; Published 1918; discussion question 3: coming-of-age novel |
 | A Farewell to Arms | B | War fiction | [Source](https://www.arts.gov/initiatives/nea-big-read/farewell-arms) — Overview: Frederic Henry’s service, retreat and desertion during World War I intertwined with the tragic love story; war is sustained organising action, not a passing mention. |
-| Riders of the Purple Sage | B | Western | [Source](https://www.loc.gov/exhibits/books-that-shaped-america/1900-to-1950.html) — Riders of the Purple Sage: originally published 1912, Western genre; not the exhibited 1940 reprint |
+| Riders of the Purple Sage | A (moved from B, l5 rank 1) | Western | [Source](https://www.loc.gov/exhibits/books-that-shaped-america/1900-to-1950.html) — Riders of the Purple Sage: originally published 1912, Western genre; not the exhibited 1940 reprint |
 | The Wonderful Wizard of Oz | C | Fantasy | [Source](https://www.loc.gov/exhibits/books-that-shaped-america/1900-to-1950.html) — Opening section: 1900; fantasy; original George M Hill edition (035.00.00) |
 | Red Harvest | C | Detective fiction | [Source](https://www.loc.gov/exhibits/books-that-shaped-america/1900-to-1950.html) — Red Harvest: first novel; hard-boiled detective thriller; Knopf 1929 caption (052.00.00) |
 

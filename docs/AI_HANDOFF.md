@@ -1,206 +1,111 @@
 # AI handoff — Quiz Game (Codex ⇄ Claude Code)
 
-Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE.md). This file holds **current task state only**; it links to, and does not duplicate, the application docs.
+Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE.md). This file holds **current task state only**; it links to, and does not duplicate, the application docs ([progression](quiz-learning-progression.md), [validity](quiz-validity.md), [curriculum](art-curriculum-approved.md), [Literature/Theatre status](art-literature-theatre-content.md), [genre completion report](art-genre-completion.md), [machine report](art-literature-theatre-validation.json)).
 
-**Last updated:** 2026-10-20 (third Claude Code session) — investigation only; **no content or code changed**; no evidence was added to the repo because the user's checkpoint-commit approval gate is still open. Only `AGENTS.md`, `CLAUDE.md` and this file were created/edited by Claude Code. Scratch analysis scripts live outside the repo (Claude scratchpad) and are reproducible from `scripts/art-genre-compatibility.cjs`.
+**Last updated:** 2026-10-20, Claude Code, second-checkpoint session. Scratch analysis scripts are outside the repo (Claude scratchpad); everything below is reproducible with `scripts/art-genre-compatibility.cjs` and the commands at the end.
 
-## Repository
+## Repository and Git state
 
 | | |
 |---|---|
 | Repo | `bayatlisimay-code/quiz-game` (origin `https://github.com/bayatlisimay-code/quiz-game.git`) |
 | Working directory | `/Users/simaybayatli/.codex/worktrees/aeb2/quiz-game` |
-| Branch | `codex/literature-theatre-content` |
-| HEAD / baseline | `43f1859a4a825f10841a8dc29a343865a01053f0` — "feat(art): complete architecture and design curricula" |
-| Staged | none |
+| Branch | `codex/literature-theatre-content` (local only; not pushed) |
+| Checkpoints | `603e0f9` first `wip:` checkpoint (44 files, parent `43f1859`) → **second `wip:` checkpoint** (the commit directly after it; `git log -2`): R1, Literature l5 rank 1, 16 evidence assertions, tests, docs |
+| `main` / `origin/main` | unchanged at `43f1859` |
+| Uncommitted after the second checkpoint | none until the next edit |
+| `.git_backup_corrupt/` | tracked in history (98 files); **untouched — leave it that way** |
 
 ## Restrictions (explicit)
 
-- **No commit, push, merge, rebase, staging, stash, reset, clean, restore or worktree/branch switch** without the user's explicit approval in chat.
-- **No image activation** (no production image bindings, no R2 upload, no registry/asset writes). Literature and Theatre are text-only. Design stays "Coming soon".
-- Do not modify completed Painting/Sculpture/Architecture/Design content (baseline hashes are guarded by tests: 1,192 concepts / 4,730 evidence records — see [content doc](art-literature-theatre-content.md)).
-- Do not change primary classifications to improve quiz-generation coverage; do not invent distractors or negatives.
+- **No push, merge, rebase, reset, clean, restore, stash, branch/worktree switch** without explicit user approval. No further commit without approval.
+- **No image activation** (no image bindings, no R2 upload, no registry/asset writes). Literature and Theatre are text-only. Design stays "Coming soon".
+- Do not touch completed Painting/Sculpture/Architecture/Design content (baseline hashes are test-guarded).
+- Do not change the 44 approved primaries; do not weaken semantic verification, the fixed 8-exercise/6-fact composition or safe matching; **fail closed on uncertain negatives**; unknown is never false.
+- Do not change what genre lessons teach (the genre of the actual work). No work-feature assessment view, and **no wrong-option-only / assessment-only labels** unless ordinary-question feasibility is still deficient after evidence and re-staging — then design first, get approval.
 
-## Uncommitted work inventory (as of 14:42)
+## Decisions the user has made (authoritative)
 
-All of it is Codex's Literature/Theatre work from earlier sessions, plus the 3 files this session added. **10 tracked files modified, 34 untracked.**
+1. The 44-record primary table in [approvedGenrePrimaries.ts](../data/artContent/approvedGenrePrimaries.ts) / [art-genre-completion.md](art-genre-completion.md) is final. Nineteen Eighty-Four → Dystopian fiction and Oklahoma! → Musical are approved classifications (in `genreReserves.ts`), **not** mandatory active teaching facts. The older audit/candidates documents are superseded.
+2. **"Realist drama" keeps the app's current descriptive definition** (`theatreGenres.ts`: "recognisably true to life"). Do **not** use historical chronology to certify Realist-drama negatives.
+3. **R1 adopted for Literature l1** and **Literature l5 rank 1 adopted** (both done, below).
+4. Re-staging for Literature l5 and Theatre l5: analyse exhaustively first, rank by valid matching quartets, minimal priority movement and curriculum coherence, then research only the cells the strongest candidates need. The Literature l5 re-staging was approved and applied; no Theatre l5 re-staging is approved.
+5. Wrong-option-only labels: **deferred**.
+6. Preserve legitimate genre overlap; a source calling a work one genre never proves it is not another.
 
-Modified (10): `data/activeArtContent.ts`, `data/artContent/reviewedDefinitions.ts`, `data/artContent/sourceAuthoring.ts`, `data/artRelations.ts`, `src/quizEngine/assessmentTemplates.ts`, `assessmentTypes.ts`, `relationDefinitions.ts`, `templates.ts`, `src/quizEngine/__tests__/artContent.test.ts`, `questionTemplates.test.ts`.
+## Changes made since the checkpoint (uncommitted)
 
-Untracked, from Codex (31):
-- `data/artContent/`: `approvedGenrePrimaries.ts`, `genreCompatibility.ts`, `genreReserves.ts`, `literaryAuthoring.ts`, `literaryGenres.ts`, `literatureAncient.ts`, `literatureCharacters.ts`, `literatureClassicNovelists.ts`, `literatureClassics.ts`, `literatureModernNovelists.ts`, `literatureModernNovels.ts`, `literaturePoetry.ts`, `literatureShortFiction.ts`, `theatreCharacters.ts`, `theatreFirstPlays.ts`, `theatreGenres.ts`, `theatrePlays.ts`, `theatrePlaywrights.ts`, `theatreTerminology.ts`, `theatreVenues.ts`
-- `docs/`: `art-genre-candidates.md`, `art-genre-completion.md`, `art-genre-quality-audit.md`, `art-literature-theatre-content.md`, `art-literature-theatre-validation.json`
-- `scripts/`: `art-genre-compatibility.cjs`, `art-genre-reserves.cjs`, `art-literature-theatre-audit.cjs`
-- `src/quizEngine/__tests__/`: `approvedGenrePrimaries.test.ts`, `literatureTheatreContent.test.ts`, `nonExclusiveClassification.test.ts`
+**A. Literature l1 R1 re-staging (approved).** Stage is priority rank inside a placement (top 6 → A, next 3 → B, rest → C; `scheduleArtLearning`). A work's `priority` also feeds its author-credit (p1) and publication (p4) facts, so changing it would have moved those too. Instead an optional `genrePriority` on `LiteraryWork` overrides only the l1/p2 genre fact ([literaryAuthoring.ts](../data/artContent/literaryAuthoring.ts), used in [literatureClassics.ts](../data/artContent/literatureClassics.ts)): Wuthering Heights `genrePriority:4` (A→B), The Scarlet Letter `genrePriority:5` (B→A). Result Literature l1/p2: **A** Dracula, Frankenstein, Jane Eyre, Moby-Dick, Pride and Prejudice, The Scarlet Letter · **B** Wuthering Heights, Huckleberry Finn, Little Women · **C** Don Quixote, Treasure Island. 6/3/2, 11 facts, all records and primaries retained; author and publication stages of both works verified unchanged. A now holds one Gothic primary (Dracula).
 
-Untracked, added this session (3): `AGENTS.md`, `CLAUDE.md`, `docs/AI_HANDOFF.md`.
+**A2. Literature l5 rank 1 re-staging (approved).** Same genre-only mechanism in [literatureModernNovels.ts](../data/artContent/literatureModernNovels.ts) (`genrePriorities`): Riders of the Purple Sage 4→5 (B→A), The House on Mango Street 5→4 (A→B). Literature l5/p2 now: **A** Fahrenheit 451, The Great Gatsby, The Joy Luck Club, The Maltese Falcon, Riders of the Purple Sage, Their Eyes Were Watching God · **B** A Farewell to Arms, The House on Mango Street, My Ántonia · **C** Red Harvest, The Wonderful Wizard of Oz. Author (p1) and publication (p4) stages of both works verified unchanged.
 
-Also present: `.git_backup_corrupt/` — **tracked in HEAD** (98 files, from an old commit "Extract quiz builder and add core buildQuiz tests"; unmodified). The user has said to **leave it untouched**. (An earlier version of this file wrongly called it git-ignored.)
+**B. 16 new work-specific negative assertions** in [genreCompatibility.ts](../data/artContent/genreCompatibility.ts) (reviewer `Claude Code — source and work-feature comparison (not independent human editorial approval)`; new optional `reviewer` field, others still stamped Codex). **All 16 remain provisional AI-authored evidence — including the 11 Literature l5 matching cells — and must not be treated as independently approved.** Sources were fetched this session (NEA Big Read, Penguin Random House, Library of Congress, Folger, Ibsen Centre, Yale, Dictionary.com); definitions reuse those already in `literaryGenres.ts`/`theatreGenres.ts`.
 
-## Objective
-
-Make Literature and Theatre generation-ready (150/150 part×variant combinations each, fresh learners able to reach Level 10) **without** weakening correctness: final genre-primary corrections are applied; remaining work is evidence/content to make the four genre teaching placements assessable.
-
-## Approved editorial decisions
-
-The user's final 44-record primary classification (22 novel + 22 play records) is **recorded in the repo** and applied:
-- Authoritative table: [art-genre-completion.md](art-genre-completion.md) → "Complete final primary table — applied".
-- Authoritative code: [approvedGenrePrimaries.ts](../data/artContent/approvedGenrePrimaries.ts) (44 entries, verified by count; applied via `applyApprovedGenrePrimaries` in `data/activeArtContent.ts`; acceptance test `approvedGenrePrimaries.test.ts`).
-- [art-genre-quality-audit.md](art-genre-quality-audit.md) and [art-genre-candidates.md](art-genre-candidates.md) are **superseded** (banner at top) — historical recommendations only. Do not implement them.
-- Also approved: the two reserves (Nineteen Eighty-Four → Dystopian fiction; Oklahoma! → Musical), kept **outside** the active teaching plan; "Bildungsroman (coming-of-age fiction)" label on Jane Eyre and three modern records.
-- **User confirmed (2nd session): the in-repo 44-record table is authoritative; do not revert to the provisional audit.** Verified against code: Pride and Prejudice → Novel of manners; Dracula → Gothic fiction; Moby-Dick → Adventure fiction; The Great Gatsby → Modernist novel; A Farewell to Arms → War fiction; Don Quixote → Satirical fiction; Cyrano de Bergerac → Heroic comedy; Our Town, Top Girls, "Master Harold"…and the Boys → Drama (all in `approvedGenrePrimaries.ts`). Nineteen Eighty-Four → Dystopian fiction and Oklahoma! → Musical are in `genreReserves.ts` (approved classifications, **not** active teaching facts; neither is mandatory in a teaching plan).
-- Constraints on shortage repair (user, 2nd session): keep final primaries and existing verified records; reserves/alternative works may be investigated; **do not** introduce a work-feature assessment view or otherwise change the objective ("genre of the actual novel/play") without an explained design and approval; do not weaken semantic verification or the fixed quiz composition; prefer correctness over artificial 100 % coverage.
-
-## Completed work (per Codex docs; test results re-verified below)
-
-- 594 active teaching facts (297 Literature + 297 Theatre), 2,666 active evidence records, 305 source URLs; reviews are by Codex source comparison, **not independent human certification**.
-- All 44 approved primaries applied at the authoring boundary with preserved fact IDs, stages, priorities and original evidence; +65 evidence assertions (44 primary, 7 extra positives, 14 work-specific negatives).
-- Shared membership templates reworded to non-exclusive genre language; legacy Art wording updated to match.
-- 9 earlier shortage placements repaired; 12 p3/p5 review combinations now generate in isolation.
-- Latest Codex numbers: Literature 144/150 and Theatre 144/150 combinations ready; completed four Art subtopics 150/150 each with Level 10 reachable.
-
-## Unfinished work / blockers
-
-Twelve combinations fail (A/B/C × four placements); fresh learners stop at **l1/p2/A** in both subtopics:
-
-| Placement | Problem |
+| Work ≠ label | Source (basis) |
 |---|---|
-| Literature l1/p2 (classic novel genres) | 0–1 verified incorrect options per A fact; no certified 4-pair matching group |
-| Literature l5/p2 (modern novel genres) | same |
-| Theatre l1/p2 (classic play genres) | 1–3 options per A fact; no certified matching group |
-| Theatre l5/p2 (modern play genres) | 0–1 options; no certified matching group |
+| Fahrenheit 451 ≠ Family saga, Detective fiction, Western | NEA overview: one fireman, society-wide action, science fiction |
+| The Joy Luck Club ≠ Dystopian, Detective, Western | NEA overview: San Francisco / China family stories |
+| The Maltese Falcon ≠ Dystopian, Western | NEA overview: real 1928 San Francisco |
+| Riders of the Purple Sage ≠ Dystopian, Family saga, Detective | Penguin Random House description + Library of Congress (Western, 1912): moderate confidence, summary-level sources |
+| Hamlet ≠ Comedy, Comedy of manners, Heroic comedy | Folger introduction (revenge tragedy) + Folger Act 5 Sc. 2 text: four principal deaths, no comic restoration; structural comparison, not "tragedy excludes comedy" |
+| Antigone ≠ Heroic comedy | extends existing non-comedy certificate |
+| A Doll's House ≠ Comedy of manners | Ibsen Centre reception account (serious drama, nearest tragedy); moderate confidence |
 
-Cause is **content/evidence**, not an engine defect: positive genre facts exist, but work-specific *verified* negatives and a jointly compatible, permanently-lockable four-pair cohort are missing. Zero safe groups ≠ proof of impossibility. Reserve counterfactual (24 trials, 0 ready) shows adding the two reserves alone does not fix it. Details: [art-genre-completion.md](art-genre-completion.md) (§Remaining production shortages, §Reserve investigation) and per-option matrices in [the validation JSON](art-literature-theatre-validation.json) (`genreDiagnostics`).
+**C. Tests.** [approvedGenrePrimaries.test.ts](../src/quizEngine/__tests__/approvedGenrePrimaries.test.ts): the 44-primary test now expects table-order stages **except** an explicit, documented override map for the two R1 facts; three new tests (R1 and l5 shape/author-publication stages unchanged; the 16 assertions are `invalid`, `verified`, honestly labelled and never contradict a documented positive).
 
-## Validation results — run by Claude Code, 2026-10-20 ~14:00–14:42 +04
+**D. Docs.** `art-genre-completion.md` has an R1 banner and its two stage cells updated; the historical counts there are otherwise as Codex reported.
+
+## Validation — run by Claude Code, 2026-10-20 (after the changes above)
 
 | Check | Result |
 |---|---|
-| `npm test -- --runInBand --watchman=false --testTimeout=60000` | **PASS** — 29/29 suites, 547/547 tests (392 s) |
-| `npx tsc --noEmit` | PASS (exit 0) |
-| `npm run lint` | PASS (no output beyond banner) |
-| `git diff --check` | PASS |
-| `node scripts/art-image-assets.cjs --check` | `{"assets":19,"staged":19,"approved":0,"stagingApproved":19}` — unchanged |
-| `node scripts/art-literature-theatre-audit.cjs --require-ready` | **exit 1 (expected)** — readiness gate fails on the four genre placements; 594 facts authored |
-| Content/learning impact sweeps, genre-compatibility script | **not re-run** this session; last Codex-reported figures (20 Oct) are in the table above and in [art-genre-completion.md](art-genre-completion.md) |
+| `npm test -- --runInBand --watchman=false --testTimeout=60000` | **PASS 29/29 suites, 550/550 tests** (547 + 3 new) |
+| `npx tsc --noEmit` / `npm run lint` / `git diff --check` | PASS |
+| `art-image-assets.cjs --check` | 19 assets, 19 staged, 0 approved — unchanged |
+| `art-literature-theatre-audit.cjs --require-ready` | exit 1 (expected readiness gate) |
+| `art-content-impact` Literature+Theatre, 20 attempts | 6,000 requests: **5,760 ready, 240 insufficient, 0 failures; validation clean**. The same 12 combinations fail (l1/p2 and l5/p2 in both subtopics, A/B/C) |
+| `art-learning-impact` Literature+Theatre | 6,000: 120 ready, 40 insufficient, 5,840 prerequisite-blocked, 0 violations — fresh learners still stop at l1/p2/A |
+| Same sweeps with development images | identical (5,760 / 6,000 ready; 0 failures) |
+| Completed Art regression (4 subtopics, dev images): content + learning | 12,000/12,000 ready, 0 failures/violations |
+| Content validation (`validateContent`) | no errors |
 
-No failures other than the intentional readiness gate.
+Net effect on readiness: **none yet** — Literature and Theatre remain **144/150** each. All gains are in certified cells, below.
 
-## Genre-shortage analysis (Claude Code, 2nd session — read-only, from `node scripts/art-genre-compatibility.cjs`)
+## Where each blocked placement stands (A stage, after this session)
 
-**How verdicts work.** For a genre fact, a wrong option / false statement / matching cross-cell needs an *explicit sourced "invalid" assertion for that work × label* (`semanticEvidence.ts`; `stored-membership` policy: absence is `unknown`, never false). Distractors are drawn only from the other facts' answers in the same quiz pool (A = six facts, duplicate labels collapse). Matching needs a quartet of four distinct labels whose 12 off-diagonal cells are certified false and that is permanently lockable. The engine is behaving as designed.
+Cells = off-diagonal "work ≠ label" pairs still unevidenced inside the best overlap-free matching quartet; "doubtful" = pairs I judged not honestly certifiable.
 
-Stage-A cell counts (off-diagonal, 30 per placement): **valid** = documented genuine overlap, **invalid** = certified false, **unknown** = no evidence.
+| Placement | Status |
+|---|---|
+| **Literature l1** | R1 removed the documented Gothic/Bildungsroman overlaps; A now has one quartet needing 11 cells (B 10/20, C 34/45 pools). **But** every quartet in R1's A needs cells that cannot be honestly certified (e.g. Moby-Dick ≠ Gothic, The Scarlet Letter ≠ Gothic/Romance, Frankenstein ≠ Adventure [Arctic frame], Dracula ≠ Adventure). A search of all 4,620 arrangements, treating those doubtful pairs as blocked, finds **zero** arrangement whose A, B and C each keep a certifiable quartet. Matching therefore remains blocked; adding more ordinary-form negatives here would not unlock the lesson, so none were added beyond those listed. |
+| **Literature l5** | **Re-staged (rank 1).** A has a fully evidenced matching quartet {Fahrenheit 451, Joy Luck Club, Maltese Falcon, Riders} (all 11 cells; provisional AI-authored evidence). **Still blocked:** (1) *ordinary forms* — The Great Gatsby and Their Eyes Were Watching God have no certified wrong options among the A answers ("six assessable facts required; has 4"); each needs ≥2 sourced work ≠ label cells against Dystopian / Family saga / Detective / Western (or Modernist/Bildungsroman for each other, which are doubtful); (2) *B and C* — pools hold only three A facts, so they currently need about 6 more cells each (e.g. War-fiction cells for A Farewell to Arms). Note: before the re-staging B had a certified quartet; the move traded B for A (A was the harder blocker). |
+| **Theatre l1** | Ordinary forms: Hamlet now has 4 certified wrong options (all forms available). Matching: best quartet {Antigone, Cyrano, Hamlet, Importance of Being Earnest} has **2 cells left**: *Cyrano ≠ Comedy of manners* (plausible) and *Earnest ≠ Heroic comedy* (**not certifiable** — no definitional source for "heroic comedy" beyond Rostand's own subtitle). Every other quartet needs Realist-drama cells (blocked by decision 2). With those and Tartuffe/heroic-comedy cells blocked, the current staging has no certifiable quartet; the only re-stagings that do (bring The Tempest into A) leave B/C with 4/20 and 1/45 feasible pools — fragile, not recommended. **Unresolved.** |
+| **Theatre l5** | No re-staging of the existing 11 reduces the A requirement below 10 cells, and those rely on overlap-prone labels (Tragedy, Tragicomedy, Comedy of menace [also grouped with the Absurd], Memory play; Drama is valid for every play). With the Oklahoma! reserve (4 moves, Our Town leaves the plan) the best quartet still needs 12 cells including Birthday Party ≠ Absurdist drama (doubtful). **Not recommended to pursue now; unresolved.** |
 
-| Placement (A) | valid | invalid | unknown | Best matching quartet |
-|---|---:|---:|---:|---|
-| Literature l1 | 8 | 1 | 21 | **none exists** — all 9 four-label quartets contain a documented true overlap |
-| Literature l5 | 2 | 1 | 27 | overlap-free quartets exist; 11 cells to certify |
-| Theatre l1 | 2 | 12 | 16 | Antigone, Cyrano/A Doll's House, Hamlet, Earnest: **5 cells** to certify |
-| Theatre l5 | 6 | 1 | 23 | 2 overlap-free quartets; 11 cells to certify |
+## Remaining decisions for the user
 
-**Concrete examples**
-1. *Literature l1, Dracula.* "Which of these genres describes Dracula?" would offer Science fiction, Bildungsroman, Adventure fiction, Novel of manners. None is a certified wrong answer: some are plainly unlikely (manners), others are defensible readings (adventure, SF), and nothing is sourced. Cannot build MCQ/false/options blank. This is correct refusal, not over-strictness, though the label pool is too close to Dracula to supply easy distractors.
-2. *Literature l1 matching.* Gothic is documented-true for Dracula, Frankenstein, Jane Eyre and Wuthering Heights; Frankenstein is also documented as a Bildungsroman reading, as is Pride and Prejudice. Any 4-card quartet therefore contains a pair where one work legitimately accepts the other's label — the exact one-way-lock case the engine must reject (counterexample test exists). **No amount of extra negatives fixes this with the current six A works.**
-3. *Theatre l5, "Drama".* Our Town / Top Girls / "Master Harold" are approved as **Drama**, which is documented-valid for every play in the pool (column of V in all six rows). Drama can never be a wrong option, and Our Town cannot join a matching quartet. Accepted consequence of the approved primaries; do not change them.
-4. *Theatre l1 (closest).* Revenge tragedy / Greek tragedy / Comedy of manners already have 12 certified-false cells; only 5 more cells (plus one more option for Hamlet) separate it from a matching quartet.
-
-**Not yet analysed:** B and C variants of these placements and the p3/p5 reviews (the pool is larger; they depend on the same evidence). A is the first blocker.
-
-### Proposed solution (not implemented — needs user approval where marked)
-
-1. **Content only, no engine change (can start now once approved to proceed):** author work-specific, source-verified negatives in `data/artContent/genreCompatibility.ts` for the cells above, prioritising the cheapest placements: Theatre l1 → Literature l5 → Theatre l5. Add only negatives backed by a work-feature comparison like the existing ones. Stop and report if a cell cannot be sourced honestly (e.g. debatable genres such as Dracula/Science fiction stay `unknown`).
-2. **Teaching-plan decision (approval required):** Literature l1 cannot reach a safe matching quartet while A contains Jane Eyre, Wuthering Heights, Dracula and Frankenstein together. Options: re-stage which six works are introduced in A (e.g. bring in Scarlet Letter → Historical fiction or Don Quixote → Satirical fiction, moving Gothic duplicates to B/C; all records retained). Not done; changes stages/priorities.
-3. **Possible small app-wide correction (approval required; design not yet validated against `curriculumPool`):** allow a relation to register *label-only distractors* (e.g. Western, Detective fiction, Sea story) that appear only as wrong options and are never taught or reviewed. Verification is unchanged — each (work, label) negative still needs reviewed evidence — but it widens the otherwise tiny pool for MCQ/false/options-blank. It does **not** help matching, which is limited to the four selected works' own answers. Recommend deferring until step 1 shows whether it is needed.
-4. Not recommended: weakening `unknown` handling, blanket genre disjointness, or a work-feature assessment view (the user forbids the latter without approval).
-
-## Third session: evidence investigation, re-staging proposal, distractor-label evaluation
-
-**Mechanics confirmed from code.** (a) Stage = priority rank inside a placement: top 6 → A, next 3 → B, rest → C (`scheduleArtLearning`); re-staging therefore means changing the authored `priority`/reason of specific facts. (b) A quiz pool is exactly six facts (A: the six A facts; B: 3 of the A facts + 3 B; C: 2 A + 2 B + 2 C), tried over 1 / 20 / 45 combinations by priority. (c) Wrong options, false statements and matching cross-cells come only from those six facts' answers (`prepareQuizSession` → `getExerciseCapabilities(c, eligible, …)`). (d) A cell is certifiable only by an explicit sourced `invalid` assertion for that work × label (or a reviewed `disjoint-values`/`complete-set`); everything else is `unknown`.
-
-### Theatre l1/p2 — what can and cannot be certified honestly
-
-Current structural status (A / B / C pools having any overlap-free matching quartet): A 1/1 (5 cells to certify), B 10/20, C 26/45.
-
-**Drafted, not yet in the repo** (sources actually retrieved this session; apply only after the checkpoint commit; reviewer label must say "Claude Code source/work-feature comparison, not independent human certification"):
-
-| Draft cell (work ≠ label) | Basis | Confidence |
-|---|---|---|
-| Hamlet ≠ Comedy, ≠ Comedy of manners, ≠ Heroic comedy | Folger intro: revenge-tragedy form (`folger.edu/explore/shakespeares-works/hamlet/`); Folger Act 5 Sc. 2 text: Gertrude, Laertes, Claudius and Hamlet all die on stage, Fortinbras takes the crown — no comic restoration; existing `mw('comedy')` / `mw('comedy of manners')` definitions in `theatreGenres.ts`. Scope: structure of the play, not "tragedy excludes comedy" (gravedigger/Polonius comedy is incidental; the Folger further-reading page does not call the play comic). | Good |
-| A Doll's House ≠ Comedy, ≠ Comedy of manners | `ibsen.uio.no/DRINNL_Du|intro_performance.html`: contemporary critics call it a realistic drama / "nearest" a tragedy; no source calls it comedy or tragicomedy; the Nora-leaves ending is serious. Comedy of manners must itself be a comedy (existing MW definition). | Moderate |
-| Antigone ≠ Heroic comedy | Follows from the existing Antigone ≠ Comedy certificate; heroic comedy is Rostand's comedy designation (bard.org study guides already cited). | Good |
-
-Scratch simulation (extra evidence injected into a copy of the semantic context, repo untouched): Hamlet goes from 1 to 4 certified wrong options (**all ordinary forms become available for Hamlet**), Doll's House 2→4, Antigone 3→4. Matching is still blocked: the best remaining quartet is {Antigone, Cyrano, Hamlet, Importance of Being Earnest} with **2 cells left**: *Cyrano ≠ Comedy of manners* (plausible: 1640s historical romance, not a satire of contemporary manners; Utah Festival/bard.org source already in repo; moderate) and ***Earnest ≠ Heroic comedy*** (**not certifiable**: no definitional source for "heroic comedy" exists beyond Rostand's own subtitle; I searched twice).
-
-**Not certifiable without a user decision — "Realist drama" cells** (Antigone, Hamlet, Tartuffe/Earnest ≠ Realist drama; needed by the only other quartets). The app's own taught definition (`theatreGenres.ts`) is *"Drama presenting people and situations as recognisably true to life"* — descriptive, not the 1870s movement; and the A Doll's House primary rests on a review calling it "realistic". A chronology argument ("realism is an 1870s movement") would contradict the app's own definition and would require a scoping decision plus an authoritative dating source (Britannica/Oxford were not retrievable here; the Cambridge *Ibsen in Context* abstract only says Ibsen was not the first realist dramatist). Do not certify these unless the user approves a movement-scoped definition.
-
-Also found: Britannica's comedy-of-manners entry names Molière a great exponent, so *Tartuffe* may legitimately be a comedy of manners; never certify Tartuffe ≠ Comedy of manners.
-
-### Literature l5 and Theatre l5 — feasibility classification (cells not yet sourced)
-
-- **Literature l5 A.** Every overlap-free quartet needs 11 cells and includes either 3–4 *Modernist novel* cells (a tradition label; Hammett and Tan are discussed in modernist terms) or 3 *Bildungsroman* cells (Gatsby, Joy Luck Club are arguable coming-of-age readings). The cells against Dystopian / Family saga / Detective are plot-based and likely certifiable from the NEA Big Read overviews already used. Expect the quartet to remain blocked unless the Modernist/Bildungsroman cells can be sourced honestly; do not force them.
-- **Theatre l5 A.** The only two overlap-free quartets rely on *Tragedy / Tragicomedy / Comedy of menace / Memory play* cross-cells, all overlap-prone (Glass Menagerie and Fences are both widely called tragedies; comedy of menace is tragicomic; *Drama* is valid for every play). Most of the 11 cells are not honestly certifiable. This placement likely needs the re-staging/reserve route (e.g. Oklahoma! → Musical, The Crucible → Historical drama in A), as for Literature l1 — to be designed after approval.
-- B/C pools (larger option pools) were not individually sourced. Current B/C quartet coverage: Lit l5 20/20 and 45/45 (11 cells), Th l1 10/20 and 26/45, Th l5 2/20 and 15/45.
-
-### Literature l1 — exact re-staging proposals (NOT implemented; needs approval)
-
-Both keep all 11 records, the 6/3/2 schedule and every approved primary; only two `priority` values (and their reasons) change. Both give A an overlap-free quartet; B and C then have 10/20 (R1) or 18/20 (R2) and 34/45 or 29/45 feasible pools. Feasibility is structural (no *documented* overlap): each still needs ~11 sourced cells, some of which may prove un-certifiable (e.g. Frankenstein ≠ Adventure fiction — the Arctic frame — and Scarlet Letter's Gothic/romance readings must be checked first).
-
-| | A | B | C | Change |
-|---|---|---|---|---|
-| Current | Dracula, Frankenstein, Jane Eyre, Moby-Dick, Pride and Prejudice, Wuthering Heights | Scarlet Letter, Huckleberry Finn, Little Women | Don Quixote, Treasure Island | — |
-| **R1 (recommended)** | Dracula, Frankenstein, Jane Eyre, Moby-Dick, Pride and Prejudice, **The Scarlet Letter** | **Wuthering Heights**, Huckleberry Finn, Little Women | unchanged | Wuthering 5→4, Scarlet Letter 4→5 |
-| R2 | …, **Don Quixote** (replaces Wuthering) | Scarlet Letter, Huckleberry Finn, Little Women | **Wuthering Heights**, Treasure Island | Quixote 3→5, Wuthering 5→3 |
-
-Why: Gothic is documented-true for Dracula, Wuthering Heights, Jane Eyre and Frankenstein; removing one Gothic work lets A form a quartet with Moby-Dick, Pride and Prejudice and either Dracula or Frankenstein. R1 keeps a famous canonical work (Wuthering Heights) in the same placement one stage later and brings in an important American classic; R2 delays it two stages. Exhaustive search: 3,030 of 4,620 arrangements are structurally feasible; every single-swap solution exchanges one of Jane Eyre / Wuthering / Frankenstein / Dracula with Scarlet Letter or Don Quixote. Tie-breaks: equal priorities fall back to ID order. Jane Eyre/Little Women share the same `bildungsroman` identity (labels differ), so they must not share a matching quartet.
-
-### Wrong-option-only ("label-only") distractors — evaluation (NOT implemented)
-
-- **Existing support: none.** Candidates come only from the quiz's six facts; `distractorGroup` merely prefers a bucket within them; unscheduled reserves never enter pools; `disjoint-values`/`complete-set` are evidence kinds, not distractor sources.
-- **Benefit: real but partial.** A larger reviewed pool of clearly-distant, feature-defined labels (e.g. Western, Detective fiction; earlier-taught labels such as Gothic or Novel of manners for later levels) would give MCQ / false / options-blank forms more candidates. Each work × label negative would still need its own sourced evidence, so it reduces *competition for scarce labels*, not the evidence burden.
-- **Does not fix matching**: matching cards and right-hand labels are the four selected facts; distractors cannot enter it. Literature l1 A and Theatre l5 A would remain blocked.
-- **Risks:** unfamiliar labels (use only labels the learner has already been taught or are everyday terms); overlap-prone labels (Gothic, adventure, drama, tragedy) becoming false options by accident; quiet drift into teaching (must never be scheduled, reviewed, counted among the six facts, written to `learnedFactIds`, or shown with an answer key).
-- **Smallest design if approved:** an optional `distractorPool` of label-only concept records passed to `prepareQuizSession` and used only in `getExerciseCapabilities` for `optionCandidates`/`falseCandidates`, excluded from `eligible`, composition counts, matching, review pools and progress. Verification unchanged (`context.evaluate` per pair). Needs tests that such records never appear as targets/facts/matching cards. Recommendation: **defer** until per-cell sourcing shows ordinary-form shortages remain after the evidence work above.
-
-### Updated shortage diagnostics (A stage; unchanged in the repo)
-
-| Placement | Overlap-free matching quartets | Min cells to certify | Honest provability |
-|---|---:|---:|---|
-| Literature l1 | 0 | n/a | blocked by documented overlaps → needs R1/R2 |
-| Literature l5 | 9 | 11 | Modernist/Bildungsroman cells doubtful |
-| Theatre l1 | 6 | 5 (→2 with drafted evidence) | one cell not certifiable; Realist cells need decision |
-| Theatre l5 | 2 | 11 | most cells overlap-prone; likely needs re-staging |
-
-## Git checkpoint report (inspection only — nothing committed or created)
-
-- Worktree `…/worktrees/aeb2/quiz-game` on `codex/literature-theatre-content` at `43f1859`; `main` and `origin/main` are also `43f1859`, main is checked out at `/Users/simaybayatli/Developer/quiz-game`. Four other `codex/*` worktrees exist. Stash list is empty.
-- **Would be included (44 files, 2.55 MB, all text):** 10 modified + 31 untracked Codex files + `AGENTS.md`, `CLAUDE.md`, `docs/AI_HANDOFF.md` (full lists above). Largest: `docs/art-literature-theatre-validation.json` (2.06 MB report; keep, it is the machine record) and `docs/art-genre-quality-audit.md` (88 KB).
-- **Secrets scan:** regex scan (AWS/OpenAI/GitHub keys, private-key headers, `R2_SECRET_ACCESS_KEY=`, API-key/password/Bearer literals) over all 44 files: **no matches**. No `.r2.env.local` or `.art-r2-upload/` in the tree. No binaries, no build output, no `.DS_Store` among the 44 (those are ignored).
-- **Exclude/never add:** `.r2.env.local`, `.art-r2-upload/`, `.DS_Store`, `node_modules/`, `.expo/`. Do not touch `.git_backup_corrupt/` (tracked, unmodified).
-- **Recommended strategy (needs user approval; not done):** create the checkpoint **without changing the worktree, index, main, or the current branch pointer**, using a ref-only snapshot: build a tree from a temporary index (`GIT_INDEX_FILE=<tmp> git add -A`, `git write-tree`), `git commit-tree -p HEAD`, and store it as `refs/checkpoints/literature-theatre-2026-10-20` (local only, not pushed). This preserves every file as-is and is recoverable via `git checkout refs/checkpoints/… -- .` only if ever needed. Alternative if the user prefers a visible commit: one WIP commit on `codex/literature-theatre-content` (not main), message prefixed `wip:`, still unpushed. Either way: no push, no main changes, explicit approval first. Because `main` is a different checkout, committing on this branch cannot affect it.
-
-## Checkpoint status
-
-**Approved by the user and committed as a local `wip:` commit on `codex/literature-theatre-content`** (find it with `git log -1 --stat`; parent `43f1859`). Contents: exactly the 44 files listed above, staged by explicit path. Not pushed; `main` untouched; `.git_backup_corrupt/` untouched. Pre-commit checks (third session): jest 29/29 suites and 547/547 tests, `tsc --noEmit`, `npm run lint`, `git diff --check` all pass; secret-pattern scan clean (its only hit was this file's own description of the scan). The snapshot of this handoff inside the commit predates the work that follows; later edits to this file are normal uncommitted changes.
+1. Literature l1 / Theatre l1 / Theatre l5: accept as unresolved, or direct further work (see table). Theatre l1 is blocked **only** by matching (2 cells, one not certifiable).
+2. Literature l5: authorise more sourced work/label cells for Gatsby and Their Eyes (ordinary forms) and for the B/C pools.
+3. Matching architecture (read-only investigation requested next): see the investigation section once added.
 
 ## Exact next actions
 
-1. **User:** approve (or amend) the `wip:` checkpoint commit.
-2. **Claude/Codex, after the checkpoint:** apply the drafted Theatre l1 evidence (table above) to `data/artContent/genreCompatibility.ts` with accurate reviewer wording; re-run `art-genre-compatibility.cjs`, the audit, both L/T sweeps, the four-Art regression and the full jest suite; update this file.
-3. **User decisions needed:** (a) Realist-drama scope (movement vs. the app's descriptive definition) for Theatre l1; (b) R1 vs R2 vs neither for Literature l1; (c) whether to design re-staging for Theatre l5 (and Literature l5) after sourcing; (d) whether to approve a design write-up/implementation of label-only distractors.
-4. Per-cell sourcing for Literature l5 and Theatre l5 only after the above; stop and record any cell that cannot be sourced honestly.
+1. Await the user's decision on the matching-architecture investigation and the items above. Do not implement engine changes without approval; do not push or merge.
+2. If Literature l5 evidence work is approved: source ≥2 wrong options each for Gatsby and Their Eyes (A), then the B/C cells; re-run all validation; update this file.
+3. Always update this file and re-run the validation commands before ending a session.
 
-## Unresolved user decisions
+## Validation commands
 
-- Checkpoint commit approval (contents/message in chat).
-- Realist-drama scope; Heroic-comedy cell (currently uncertifiable) — accept Theatre l1 A as unresolved, or approve re-staging there too.
-- Literature l1 re-staging choice (R1 recommended).
-- Label-only distractors: defer (recommended) vs design.
+```sh
+npm test -- --runInBand --watchman=false --testTimeout=60000
+npx tsc --noEmit && npm run lint && git diff --check
+node scripts/art-image-assets.cjs --check
+node scripts/art-genre-compatibility.cjs          # matrices; read-only
+node scripts/art-literature-theatre-audit.cjs --require-ready   # exits 1 until all genre shortages are repaired
+node scripts/art-content-impact.cjs --subtopics=literature,theatre --attempts=20
+node scripts/art-learning-impact.cjs --subtopics=literature,theatre --attempts=20
+node scripts/art-content-impact.cjs --subtopics=painting,sculpture,architecture,design --attempts=20 --development-images --require-ready
+node scripts/art-learning-impact.cjs --subtopics=painting,sculpture,architecture,design --attempts=20 --development-images
+```
 
-## Key files affected so far
-
-See the inventory above. Most relevant for the next step: `data/artContent/approvedGenrePrimaries.ts`, `genreCompatibility.ts`, `genreReserves.ts`, `literaryGenres.ts`, `theatreGenres.ts`, `scripts/art-genre-compatibility.cjs`, `src/quizEngine/__tests__/{approvedGenrePrimaries,literatureTheatreContent,nonExclusiveClassification}.test.ts`.
-
-## Git status at end of this session
-
-`git status --short`: 10 modified (`M`), 34 untracked (`??`), 0 staged — HEAD still `43f1859` (verified at the second session; `AGENTS.md`/`CLAUDE.md` have since been edited only by Claude Code). Nothing committed, pushed, staged, stashed or reset by Claude Code; no refs created.
+Reviews in this repo are source/work-feature comparisons by Codex or Claude Code, **not independent human editorial certification**.

@@ -15,5 +15,9 @@ const rows:readonly Row[]=[
  ['wonderful-wizard-oz','The Wonderful Wizard of Oz','L. Frank Baum','l-frank-baum',1900,s(loc,'Opening section: 1900; fantasy; original George M Hill edition (035.00.00)','Library of Congress'),'Fantasy','fantasy'],
  ['red-harvest','Red Harvest','Dashiell Hammett','dashiell-hammett',1929,s(loc,'Red Harvest: first novel; hard-boiled detective thriller; Knopf 1929 caption (052.00.00)','Library of Congress'),'Detective fiction','detective',undefined,'First book edition; earlier serial text was reworked.'],
 ];
-export const modernNovels:readonly LiteraryWork[]=rows.map(([id,title,author,authorId,year,source,label,genreId,genreSource,scope],i)=>({id,title,author,authorId:`person:${authorId}`,source,priority:i<6?5:i<9?4:3,genre:{label,id:genreId,source:genreSource??source},publication:{year,source,...(scope?{scope}:{})}}));
+// User-approved genre-only re-staging (Literature l5 rank 1, 2026-10-20): the Western moves into A and one of the
+// two Bildungsroman works moves to B so the genre lesson has a safe matching quartet. Author and publication facts
+// keep the row-order priority.
+const genrePriorities:Readonly<Record<string,number>>={'riders-purple-sage':5,'house-mango-street':4};
+export const modernNovels:readonly LiteraryWork[]=rows.map(([id,title,author,authorId,year,source,label,genreId,genreSource,scope],i)=>({id,title,author,authorId:`person:${authorId}`,source,priority:i<6?5:i<9?4:3,...(genrePriorities[id]===undefined?{}:{genrePriority:genrePriorities[id]}),genre:{label,id:genreId,source:genreSource??source},publication:{year,source,...(scope?{scope}:{})}}));
 export const literatureModernNovelsSet=novelSet('l5',modernNovels);

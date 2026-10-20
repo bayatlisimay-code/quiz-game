@@ -7,6 +7,8 @@ export const pg=(id:number,locator='About this eBook: Author, Title and Subject 
 export const literaryFact=(input:SourceFact)=>sourceFact({...input,reviewedAt:'2026-10-19'});
 export type LiteraryWork=Readonly<{
  id:string;title:string;author:string;authorId:string;source:Source;priority:number;
+ /** Optional stage override for the genre lesson only; author and publication facts keep `priority`. */
+ genrePriority?:number;
  genre?:Readonly<{label:string;id:string;source:Source}>;
  publication?:Readonly<{year:number;source:Source;scope?:string}>;
 }>;
@@ -29,7 +31,7 @@ export function novelSet(level:string,works:readonly LiteraryWork[]):AuthoredSet
  const set=joinSets(works.flatMap(w=>{
   if(!w.genre)throw new Error(`Missing sourced genre: ${w.id}`);
   return [authorCredit(w,'literature',level,'p1','author'),literaryFact({subtopic:'literature',level,part:'p2',id:w.id,subject:w.title,subjectId:`work:${w.id}`,subjectType:'work',answer:w.genre.label,answerId:`literary-genre:${w.genre.id}`,answerType:'category',source:w.genre.source,
-   qualifiers:{},scope:'',priority:w.priority,priorityReason:'Recognise a documented genre without excluding other valid classifications.'}),publicationFact(w,level)];
+   qualifiers:{},scope:'',priority:w.genrePriority??w.priority,priorityReason:w.genrePriority===undefined?'Recognise a documented genre without excluding other valid classifications.':'Recognise a documented genre without excluding other valid classifications; staged to keep overlapping Gothic classifications out of one matching group.'}),publicationFact(w,level)];
  }));
  addGenreCompatibility(set,'literature');
  return set;

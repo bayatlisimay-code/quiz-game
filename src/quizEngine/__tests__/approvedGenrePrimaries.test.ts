@@ -14,6 +14,16 @@ const expected: Record<string,string[]> = {
  'theatre_l1': ['Revenge tragedy','Greek tragedy','Comedy','Comedy of manners','Realist drama','Heroic comedy','Greek tragedy','Comedy of manners','Comedy','Tragedy','Shakespearean romance'],
  'theatre_l5': ['Drama','Tragicomedy','Memory play','Comedy of menace','Realist drama','Tragedy','Absurdist drama','Drama','Drama','Absurdist drama','Historical drama'],
 };
+// User-approved re-staging (2026-10-20): Literature l1 (R1) swaps two genre facts so A holds a single
+// Gothic classification; Literature l5 (rank 1) swaps two so A holds a safe Western/Dystopian/Family-saga/Detective quartet. Every other fact keeps its table-order stage; author and
+// publication facts for these works are unaffected.
+const approvedStageOverrides: Record<string,'A'|'B'|'C'> = {
+ 'art_literature_l1_p2_wuthering-heights':'B',
+ 'art_literature_l1_p2_scarlet-letter':'A',
+ // Literature l5 rank 1 (user-approved 2026-10-20).
+ 'art_literature_l5_p2_riders-purple-sage':'A',
+ 'art_literature_l5_p2_house-mango-street':'B',
+};
 const originalSets=[literatureClassicsSet,literatureModernNovelsSet,...theatrePlaySets];
 
 test('all 44 approved primaries reach the active assessment text without deleting original facts or evidence',()=>{
@@ -27,7 +37,7 @@ test('all 44 approved primaries reach the active assessment text without deletin
    expect(active.object).toBe(expected[key][index]);
    expect(active.assessment!.factId).toBe(before.assessment!.factId);
    expect(active.learning).toEqual(before.learning);
-   expect(active.introducedIn).toBe(index<6?'A':index<9?'B':'C');
+   expect(active.introducedIn).toBe(approvedStageOverrides[before.id] ?? (index<6?'A':index<9?'B':'C'));
    expect(context.evaluate(active,active).verdict).toBe('valid');
    expect(context.evaluate(active,before).verdict).toBe('valid');
    // Canonical metadata alone is insufficient: templates must use the approved
@@ -83,4 +93,50 @@ test('approved reserves remain unscheduled and cannot silently enter teaching or
   ['Nineteen Eighty-Four','Dystopian fiction'],['Oklahoma!','Musical'],
  ]);
  for(const reserve of genreReserveFacts.concepts)expect(approvedArtContent.some(c=>c.id===reserve.id)).toBe(false);
+});
+
+test('Literature l1 R1 re-staging keeps 6/3/2, one Gothic primary in A, and leaves author and publication stages alone',()=>{
+ const stageOf=(part:string,work:string)=>approvedArtContent.find(c=>c.id===`art_literature_l1_${part}_${work}`)!.introducedIn;
+ const genre=approvedArtContent.filter(c=>c.id.startsWith('art_literature_l1_p2_'));
+ expect(genre).toHaveLength(11);
+ for(const [stage,count] of [['A',6],['B',3],['C',2]] as const)expect(genre.filter(c=>c.introducedIn===stage)).toHaveLength(count);
+ expect(genre.filter(c=>c.introducedIn==='A').filter(c=>c.object==='Gothic fiction').map(c=>c.subject)).toEqual(['Dracula']);
+ expect(stageOf('p2','wuthering-heights')).toBe('B');
+ expect(stageOf('p2','scarlet-letter')).toBe('A');
+ // Only the genre lesson moved; the same works keep their author-credit and publication stages.
+ expect(stageOf('p1','wuthering-heights')).toBe('A');
+ expect(stageOf('p4','wuthering-heights')).toBe('A');
+ expect(stageOf('p1','scarlet-letter')).toBe('B');
+ expect(stageOf('p4','scarlet-letter')).toBe('B');
+});
+
+test('source-compared genre negatives added by Claude Code are explicit, work-specific and honestly labelled',()=>{
+ type Assertion=Extract<(typeof approvedArtEvidence)[number],{kind:'assertion'}>;
+ const assertions=approvedArtEvidence.filter((e):e is Assertion=>e.kind==='assertion');
+ const added=assertions.filter(e=>e.reviewedBy?.startsWith('Claude Code'));
+ expect(added).toHaveLength(16);
+ for(const e of added){
+  expect(e.verdict).toBe('invalid');
+  expect(e.reviewStatus).toBe('verified');
+  expect(e.reviewedBy).toMatch(/not independent human editorial approval/);
+  expect(e.sourceUrl).toMatch(/^https:\/\//);
+ }
+ // A documented positive reading must never be turned into a negative.
+ const negatives=new Set(added.map(e=>`${e.subjectId}|${e.valueId}`));
+ for(const positive of assertions.filter(e=>e.verdict==='valid'))expect(negatives.has(`${positive.subjectId}|${positive.valueId}`)).toBe(false);
+});
+
+test('Literature l5 rank 1 re-staging keeps 6/3/2 and moves only the two approved genre facts',()=>{
+ const stageOf=(part:string,work:string)=>approvedArtContent.find(c=>c.id===`art_literature_l5_${part}_${work}`)!.introducedIn;
+ const genre=approvedArtContent.filter(c=>c.id.startsWith('art_literature_l5_p2_'));
+ expect(genre).toHaveLength(11);
+ for(const [stage,count] of [['A',6],['B',3],['C',2]] as const)expect(genre.filter(c=>c.introducedIn===stage)).toHaveLength(count);
+ expect(genre.filter(c=>c.introducedIn==='A').map(c=>c.subject).sort()).toEqual(
+  ['Fahrenheit 451','Riders of the Purple Sage','The Great Gatsby','The Joy Luck Club','The Maltese Falcon','Their Eyes Were Watching God']);
+ expect(genre.filter(c=>c.introducedIn==='B').map(c=>c.subject).sort()).toEqual(['A Farewell to Arms','My Ántonia','The House on Mango Street']);
+ // Author and publication placements keep their original stages.
+ for(const part of ['p1','p4']){
+  expect(stageOf(part,'riders-purple-sage')).toBe('B');
+  expect(stageOf(part,'house-mango-street')).toBe('A');
+ }
 });
