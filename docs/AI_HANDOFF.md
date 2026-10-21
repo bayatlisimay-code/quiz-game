@@ -13,7 +13,7 @@ Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE
 | Branch | `codex/literature-theatre-content` (local only; not pushed) |
 | Checkpoints | `603e0f9` first `wip:` checkpoint (44 files, parent `43f1859`) → **second `wip:` checkpoint** (the commit directly after it; `git log -2`): R1, Literature l5 rank 1, 16 evidence assertions, tests, docs |
 | `main` / `origin/main` | unchanged at `43f1859` |
-| Uncommitted after the second checkpoint | `docs/AI_HANDOFF.md` only (the read-only matching-architecture findings below; awaiting approval to commit) |
+| Documentation checkpoint | `2055707` (matching-architecture findings); newer duplicate-target findings below are uncommitted |
 | `.git_backup_corrupt/` | tracked in history (98 files); **untouched — leave it that way** |
 
 ## Restrictions (explicit)
@@ -149,19 +149,112 @@ Hypothesis-tested end to end (scratch, **hypothetical** cells and a two-fact re-
 - Literature l1 and Theatre l5 appear unresolvable with the current works and fail-closed evidence regardless of architecture.
 - Cell judgments marked "blocked/doubtful" are my conservative editorial calls, not source findings.
 
+## Duplicate-target matching: minimal generator change (read-only investigation; NOT implemented, NOT committed)
+
+Direction approved by the user: support **duplicate canonical target answers** in matching (e.g. Dracula and Wuthering Heights both → "Gothic fiction"), opt-in, reusing today's identity-based grading and the unchanged red/green UI. This **supersedes** the broader "interchangeable-block" recommendation above wherever they differ; the simpler rule below is strictly safer and costs almost no feasibility.
+
+### Established facts
+- Grading, the UI and saved progress already support interchangeable identical cards (see the section above). Only generation and the final validators forbid duplicates.
+- Exact places that must change: `matchingCandidates`/`compatible()` in [exerciseFactory.ts](../src/quizEngine/exerciseFactory.ts); `hasIndistinguishableAnswers` in [matchingSafety.ts](../src/quizEngine/matchingSafety.ts) (callers unchanged); the policy type/builder in [relationPolicies.ts](../src/quizEngine/relationPolicies.ts).
+- Existing tests that must keep passing unchanged: `semanticValidation.test.ts` "matching excludes indistinguishable RHS cards…" (duplicate answers stay `unavailable` for `created_in_decade`/`painted_by`), `answerValidation.test.ts` (legacy identity grading), `engineHardening.test.ts` (duplicate values, no duplicate MCQ cards).
+- Scratch prototype of the recommended rule on the real planner (flag on `genre_of_novel`/`genre_of_play` only): Literature+Theatre 2,880/3,000 ready (identical to today), 0 failures, 0 duplicate cards generated in the currently-ready placements; completed Art sample 1,800/1,800 ready, 0 duplicates, identical counts (the unflagged path is the original expression, so output is unchanged by construction).
+
+### Smallest recommended change (rule)
+For a relation with the new opt-in flag, a matching quartet is acceptable only if:
+1. Cards with the **same canonical target** (identical `answer.identity`, verified `valid` both ways) **and exactly the same displayed text** are interchangeable; their `acceptedAnswerIdentities` are identical. Same identity with different display text is not paired (deferred).
+2. **Every pair with different targets must be verified `invalid` in both directions.** No verified-valid alternative and no `unknown` may be displayed. (Stricter than today's "valid overlap allowed if lockable"; this is what keeps the exercise unambiguous and canonical-target-only. A work's other true classifications simply cannot appear as competing cards.)
+3. At least three distinct targets (at most one duplicated pair) and at least one `invalid` cell.
+4. The existing `isPermanentlyLockable` check stays as defence in depth.
+Left-side distinctness (subject, label, stimulus) is unchanged. Unflagged relations keep today's exact code path.
+
+### Why it is safe
+- Without cross-target valid cells, the valid relation is exactly "same target", an equivalence relation (verified exhaustively: of 4,096 four-card patterns, 15 = Bell(4) are lockable), so every verified-correct selection leaves a completion and nothing is silently rejected.
+- Unknown cells cannot appear, so no unverified pair is ever graded.
+- No grading, UI, progress, content, evidence or curriculum change; existing subjects unaffected unless flagged.
+- **No `interchangeableTargets` marker is needed (decided).** The validators already check every pair against `context.evaluate`, lockability and "equivalent cards graded wrong" from the exercise's own data; identical text with the same defined `answerIdentity` and identical accepted sets is interchangeable by construction. The unflagged generator path is unchanged, and the byte-identical baseline plus the existing `duplicateMatching: 0` assertions (artPilot, artContent, architectureDesignContent tests; completed-Art scopes only) catch any leak.
+
+### Expected effect on the four placements (existing evidence only; no new research)
+| Placement | Helps? | Evidence still needed | A / B / C matching | Ordinary shortages that remain |
+|---|---|---|---|---|
+| Literature l1/p2 | B and C only (cells 11→9); A unchanged | A: 11 cells incl. uncertifiable ones | none certified | severe: 5 of 6 A facts have 0 wrong options |
+| Literature l5/p2 | marginal (C 8→7) | A certified already; B/C ≈6–7 cells | A yes; B/C no | Gatsby, Their Eyes (A); B/C introductions have 0 wrong options |
+| Theatre l1/p2 | B 3→1 cell, C 6→3; A needs re-staging to benefit | A: 2 cells, one uncertifiable (Earnest ≠ Heroic comedy) | none certified today | B/C: The Bacchae 0, four facts 1 |
+| Theatre l5/p2 | C only (9→7) | A 11 cells, overlap-prone labels | none | severe |
+**Implementing the change alone makes no blocked placement generate**; it lowers the evidence required in B/C pools and makes the Theatre l1 re-staging path viable. Ordinary-question shortages are independent and remain.
+
+### Remaining limitations and risks
+- **Final user decisions:** keep ≥3 distinct targets among the four pairs; duplicate cards must display exactly the same text; no different-label sharing for now; no new abstractions.
+- Display-different same-identity cards (e.g. "Bildungsroman" vs "Coming-of-age fiction") are intentionally NOT paired; Literature l1/l5 B/C pools containing both stay unavailable for matching until labels are unified or this is revisited.
+- Flagging the genre relations changes (narrows) the matching candidate set for genre reviews (p3/p5/l10); readiness was unchanged in the prototype, but the sweeps must be re-run after implementation.
+
+### Final Codex implementation prompt (approved direction; copy from here)
+
+```text
+TASK: Opt-in duplicate-target matching (Quiz Game). Minimal generator + safety change.
+
+Read first: AGENTS.md, CLAUDE.md, docs/AI_HANDOFF.md (section "Duplicate-target matching: minimal generator change").
+Repo: /Users/simaybayatli/.codex/worktrees/aeb2/quiz-game, branch codex/literature-theatre-content. Verify pwd, branch and `git status` first; stop and report any mismatch.
+Rules: do NOT commit, push, merge, stage, reset, clean, stash or touch .git_backup_corrupt/. Leave all work uncommitted for independent review. Do not edit content, evidence, priorities, staging, curricula, UI, grading (answerValidation.ts, matchingInteraction.ts), progress code, or MCQ / true-false / fill-blank logic. Add no new abstractions, helper modules, exercise metadata fields, or relation-specific logic in the engine (no mention of genres, Gothic fiction or specific works in engine code).
+
+GOAL
+Let a four-pair matching exercise contain two cards with the SAME canonical target answer and EXACTLY the same displayed text (e.g. two works whose taught answer is "Gothic fiction"). The two target cards are interchangeable (existing identity-based grading already does this); a correct pair locks permanently and shows the existing green feedback; a wrong choice shows the existing red feedback; the other identical card stays available for the other work. Opt-in per relation: every relation without the flag must behave exactly as today. Initially enable it only for genre_of_novel and genre_of_play.
+
+BEFORE EDITING
+1. Baseline: for painting, sculpture, architecture and design, generate matching exercises for a fixed seed set (all part/variant cases, at least 3 seeds, via buildQuizResult or measureGenerationCoverage) and save the JSON/hashes in a test fixture. After your change these must be byte-identical.
+2. Prerequisite test, written and passing BEFORE any code change: isMatchingPairCorrect, attemptMatchingPair and gradeMatchingAssignment already treat two cards with equal answerIdentity and equal acceptedAnswerIdentities as interchangeable (either card accepted for either work; locked cards cannot be reused). If this is false, STOP and report.
+
+CHANGES (all small)
+A. src/quizEngine/relationPolicies.ts: add `readonly allowDuplicateTargetAnswers?: boolean` to RelationPolicy (undefined = false). Add a small readonly list of relation ids (same style as protectedRelationIds) containing exactly "genre_of_novel" and "genre_of_play", and set the flag true for those relations only in reviewedPolicy. First verify both relations resolve through reviewedPolicy in targetRelationPolicies; change no other relation, no legacy policy.
+B. src/quizEngine/exerciseFactory.ts, matchingCandidates / compatible(a, b), applied ONLY to groups whose getRelationPolicy(...).allowDuplicateTargetAnswers === true (unflagged groups run the original expression and path unchanged):
+   - sameTarget(a, b) = context.claim(a).answer.identity === context.claim(b).answer.identity AND normalised displayed matching answer text (getAnswerLabel(x, "matching")) is exactly equal AND context.evaluate(a, b).verdict === "valid" AND context.evaluate(b, a).verdict === "valid". A sameTarget pair skips only the existing "answer label differs", "answer text differs" and "!equivalentAnswers" tests.
+   - a pair with the same identity but different displayed text is NOT compatible (do not pair it).
+   - every other pair must have evaluate(a, b) AND evaluate(b, a) === "invalid" (never "valid", never "unknown") and still pass all existing distinctness tests. Missing evidence is never treated as false.
+   - left-side distinctness (subject identity, matching label, stimulus) is unchanged for all pairs.
+   - when four concepts are selected (flagged groups only), additionally require at least 3 distinct answer identities among the 4 (so at most one duplicated pair) and at least one "invalid" cell. Keep the existing isPermanentlyLockable check and the existing pair / acceptedAnswerIdentities construction unchanged.
+C. src/quizEngine/matchingSafety.ts: change hasIndistinguishableAnswers itself (same signature, same callers, no options argument): identical normalised right-hand text is still "indistinguishable" EXCEPT when both pairs have the same defined answerIdentity and identical acceptedAnswerIdentities (as sets; treat a missing list as empty). Identical text with different or missing identity stays indistinguishable. Do not add an exercise-level marker: the validators (quizCompositionViolations, exerciseValidityViolations) already check every pair against context.evaluate, lockability and "equivalent cards graded wrong", so a duplicate that is not semantically interchangeable still fails.
+D. Leave the duplicateMatching counter and its existing `duplicateMatching: 0` assertions (artPilot, artContent, architectureDesignContent tests; completed-Art scopes) untouched. If a change makes one of them fail, report it instead of weakening it.
+
+TESTS (new file src/quizEngine/__tests__/duplicateTargetMatching.test.ts; all existing tests stay unchanged and passing)
+1. Policy: allowDuplicateTargetAnswers is true for exactly genre_of_novel and genre_of_play across targetRelationPolicies and legacy policies, and false/undefined for every other relation.
+2. Generation (synthetic certified fixtures via the existing helpers, with a policy override setting the flag): two records sharing a target and exact display text plus two distinct targets, all cross-target cells verified "invalid" -> status "generated", exactly 4 pairs, the two duplicate cards have identical right text and answerIdentity, distinct pair ids and identical acceptedAnswerIdentities, quizCompositionViolations and exerciseValidityViolations return [].
+3. Interaction with the real attemptMatchingPair / gradeMatchingAssignment: either duplicate card is accepted for either duplicated work and locks permanently; the remaining identical card is accepted for the other duplicated work; a locked card cannot be reused; a wrong card yields the existing wrong state; both card orderings grade correct.
+4. Property test: over all 4096 off-diagonal valid-patterns of four cards (own card valid), isPermanentlyLockable is true for exactly 15 patterns (the partitions of 4); every exercise generated across many seeds for the flagged fixtures has a partition structure with >= 3 distinct identities.
+5. Overlapping classifications: a flagged fixture where a work also has a verified-valid alternative shown on another card (including a one-way validity) -> generation returns "unavailable"; it never produces a quartet that grades the alternative wrong or leaves a dead end.
+6. Unknown relationships: a quartet needing any "unknown" cross cell -> "unavailable"; no generated exercise contains an unknown cell.
+7. Degenerate / unsolvable: fewer than 3 distinct targets (3+1, 2+2, 4 identical) -> "unavailable"; same identity with different displayed text is never paired.
+8. Validator: identical right text with the same defined answerIdentity and identical accepted sets is not flagged; identical text with different identity, or with missing identity, is still flagged ("Matching answers must be visibly distinct").
+9. Flag off: the existing duplicate-answer fixtures for created_in_decade and painted_by remain "unavailable"; no new duplicate cards appear for any unflagged relation.
+10. Determinism: the same seed returns the identical exercise; different seeds vary where candidates allow.
+11. Regression: the saved baseline for the four completed Art subtopics is byte-identical.
+
+VALIDATION (run all and report exact results)
+npm test -- --runInBand --watchman=false --testTimeout=60000
+npx tsc --noEmit
+npm run lint
+git diff --check
+node scripts/art-literature-theatre-audit.cjs --require-ready   (expected exit 1)
+node scripts/art-content-impact.cjs --subtopics=literature,theatre --attempts=20   (also with --development-images)
+node scripts/art-learning-impact.cjs --subtopics=literature,theatre --attempts=20   (also with --development-images)
+node scripts/art-content-impact.cjs --subtopics=painting,sculpture,architecture,design --attempts=20 --development-images --require-ready
+node scripts/art-learning-impact.cjs --subtopics=painting,sculpture,architecture,design --attempts=20 --development-images
+Expected: Literature and Theatre stay 144/150 ready each (this change alone does not unlock the blocked genre placements; evidence and ordinary-question shortages remain), 0 failures/violations, completed Art 12,000/12,000, fresh learners unchanged. Report any difference, especially in genre p3/p5/l10 review matching and any newly generated duplicate cards.
+
+DELIVER
+List the changed files with a one-line rationale each, the test and validation results, and any deviation from this prompt. Update docs/AI_HANDOFF.md (what changed, results, exact next action, git status). Leave everything uncommitted.
+```
+
 ## Remaining decisions for the user
 
-1. **Approve (or reject) the recommended interchangeable-block matching architecture** (opt-in per relation, genre relations first, ≥3 distinct answers). Not requested of Codex yet.
-2. **Theatre l1:** approve re-staging She Stoops to Conquer→A / The Importance of Being Earnest→B (only meaningful with item 1) and authorise sourcing the two revenge-tragedy cells plus Bacchae/ordinary-form evidence.
+1. **Run the final Codex prompt above** (user approval to start implementation is still pending; Codex has not been invoked). The broader interchangeable-block architecture is NOT being pursued.
+2. **Theatre l1:** approve re-staging She Stoops to Conquer→A / The Importance of Being Earnest→B (only meaningful once duplicate-target matching exists) and authorise sourcing the two revenge-tragedy cells plus Bacchae/ordinary-form evidence.
 3. **Literature l5:** authorise ≥2 wrong-option cells each for The Great Gatsby and Their Eyes Were Watching God, then the B/C cells.
 4. **Literature l1 and Theatre l5:** accept as unresolved (recommended) or direct a broader change (new works / reserves).
-5. Whether to commit these findings (not committed) and whether display-different same-identity cards (e.g. "Bildungsroman" vs "Coming-of-age fiction") may share a block.
 
 ## Exact next actions
 
-1. Wait for the user's decision on architecture and Theatre l1/Literature l5 evidence. No engine/UI/content changes until approved; no push or merge.
-2. If approved, implement in small validated steps: (a) policy flag + `matchingBlocks` + tests with the flag off (no output change), (b) enable for genre relations, (c) Theatre l1 re-staging + sourced cells, (d) Literature l5 ordinary/B/C evidence; run all validation after each; update this file; checkpoint with explicit file paths.
-3. Always update this file before ending a session.
+1. User approves and runs the Codex prompt; Claude Code then reviews the uncommitted diff independently (rule, tests, baseline, sweeps) before any checkpoint.
+2. After the engine change is reviewed and checkpointed: Theatre l1 re-staging + sourced cells, then Literature l5 ordinary/B/C evidence (each needs the user's go-ahead).
+3. No push or merge to `main` without approval. Always update this file before ending a session.
 
 ## Validation commands
 
