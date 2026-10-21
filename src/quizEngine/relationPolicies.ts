@@ -8,6 +8,7 @@ export type RelationPolicy = {
   readonly allowTypedBlank: boolean;
   readonly allowOptionsBlank: boolean;
   readonly allowMatching: boolean;
+  readonly allowDuplicateTargetAnswers?: boolean;
   readonly validateMatching: boolean;
   readonly semanticStrategy: string;
   readonly strategyMetadata?: Readonly<Record<string, unknown>>;
@@ -217,10 +218,14 @@ const allowedEvents: Readonly<Record<string, readonly string[]>> = Object.freeze
   period_or_year_of_play: ["writing", "first performance", "first publication"],
   historical_period_or_opening_year_of_theatre_venue: ["opening", "historical period"],
 });
+const duplicateTargetRelationIds: readonly string[] = Object.freeze([
+  "genre_of_novel", "genre_of_play",
+]);
 const reviewedPolicy = (relation: string): RelationPolicy => Object.freeze({
   status: "semantically-validated", allowedExerciseTypes: Object.freeze(["mcq", "true_false", "fill_blank"] as const),
   requiresValidatedNegative: true, allowTypedBlank: true, allowOptionsBlank: true,
   allowMatching: true, validateMatching: true, semanticStrategy: "reviewed-evidence",
+  ...(duplicateTargetRelationIds.includes(relation) ? { allowDuplicateTargetAnswers: true } : {}),
   strategyMetadata: { family: relationDefinitions[relation].family, creatorRole: relationDefinitions[relation].creatorRole, allowedEvents: allowedEvents[relation], requiredContract: requiredContracts[relation] },
 });
 export const targetRelationPolicies: RelationPolicies = Object.freeze({ ...legacyPolicies,

@@ -202,6 +202,7 @@ export function* matchingCandidates(
     groups.set(concept.relation, group);
   }
   for (const group of seededShuffle([...groups.values()], `${seed}:matching-groups`)) {
+    const allowDuplicateTargetAnswers = getRelationPolicy(group[0].relation, context.policies).allowDuplicateTargetAnswers === true;
     const ordered = seededShuffle(group, `${seed}:matching-select`);
     const selected: Concept[] = [];
     const compatibility = new Map<string, boolean>();
@@ -215,16 +216,30 @@ export function* matchingCandidates(
       const secondText = second?.kind === "text" ? second.text : second?.fallbackText;
       const indistinguishable = (firstText && secondText && normalizeSemanticText(firstText) === normalizeSemanticText(secondText)) || first && second && ((first.kind === "text" && second.kind === "text" && normalizeSemanticText(first.text) === normalizeSemanticText(second.text)) ||
         (first.kind === "image" && second.kind === "image" && (first.image.imageId === second.image.imageId || first.image.uri === second.image.uri)));
-      const result = !indistinguishable && normalizeSemanticText(getAnswerLabel(a, "matching")).toLowerCase() !== normalizeSemanticText(getAnswerLabel(b, "matching")).toLowerCase() &&
-        normalizeSemanticText(getMatchingLabel(a)).toLowerCase() !== normalizeSemanticText(getMatchingLabel(b)).toLowerCase() && context.claim(a).subjectIdentity !== context.claim(b).subjectIdentity &&
-        normalizeSemanticText(a.subject) !== normalizeSemanticText(b.subject) && (normalizeSemanticText(aa.text) !== normalizeSemanticText(bb.text) && ((aa.caseSensitive && bb.caseSensitive) || normalizeSemanticText(aa.text).toLowerCase() !== normalizeSemanticText(bb.text).toLowerCase())) && !equivalentAnswers(aa, bb) &&
-        context.evaluate(a, b).verdict !== "unknown" && context.evaluate(b, a).verdict !== "unknown";
+      let result: boolean;
+      if (allowDuplicateTargetAnswers) {
+        const ab = context.evaluate(a, b).verdict, ba = context.evaluate(b, a).verdict;
+        const sameTarget = aa.identity === bb.identity &&
+          normalizeSemanticText(getAnswerLabel(a, "matching")) === normalizeSemanticText(getAnswerLabel(b, "matching")) && ab === "valid" && ba === "valid";
+        result = !indistinguishable &&
+          normalizeSemanticText(getMatchingLabel(a)).toLowerCase() !== normalizeSemanticText(getMatchingLabel(b)).toLowerCase() && context.claim(a).subjectIdentity !== context.claim(b).subjectIdentity &&
+          normalizeSemanticText(a.subject) !== normalizeSemanticText(b.subject) &&
+          (sameTarget || (aa.identity !== bb.identity && ab === "invalid" && ba === "invalid" &&
+            normalizeSemanticText(getAnswerLabel(a, "matching")).toLowerCase() !== normalizeSemanticText(getAnswerLabel(b, "matching")).toLowerCase() &&
+            (normalizeSemanticText(aa.text) !== normalizeSemanticText(bb.text) && ((aa.caseSensitive && bb.caseSensitive) || normalizeSemanticText(aa.text).toLowerCase() !== normalizeSemanticText(bb.text).toLowerCase())) && !equivalentAnswers(aa, bb)));
+      } else {
+        result = !indistinguishable && normalizeSemanticText(getAnswerLabel(a, "matching")).toLowerCase() !== normalizeSemanticText(getAnswerLabel(b, "matching")).toLowerCase() &&
+          normalizeSemanticText(getMatchingLabel(a)).toLowerCase() !== normalizeSemanticText(getMatchingLabel(b)).toLowerCase() && context.claim(a).subjectIdentity !== context.claim(b).subjectIdentity &&
+          normalizeSemanticText(a.subject) !== normalizeSemanticText(b.subject) && (normalizeSemanticText(aa.text) !== normalizeSemanticText(bb.text) && ((aa.caseSensitive && bb.caseSensitive) || normalizeSemanticText(aa.text).toLowerCase() !== normalizeSemanticText(bb.text).toLowerCase())) && !equivalentAnswers(aa, bb) &&
+          context.evaluate(a, b).verdict !== "unknown" && context.evaluate(b, a).verdict !== "unknown";
+      }
       compatibility.set(key, result);
       return result;
     };
     function* search(start: number): Generator<{ concepts: readonly Concept[]; exercise: MatchingExercise }> {
       if (!spendSearchNode(budget)) return;
       if (selected.length === 4) {
+        if (allowDuplicateTargetAnswers && new Set(selected.map(concept => context.claim(concept).answer.identity)).size < 3) return;
         if (!selected.some((left) => selected.some((right) => context.evaluate(left, right).verdict === "invalid"))) return;
         const matrix = selected.map(left => selected.map(right => context.evaluate(left, right).verdict === "valid"));
         if (!isPermanentlyLockable(matrix)) return;

@@ -31,6 +31,10 @@ export function hasIndistinguishableAnswers(pairs: readonly MatchingPair[]): boo
   const normalize = (text: string) => text.normalize("NFC").trim().replace(/\s+/g, " ");
   return pairs.some((a, i) => pairs.slice(i + 1).some(b => {
     const first = normalize(a.right), second = normalize(b.right);
+    if (a.answerIdentity !== undefined && a.answerIdentity === b.answerIdentity) {
+      const firstAccepted = new Set(a.acceptedAnswerIdentities ?? []), secondAccepted = new Set(b.acceptedAnswerIdentities ?? []);
+      if (firstAccepted.size === secondAccepted.size && [...firstAccepted].every(identity => secondAccepted.has(identity))) return false;
+    }
     return first === second || ((!a.caseSensitive || !b.caseSensitive) && first.toLowerCase() === second.toLowerCase());
   }));
 }

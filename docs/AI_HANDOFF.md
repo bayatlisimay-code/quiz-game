@@ -2,7 +2,56 @@
 
 Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE.md). This file holds **current task state only**; it links to, and does not duplicate, the application docs ([progression](quiz-learning-progression.md), [validity](quiz-validity.md), [curriculum](art-curriculum-approved.md), [Literature/Theatre status](art-literature-theatre-content.md), [genre completion report](art-genre-completion.md), [machine report](art-literature-theatre-validation.json)).
 
-**Last updated:** 2026-10-20, Claude Code, second-checkpoint session. Scratch analysis scripts are outside the repo (Claude scratchpad); everything below is reproducible with `scripts/art-genre-compatibility.cjs` and the commands at the end.
+**Last updated:** 2026-10-21, Claude Code, after independent review and the duplicate-target checkpoint commit (see `git log -1`). Earlier research and checkpoint findings below are retained.
+
+## Current implementation — duplicate-target matching
+
+- Started in the required worktree on `codex/literature-theatre-content`, **clean at `ca8d66a`**. Earlier work was already checkpointed; no existing uncommitted files were overwritten. HEAD is unchanged this session; no commit, push, stage, merge, reset, clean, stash or worktree/branch switch occurred. `.git_backup_corrupt/` was not touched.
+- **Before production edits:** the prerequisite identity-grading/interaction test passed (1/1, 7.842 seconds). Existing grading accepts either identical card, locks correct pairs permanently, prevents physical-card reuse, and reports wrong selections using the existing wrong state. Also saved **1,800 pre-change SHA-256 matching payload hashes**: all 600 completed-Art part/variant cases, three fixed seeds, development-image delivery. The regression test subsequently matched all hashes.
+- `relationPolicies.ts`: optional `allowDuplicateTargetAnswers`; only the two requested reviewed relations opt in. Both resolve through `reviewedPolicy`. Legacy policy definitions are unchanged: archived `genre_of_play` remains unflagged; `genre_of_novel`, which has no archived override, inherits its reviewed policy.
+- `exerciseFactory.ts`: flagged matching groups permit exact-display, same-identity, mutually verified-valid duplicate targets; different targets require mutually verified-invalid cells and the existing distinctness tests. Same identity with different display is rejected. Quartets require at least three target identities and an invalid cell. The existing permanent-lock safety check and pair/accepted-set construction remain intact. Unflagged groups retain the original compatibility expression and search behavior.
+- `matchingSafety.ts`: identical visible cards are exempt from indistinguishability only with the same defined answer identity and equal accepted-identity sets (missing list = empty). Validators and callers are unchanged.
+- New `duplicateTargetMatching.test.ts` covers policy scope, generation, both validators, real interaction/grading, all 4,096 reflexive four-card patterns (exactly **15** lockable equivalence partitions), overlaps including one-way validity, unknowns, degenerate groups, differing displays, flag-off fixtures, deterministic variation and the saved completed-Art baseline. The baseline test has a 300-second explicit allowance for its 1,800 generations; the requested full-suite command still uses `--testTimeout=60000`.
+- **No content, evidence, priorities, stages, curriculum, ordinary-question generation, grading, UI, progress, image infrastructure or production settings changed.** No new helper module, exercise metadata or engine relation-specific behavior was added. `duplicateMatching` and all existing zero-duplicate assertions are unchanged.
+
+### Independent review and final validation (Claude Code, 2026-10-21) — approved, committed
+
+- **Review verdict:** no bugs. The flagged branch implements the approved rule exactly; the unflagged branch is the original expression verbatim; the identity/accepted-set exemption in `hasIndistinguishableAnswers` is correct; production quiz generation uses `activeSemanticContext` (target policies, flag present). No unintended changes (six files only).
+- **Baseline independently verified:** all 1,800 completed-Art matching hashes were regenerated from a pristine export of the pre-change commit with 0 mismatches against `completedArtMatchingBaseline.json`; the new code also matches them.
+- **Approved cleanups applied before the commit:** the policy test now sorts the relation ids and asserts only the production `targetRelationPolicies` (the incidental `legacyRelationPolicies` assertion was removed).
+- **Final results after the cleanups:** `tsc --noEmit` PASS; `npm run lint` PASS; `git diff --check` PASS; affected suites (duplicateTargetMatching, semanticValidation, answerValidation, engineHardening) 4/4 suites, 75/75 tests; **full suite 30/30 suites, 566/566 tests**. Independent sweeps matched Codex's: Literature+Theatre 5,760/6,000 ready in both delivery modes (0 failures, 0 duplicate matching, content-validation errors 0); L/T fresh learners 120 ready / 40 insufficient / 5,840 prerequisite-blocked / 0 violations; completed Art 12,000/12,000 for generation and fresh-learner sweeps.
+
+### Literature/Theatre blockers that remain (unchanged by this engine change)
+All four genre placements still fail A/B/C safely (144/150 combinations ready per subtopic); fresh learners still stop at l1/p2/A.
+- **Literature l1/p2:** matching needs cells that cannot be honestly certified (A); severe ordinary-form shortages (5 of 6 A facts have no wrong options).
+- **Literature l5/p2:** A has a certified matching quartet; ordinary forms fail for The Great Gatsby and Their Eyes Were Watching God (no wrong options); B/C need about 6–7 more cells and have introductions with no wrong options.
+- **Theatre l1/p2:** A needs 2 cells (one — *Earnest ≠ Heroic comedy* — not certifiable); the She Stoops→A / Earnest→B re-staging plus two revenge-tragedy cells would now be viable with duplicate targets; B/C also need ordinary evidence (The Bacchae has none; four facts have one).
+- **Theatre l5/p2:** no workable path with current works and fail-closed evidence.
+Awaiting user approval before any re-staging, evidence or content work.
+
+### Validation — 2026-10-21
+
+| Check | Result |
+|---|---|
+| Prerequisite, before production changes | PASS 1/1 |
+| Focused safety tests excluding the long baseline | PASS 15/15 |
+| Completed-Art baseline | All 1,800 matching payload hashes identical |
+| `npm test -- --runInBand --watchman=false --testTimeout=60000` | **PASS 30/30 suites, 566/566 tests**, 775.13 seconds; all existing tests unchanged |
+| `npx tsc --noEmit`, `npm run lint`, `git diff --check` | PASS |
+| `art-literature-theatre-audit.cjs --require-ready` | exit 1, expected; validation errors `[]` |
+| L/T generation, 20 attempts, production **and** development images | Each: 6,000 requests, 5,760 ready, 240 insufficient, 0 failures, 0 duplicate matching exercises; content validation errors 0. **144/150 combinations each subtopic** |
+| L/T fresh learning, 20 attempts, both delivery modes | Each: 6,000 requests, 120 ready, 40 insufficient, 5,840 prerequisite-blocked, 0 violations; exit 1 reflects existing shortages |
+| Completed Art generation, 20 attempts, development images, `--require-ready` | 12,000/12,000 ready; 0 shortages, failures or duplicates; content validation errors 0 |
+| Completed Art fresh learning, 20 attempts, development images | 12,000/12,000 ready; 0 shortages, prerequisite blocks or violations |
+| Additional flag-off versus flag-on review comparison | All 138 p3/p5/l10 cases × 20 seeds = **2,760** matching payloads identical; no readiness changes or duplicates; **61** genre-matching exercises in each run |
+| Matching variation, completed Art | 589/600 cases have multiple fact quartets across 20 seeds; range 1–20; 11 retain one available quartet |
+| `art-image-assets.cjs --check` | PASS: 19 assets, 19 staged, 0 approved, 19 staging-approved; no asset writes |
+
+The four l1/p2 and l5/p2 genre placements still fail A/B/C safely; dependent reviews remain ready in isolated generation, and fresh learners still stop at l1/p2/A. This engine change alone does not resolve their matching-evidence and ordinary-question shortages. No discrepancy from the requested readiness target was observed. Initial new-test authoring failures (JSON registry typing and missing synthetic learning priorities) were corrected in the new test only; production grading and existing tests were not changed.
+
+**Files changed (six):** the three engine files above; `src/quizEngine/__tests__/duplicateTargetMatching.test.ts`; `src/quizEngine/__tests__/fixtures/completedArtMatchingBaseline.json`; this handoff. Final `git status --short`: four modified tracked files, two untracked new files, nothing staged. HEAD remains `ca8d66a58119979193ae25eea76c00c0c93d41a9`. No other implementation file is changed. No scope deviations; the explicit long-baseline test allowance and additional read-only image/review checks are documented above.
+
+**Exact next action (superseded — review completed above):** independently review these six uncommitted files, particularly the preserved unflagged expression, identity/set exemption, prerequisite test and frozen baseline. Do not commit or push without explicit user approval. Content/evidence/re-staging repairs remain separate user decisions below; do not begin them as part of this task.
 
 ## Repository and Git state
 
@@ -13,7 +62,7 @@ Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE
 | Branch | `codex/literature-theatre-content` (local only; not pushed) |
 | Checkpoints | `603e0f9` first `wip:` checkpoint (44 files, parent `43f1859`) → **second `wip:` checkpoint** (the commit directly after it; `git log -2`): R1, Literature l5 rank 1, 16 evidence assertions, tests, docs |
 | `main` / `origin/main` | unchanged at `43f1859` |
-| Documentation checkpoint | `2055707` (matching-architecture findings); newer duplicate-target findings below are uncommitted |
+| Documentation checkpoint | `ca8d66a` (duplicate-target decision and implementation prompt); implementation committed in the checkpoint after it (`git log -2`) |
 | `.git_backup_corrupt/` | tracked in history (98 files); **untouched — leave it that way** |
 
 ## Restrictions (explicit)
@@ -149,7 +198,9 @@ Hypothesis-tested end to end (scratch, **hypothetical** cells and a two-fact re-
 - Literature l1 and Theatre l5 appear unresolvable with the current works and fail-closed evidence regardless of architecture.
 - Cell judgments marked "blocked/doubtful" are my conservative editorial calls, not source findings.
 
-## Duplicate-target matching: minimal generator change (read-only investigation; NOT implemented, NOT committed)
+## Duplicate-target matching: minimal generator change (implemented; committed after review)
+
+Implementation and current validation are recorded above. The investigation and approved prompt below are retained as the design record; their future-tense instructions have now been carried out.
 
 Direction approved by the user: support **duplicate canonical target answers** in matching (e.g. Dracula and Wuthering Heights both → "Gothic fiction"), opt-in, reusing today's identity-based grading and the unchanged red/green UI. This **supersedes** the broader "interchangeable-block" recommendation above wherever they differ; the simpler rule below is strictly safer and costs almost no feasibility.
 
@@ -245,16 +296,15 @@ List the changed files with a one-line rationale each, the test and validation r
 
 ## Remaining decisions for the user
 
-1. **Run the final Codex prompt above** (user approval to start implementation is still pending; Codex has not been invoked). The broader interchangeable-block architecture is NOT being pursued.
+1. **Independent review of the uncommitted implementation above.** The user approved and Codex implemented the minimal prompt; no checkpoint or push is authorised. The broader interchangeable-block architecture is NOT being pursued.
 2. **Theatre l1:** approve re-staging She Stoops to Conquer→A / The Importance of Being Earnest→B (only meaningful once duplicate-target matching exists) and authorise sourcing the two revenge-tragedy cells plus Bacchae/ordinary-form evidence.
 3. **Literature l5:** authorise ≥2 wrong-option cells each for The Great Gatsby and Their Eyes Were Watching God, then the B/C cells.
 4. **Literature l1 and Theatre l5:** accept as unresolved (recommended) or direct a broader change (new works / reserves).
 
 ## Exact next actions
 
-1. User approves and runs the Codex prompt; Claude Code then reviews the uncommitted diff independently (rule, tests, baseline, sweeps) before any checkpoint.
-2. After the engine change is reviewed and checkpointed: Theatre l1 re-staging + sourced cells, then Literature l5 ordinary/B/C evidence (each needs the user's go-ahead).
-3. No push or merge to `main` without approval. Always update this file before ending a session.
+1. Return to finishing Literature and Theatre only with the user's approval of each step: (a) Theatre l1 re-staging (She Stoops to Conquer→A, The Importance of Being Earnest→B) with sourced cells and Bacchae/ordinary-form evidence; (b) Literature l5 wrong-option evidence for Gatsby and Their Eyes, then B/C cells; (c) accept Literature l1 and Theatre l5 as unresolved or direct a broader change.
+2. No push or merge to `main` without approval; leave `.git_backup_corrupt/` untouched. Always update this file before ending a session.
 
 ## Validation commands
 
