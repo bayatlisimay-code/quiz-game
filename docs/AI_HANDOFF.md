@@ -2,13 +2,25 @@
 
 Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE.md). This file holds **current task state only**. Application docs: [progression](quiz-learning-progression.md) · [validity](quiz-validity.md) · [curriculum](art-curriculum-approved.md) · [Literature/Theatre status](art-literature-theatre-content.md) · [genre report](art-genre-completion.md). Earlier research (matching architecture, duplicate-target design, the Codex prompt) lives in commits `2055707` and `ca8d66a`.
 
-**Last updated:** 2026-10-21, Codex approved local integration. **Literature/Theatre 150/150 each; local fast-forward authorised. No push or Stage 4.**
+**Last updated:** 2026-10-21, Codex completed local integration. **Literature/Theatre integrated into `main`, 150/150 each. All post-integration checks pass. No push or Stage 4.**
 
-## Approved integration — in progress (2026-10-21)
+## Local integration — complete (2026-10-21)
 
 The user authorised integration of `e79efc6` without rewriting history. The pending Stage 3 review note was committed separately on the development branch as `5231e16`. Both starting worktrees were verified: development at `e79efc6` with only that pending note, and main clean at `43f1859` in `/Users/simaybayatli/Developer/quiz-game`.
 
-Updated `AGENTS.md` for the main checkout, retained development worktree and current technical/editorial status, preserving the repository and quiz safeguards. `CLAUDE.md` now follows those current checkout locations instead of its obsolete development-only pin. Next: fast-forward the existing main checkout, run full tests, TypeScript, lint and readiness/regression checks there, then record the results. No push, Stage 4, reset or history rewrite is authorised. `.git_backup_corrupt/` must remain unchanged.
+Updated `AGENTS.md` for the main checkout, retained development worktree and current technical/editorial status, preserving the repository and quiz safeguards. `CLAUDE.md` now follows those current checkout locations instead of its obsolete development-only pin. Main fast-forwarded to `068241e` (the guidance commit) and was clean before validation. Checkpoint `e79efc6` and all earlier commits are preserved; no squash or history rewrite occurred.
+
+### Post-integration validation, run in the actual main checkout
+
+- `npm test -- --runInBand --watchman=false --testTimeout=60000`: **30/30 suites, 571/571 tests**, 567.195 seconds, including all 1,800 frozen completed-Art matching payloads and matching safety/interaction regressions.
+- TypeScript, lint, readiness/content audit, genre compatibility, images and whitespace: **PASS**. The initial lint attempt was blocked only by sandbox access to the ignored Expo cache; the permitted rerun passed. Image registry remains 19 staged assets, 0 production-approved; no image content was changed.
+- Literature/Theatre generation, 20 attempts per combination, production and development-image delivery: **6,000/6,000 ready in each mode**, **150/150 combinations each**, zero shortages, failures or content-validation issues. Each mode includes 305 safe duplicate-target matching exercises.
+- Literature/Theatre full fresh progression, 20 attempts, both modes: **6,000/6,000 ready each**, zero shortages, prerequisite blocks or violations; Level 10 reached.
+- Completed Painting/Sculpture/Architecture/Design generation and fresh progression, 20 attempts, development images: **12,000/12,000 each**, zero shortages/failures/violations and zero duplicate matching exercises. Baseline content and evidence hashes remain unchanged.
+
+The final development-branch documentation checkpoint containing this record is fast-forwarded into main as well; it changes only `AGENTS.md` and this handoff, so application code is identical to the main commit tested above. Both local branches point to that final checkpoint; both working trees are checked clean in the final integration report. `.git_backup_corrupt/` retains tree `501db868b1e2de0c458d87b22515ae0ddff91b08`, identical to the original main baseline, with no branch-history changes. No user progress or production settings were altered.
+
+**Git / exact next action:** local integration is complete; `origin/main` remains at `43f1859` because nothing was pushed. Await explicit user instructions before any push or Stage 4 work. Human editorial certification of provisional evidence and the existing readability/variation follow-ups remain release-audit items; technical integration does not resolve them.
 
 ## Stage 3 integration review — passed (2026-10-21)
 
@@ -22,7 +34,7 @@ All checks were rerun: **30/30 suites, 571/571 tests** (545.981 seconds); TypeSc
 
 ## Final checkpoint — local only (2026-10-21)
 
-This document is included in the user-authorised checkpoint **`feat(art): complete Literature and Theatre genre readiness`**, parent `b2ca62133335c30ddfa78bccced49603386bb10a`, on `codex/literature-theatre-content`. The checkpoint hash is the containing commit (`git log -1`). Its 11 explicitly staged files cover only Literature/Theatre content, evidence, regression tests and status documentation. The complete diff was reviewed; no unrelated files, temporary files or potential secrets were found. The four factual corrections below are preserved. `.git_backup_corrupt/` is untouched.
+This document was included in the user-authorised checkpoint **`feat(art): complete Literature and Theatre genre readiness`** (`e79efc6`), parent `b2ca62133335c30ddfa78bccced49603386bb10a`, on `codex/literature-theatre-content`. Its 11 explicitly staged files cover only Literature/Theatre content, evidence, regression tests and status documentation. The complete diff was reviewed; no unrelated files, temporary files or potential secrets were found. The four factual corrections below are preserved. `.git_backup_corrupt/` is untouched.
 
 Confirmed the latest full-suite and sweep logs against the unchanged implementation: **571/571 tests across 30 suites**, Literature/Theatre **150/150 combinations each**, generation and fresh progression **6,000/6,000 each in both delivery modes**, completed Art generation and fresh progression **12,000/12,000 each**, with zero validation failures or progression violations. TypeScript, lint, readiness/content audit and image validation were rerun successfully during checkpoint review; whitespace checks passed. No application code changed during this review, so the long suite and sweeps were not repeated.
 

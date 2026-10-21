@@ -6,7 +6,7 @@ Quiz Game is a Duolingo-style general-knowledge learning app (iOS/Android): Reac
 
 ## Current project status
 
-- Literature and Theatre are complete at **150/150 ready each**, including full fresh-learner progression. Checkpoint `e79efc6` and its separately committed Stage 3 review are approved for local fast-forward integration into `main`.
+- Literature and Theatre are integrated into local **`main`**, complete at **150/150 ready each**, including full fresh-learner progression. Checkpoint `e79efc6` and its separately committed Stage 3 review (`5231e16`) are preserved through fast-forward integration; see the handoff for post-integration validation.
 - The integration commits preserve the four factual corrections, non-exclusive genre evidence, safe interchangeable matching targets and all completed Art regressions. Technical readiness is not human editorial release certification; provisional evidence still requires editorial review.
 - No push or Stage 4 work is authorised. Literature/Theatre remain text-only, production image settings stay unchanged and Design remains "Coming soon".
 
