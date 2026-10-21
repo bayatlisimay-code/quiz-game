@@ -1,5 +1,12 @@
 # Final Literature and Theatre genre implementation and validation
 
+> **Final matching repair, 21 October 2026:** Literature and Theatre are each **150/150 ready**, with 6,000/6,000 generation and fresh-learner requests passing in each delivery mode. Treasure Island enters Literature A, The Scarlet Letter moves to C; Oklahoma! enters Theatre l5 B in the genre-only Our Town slot, and Bald Soprano moves to A. Our Town’s Drama record and other lessons are retained. All four factual corrections remain positive. See [the current handoff](AI_HANDOFF.md). Earlier blocked reports below are historical.
+
+> **Independent review, 21 October 2026 — completion is blocked.** Four contradicted genre exclusions were corrected to documented valid alternatives without changing primary answers. Current generation readiness is **Literature 149/150; Theatre 148/150**. Literature l1/p2/A and Theatre l5/p2/B–C now fail safely on matching; full fresh progression is blocked. See [the independent review and evidence](AI_HANDOFF.md#independent-review-outcome--blocked-2026-10-21). The 150/150 results below are historical, before these corrections.
+
+> **Final status, 21 October 2026 — all four blocked genre placements now generate.** Literature and Theatre are each **150/150 ready** (6,000/6,000 requests per delivery mode), and fresh learners progress through every level with no prerequisite blocks or violations. The changes since the report below (all genre-lesson-only; 11 facts and 6/3/2 preserved; every record retained): Literature l1 uses The Moonstone in Jane Eyre's genre slot; Theatre l1 and l5 genre stages re-ordered; Top Girls → *Feminist drama* and “Master Harold” → *Realist drama* (sourced); Little Women's display text unified; Gatsby's *Modernist novel* kept; **Our Town remains *Drama*** (no reliable narrower source found). Table below shows the active primaries and stages. The reservation counts and shortage sections further down are historical. All new negative evidence is provisional AI-authored (reviewer "Claude Code") and not independently approved; see [AI_HANDOFF.md](AI_HANDOFF.md).
+
+
 > **Update, 20 October 2026 (user-approved R1 re-staging).** In Literature l1/p2 only the *genre* facts of Wuthering Heights (A→B) and The Scarlet Letter (B→A) changed stage, so Literature l1 A holds a single Gothic primary (Dracula). Their author and publication facts keep their stages. In Literature l5/p2, Riders of the Purple Sage moved B→A and The House on Mango Street A→B (genre facts only; their author and publication stages are unchanged). Sixteen new work-specific negative assertions (reviewer: Claude Code) were also added in `genreCompatibility.ts`; see [AI_HANDOFF.md](AI_HANDOFF.md). All 12 failing combinations are unchanged, and counts below that predate this note (evidence totals, stage columns elsewhere) are otherwise as originally reported.
 
 
@@ -24,16 +31,16 @@ Each row below is the current active answer, with the existing introduction stag
 | Work | Stage | Applied primary answer | Source / locator |
 | --- | --- | --- | --- |
 | Pride and Prejudice | A | Novel of manners | [Source](https://shop.bl.uk/products/pride-and-prejudice-signature-gilded-edition) — Synopsis explicitly identifies a novel of manners, with courtship and social judgements. |
-| Jane Eyre | A | Bildungsroman (coming-of-age fiction) | [Source](https://www.gutenberg.org/ebooks/1260) — About this eBook: Author, Title and Subject fields (not the automatically generated summary) |
+| ~~Jane Eyre~~ → The Moonstone | A | Detective fiction | [Source](https://www.penguinrandomhouse.com/books/260151/the-moonstone-by-wilkie-collins/) — Publisher description: an early model of the detective novel; Sergeant Cuff investigates the theft of a diamond. **Genre lesson only:** Jane Eyre keeps her author and publication lessons and her record. |
 | Wuthering Heights | B (moved from A, R1) | Gothic fiction | [Source](https://www.bronte.org.uk/about-the-brontes/the-bronte-novels) — Emily Brontë section: nightmarish Gothic elements; genre-defining classic. Psychological fiction remains valid. |
 | Frankenstein | A | Science fiction | [Source](https://www.gutenberg.org/ebooks/84) — About this eBook: Author, Title and Subject fields (not the automatically generated summary) |
 | Dracula | A | Gothic fiction | [Source](https://www.gutenberg.org/ebooks/345) — About this eBook, Subject Gothic fiction alongside Horror tales and Epistolary fiction. Not the generated summary. |
 | Moby-Dick | A | Adventure fiction | [Source](https://assets.penguinrandomhouse.com/book-resumes/MelvilleHerman_MobyDick_20241031.pdf) — Book description: adventure, whaling lore and social commentary. Sea story remains valid. |
-| The Scarlet Letter | A (moved from B, R1) | Historical fiction | [Source](https://www.gutenberg.org/ebooks/25344) — About this eBook: Author, Title and Subject fields (not the automatically generated summary) |
+| The Scarlet Letter | C (final matching repair) | Historical fiction | [Source](https://www.gutenberg.org/ebooks/25344) — About this eBook: Author, Title and Subject fields (not the automatically generated summary) |
 | Adventures of Huckleberry Finn | B | Adventure fiction | [Source](https://www.gutenberg.org/ebooks/76) — About this eBook: Author, Title and Subject fields (not the automatically generated summary) |
-| Little Women (Part One) | B | Coming-of-age fiction | [Source](https://www.gutenberg.org/ebooks/514) — About this eBook, Subject Bildungsromans and Domestic fiction; Part One maturation is assessed, not later Part Two events. |
+| Little Women (Part One) | B | Bildungsroman (coming-of-age fiction) | [Source](https://www.gutenberg.org/ebooks/514) — About this eBook, Subject Bildungsromans and Domestic fiction; Part One maturation is assessed, not later Part Two events. |
 | Don Quixote (Part One) | C | Satirical fiction | [Source](https://cvc.cervantes.es/ensenanza/quijote_aula/unidad_02/construir_10.asp) — Literary parody of chivalric books and its social critical purpose; Part One. Satirical fiction describes the sustained comic/parodic mode, not a claim that all other genre readings are false. |
-| Treasure Island | C | Adventure fiction | [Source](https://penguinrandomhousehighereducation.com/book/?isbn=9780140437683) — Scholarly edition description explicitly identifies the quintessential adventure story. |
+| Treasure Island | A (final matching repair) | Adventure fiction | [Source](https://penguinrandomhousehighereducation.com/book/?isbn=9780140437683) — Scholarly edition description explicitly identifies the quintessential adventure story. |
 
 ### Literature — Modern and Contemporary
 
@@ -58,12 +65,12 @@ Each row below is the current active answer, with the existing introduction stag
 | Hamlet | A | Revenge tragedy | [Source](https://www.folger.edu/explore/shakespeares-works/hamlet/) — Introduction: revenge-tragedy form |
 | Antigone | A | Greek tragedy | [Source](https://assets.cambridge.org/97805211/34781/frontmatter/9780521134781_frontmatter.pdf) — Antigone edition description explicitly identifies Greek tragedy; Sophocles’ original, not a later adaptation. |
 | Tartuffe | A | Comedy | [Source](https://www.gutenberg.org/ebooks/28488) — About this eBook: Author, Title and Subject fields (not the automatically generated summary) |
-| The Importance of Being Earnest | A | Comedy of manners | [Source](https://www.bloomsbury.com/uk/importance-of-being-earnest-9781474260756/) — Student edition description: comedy of manners and satire. Comedy and farce remain compatible. |
+| The Importance of Being Earnest | B (moved from A, Theatre l1) | Comedy of manners | [Source](https://www.bloomsbury.com/uk/importance-of-being-earnest-9781474260756/) — Student edition description: comedy of manners and satire. Comedy and farce remain compatible. |
 | A Doll’s House | A | Realist drama | [Source](https://ibsen.uio.no/DRINNL_Du%7Cintro_performance.html) — First performance Copenhagen 21 December 1879; contemporary reception as realistic drama |
 | Cyrano de Bergerac | A | Heroic comedy | [Source](https://www.reseau-canope.fr/edutheque-theatre-en-acte/oeuvre/edmond-rostand/cyrano-de-bergerac.html) — Opening: Edmond Rostand’s heroic comedy, written and first performed in 1897 |
 | The Bacchae | B | Greek tragedy | [Source](https://api.pageplace.de/preview/DT0400.9781108956437_A49239509/preview-9781108956437_A49239509.pdf) — Cambridge Greek and Latin Classics introduction: tragic play; first performed in or shortly after 405 BC |
 | The School for Scandal | B | Comedy of manners | [Source](https://www.bloomsbury.com/UK/author/richard-brinsley-sheridan/) — Biography explicitly calls The School for Scandal a comedy of manners, opened 1777 |
-| She Stoops to Conquer | B | Comedy | [Source](https://www.bloomsbury.com/CA/author/oliver-goldsmith/) — Author biography: comedy She Stoops to Conquer, 1773 |
+| She Stoops to Conquer | A (moved from B, Theatre l1) | Comedy | [Source](https://www.bloomsbury.com/CA/author/oliver-goldsmith/) — Author biography: comedy She Stoops to Conquer, 1773 |
 | Doctor Faustus | C | Tragedy | [Source](https://www.gutenberg.org/ebooks/779) — About this eBook: Author, Title and Subject fields (not the automatically generated summary) |
 | The Tempest | C | Shakespearean romance | [Source](https://www.folger.edu/explore/shakespeares-works/the-tempest/) — Introduction: putting romance onstage |
 
@@ -71,17 +78,17 @@ Each row below is the current active answer, with the existing introduction stag
 
 | Work | Stage | Applied primary answer | Source / locator |
 | --- | --- | --- | --- |
-| Our Town | A | Drama | [Source](https://www.concordtheatricals.com/p/646/our-town) — Byline, form classification and History section |
+| Oklahoma! | B (approved reserve; genre-only Our Town replacement) | Musical | [Source](https://rodgersandhammerstein.com/show/oklahoma/) — Creator estate: original integrated stage musical; Our Town’s Drama record is retained outside the active genre plan. |
 | Waiting for Godot | A | Tragicomedy | [Source](https://groveatlantic.com/book/waiting-for-godot/) — Samuel Beckett; subtitle A Tragicomedy in Two Acts; Théâtre de Babylone beginning in 1953 |
 | The Glass Menagerie | A | Memory play | [Source](https://media.milwaukeerep.com/filer_public/50/cd/50cdabfd-ea29-4766-888d-b645228ee2f7/glass_menagerie_sg.pdf) — Tom’s memory structures the play’s presentation of past events |
 | The Birthday Party | A | Comedy of menace | [Source](https://www.hampsteadtheatre.com/news/2020/october/harold-pinter-and-the-1950s-british-stage/) — The Birthday Party and Irving Wardle’s comedy-of-menace term in the producing theatre’s historical account. |
-| A Raisin in the Sun | A | Realist drama | [Source](https://teachers.yale.edu/curriculum/units/2007/1/9/3) — Reproduced Hansberry interview: genuine realism, explicitly distinguished from naturalism. |
-| Fences | A | Tragedy | [Source](https://www.theoldglobe.org/globalassets/pdfs/programs/2026/fences-2026-final-web.pdf) — Director interview discusses tragedy and Troy’s hubris; social realism and symbolic elements remain compatible. |
+| A Raisin in the Sun | C (moved from A, Theatre l5) | Realist drama | [Source](https://teachers.yale.edu/curriculum/units/2007/1/9/3) — Reproduced Hansberry interview: genuine realism, explicitly distinguished from naturalism. |
+| Fences | C (moved from A, Theatre l5) | Tragedy | [Source](https://www.theoldglobe.org/globalassets/pdfs/programs/2026/fences-2026-final-web.pdf) — Director interview discusses tragedy and Troy’s hubris; social realism and symbolic elements remain compatible. |
 | Rosencrantz and Guildenstern Are Dead | B | Absurdist drama | [Source](https://groveatlantic.com/book/rosencrantz-guildenstern-are-dead/) — Edition and critical account identify absurdist tragicomedy; dramatic comedy is retained as a valid alternative. |
-| Top Girls | B | Drama | [Source](https://www.concordtheatricals.com/p/1798/top-girls) — Byline, form classification and History section |
-| “Master Harold”…and the Boys | B | Drama | [Source](https://yalerep.org/seasons/1981-82-yale-repertory-theatre/) — Original production archive, March 1982, written and directed by Athol Fugard: original stage drama in the broad form sense, not a narrower realist-genre claim. |
-| The Bald Soprano | C | Absurdist drama | [Source](https://www.theatre-huchette.com/pdf/DOSSIER-PEDAGOGIQUE-2023.pdf) — Pages 3, 5–6, 16–19: Ionesco, premiere 11 May 1950, theatre of the absurd |
-| The Crucible | C | Historical drama | [Source](https://arthurmillersociety.net/millers-works/) — The Crucible account: dramatisation of the Salem witch trials, with a political parallel to McCarthyism, not a literal 1950s setting. |
+| Top Girls | A (moved from B, Theatre l5) | Feminist drama | [Source](https://www.encyclopedia.com/arts/educational-magazines/top-girls) — Encyclopedia.com entry: a feminist drama with fantasy elements, set in contemporary times, with a non-linear form. |
+| “Master Harold”…and the Boys | B | Realist drama | [Source](https://www.encyclopedia.com/arts/educational-magazines/master-harold-and-boys) — Encyclopedia.com entry, Style section: the one-act, autobiographical play subscribes to the school of realism. |
+| The Bald Soprano | A (final matching repair) | Absurdist drama | [Source](https://www.theatre-huchette.com/pdf/DOSSIER-PEDAGOGIQUE-2023.pdf) — Pages 3, 5–6, 16–19: Ionesco, premiere 11 May 1950, theatre of the absurd |
+| The Crucible | A (moved from C, Theatre l5) | Historical drama | [Source](https://arthurmillersociety.net/millers-works/) — The Crucible account: dramatisation of the Salem witch trials, with a political parallel to McCarthyism, not a literal 1950s setting. |
 
 ## Evidence and compatibility improvements
 

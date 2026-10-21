@@ -27,11 +27,15 @@ export function publicationFact(work:LiteraryWork,level:string):AuthoredSet{
  qualifiers:{event:'first publication',publicationScope:scope??'original-language publication'},scope:scope??'Original publication.',priority:work.priority,priorityReason:'Distinguish original publication from later editions and translations.',contract:{event:'first publication'},
  temporal:{start:year,end:year,calendar:'gregorian-proleptic'},completeField:{valueIds:[`year:${year}`],reason:'The precisely scoped first-publication event falls in this single calendar year, not the digital release date.'}});
 }
-export function novelSet(level:string,works:readonly LiteraryWork[]):AuthoredSet{
- const set=joinSets(works.flatMap(w=>{
-  if(!w.genre)throw new Error(`Missing sourced genre: ${w.id}`);
-  return [authorCredit(w,'literature',level,'p1','author'),literaryFact({subtopic:'literature',level,part:'p2',id:w.id,subject:w.title,subjectId:`work:${w.id}`,subjectType:'work',answer:w.genre.label,answerId:`literary-genre:${w.genre.id}`,answerType:'category',source:w.genre.source,
-   qualifiers:{},scope:'',priority:w.genrePriority??w.priority,priorityReason:w.genrePriority===undefined?'Recognise a documented genre without excluding other valid classifications.':'Recognise a documented genre without excluding other valid classifications; staged to keep overlapping Gothic classifications out of one matching group.'}),publicationFact(w,level)];
+/** `genreWorks` optionally supplies the genre lesson's works, index-aligned with `works`; author credits and
+ * first-publication facts always come from `works`. */
+export function novelSet(level:string,works:readonly LiteraryWork[],genreWorks:readonly LiteraryWork[]=works):AuthoredSet{
+ if(genreWorks.length!==works.length)throw new Error('Genre works must align with the level works');
+ const set=joinSets(works.flatMap((w,i)=>{
+  const g=genreWorks[i];
+  if(!g.genre)throw new Error(`Missing sourced genre: ${g.id}`);
+  return [authorCredit(w,'literature',level,'p1','author'),literaryFact({subtopic:'literature',level,part:'p2',id:g.id,subject:g.title,subjectId:`work:${g.id}`,subjectType:'work',answer:g.genre.label,answerId:`literary-genre:${g.genre.id}`,answerType:'category',source:g.genre.source,
+   qualifiers:{},scope:'',priority:g.genrePriority??g.priority,priorityReason:g.genrePriority===undefined?'Recognise a documented genre without excluding other valid classifications.':'Recognise a documented genre without excluding other valid classifications; staged to keep overlapping Gothic classifications out of one matching group.'}),publicationFact(w,level)];
  }));
  addGenreCompatibility(set,'literature');
  return set;

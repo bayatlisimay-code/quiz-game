@@ -5,15 +5,17 @@ type Primary = readonly [label: string, value: string, url?: string, locator?: s
 // Final editorial decisions, 2026-10-20. This overlay preserves the original
 // records and every original evidence assertion; only the active answer changes.
 export const approvedGenrePrimaries: Readonly<Record<string, Primary>> = {
+ 'oklahoma':['Musical','musical','https://www.concordtheatricals.com/p/44839/rodgers-hammersteins-oklahoma','Previously approved reserve classification: licensed original Rodgers and Hammerstein full-length musical, with its score and musical numbers; not Green Grow the Lilacs or the film adaptation.'],
  'pride-prejudice':['Novel of manners','novel-manners','https://shop.bl.uk/products/pride-and-prejudice-signature-gilded-edition','Synopsis explicitly identifies a novel of manners, with courtship and social judgements.'],
  'jane-eyre':['Bildungsroman (coming-of-age fiction)','bildungsroman'],
+ 'moonstone':['Detective fiction','detective','https://www.penguinrandomhouse.com/books/260151/the-moonstone-by-wilkie-collins/','Publisher description: an early model of the detective novel in which Sergeant Cuff investigates the theft of a diamond; Britannica also calls it one of the first English detective novels.'],
  'wuthering-heights':['Gothic fiction','gothic','https://www.bronte.org.uk/about-the-brontes/the-bronte-novels','Emily Brontë section: nightmarish Gothic elements; genre-defining classic. Psychological fiction remains valid.'],
  'frankenstein':['Science fiction','science-fiction'],
  'dracula':['Gothic fiction','gothic','https://www.gutenberg.org/ebooks/345','About this eBook, Subject Gothic fiction alongside Horror tales and Epistolary fiction. Not the generated summary.'],
  'moby-dick':['Adventure fiction','adventure','https://assets.penguinrandomhouse.com/book-resumes/MelvilleHerman_MobyDick_20241031.pdf','Book description: adventure, whaling lore and social commentary. Sea story remains valid.'],
  'scarlet-letter':['Historical fiction','historical'],
  'huckleberry-finn':['Adventure fiction','adventure'],
- 'little-women':['Coming-of-age fiction','bildungsroman','https://www.gutenberg.org/ebooks/514','About this eBook, Subject Bildungsromans and Domestic fiction; Part One maturation is assessed, not later Part Two events.'],
+ 'little-women':['Bildungsroman (coming-of-age fiction)','bildungsroman','https://www.gutenberg.org/ebooks/514','About this eBook, Subject Bildungsromans and Domestic fiction; Part One maturation is assessed, not later Part Two events.'],
  'don-quixote':['Satirical fiction','satire','https://cvc.cervantes.es/ensenanza/quijote_aula/unidad_02/construir_10.asp','Literary parody of chivalric books and its social critical purpose; Part One. Satirical fiction describes the sustained comic/parodic mode, not a claim that all other genre readings are false.'],
  'treasure-island':['Adventure fiction','adventure','https://penguinrandomhousehighereducation.com/book/?isbn=9780140437683','Scholarly edition description explicitly identifies the quintessential adventure story.'],
  'great-gatsby':['Modernist novel','modernist','https://www.cambridge.org/core/books/abs/cambridge-companion-to-f-scott-fitzgerald/great-art-small-art-and-modernist-cachet/B9BE748753C881A32D64774E5577A565','Public chapter abstract: Fitzgerald aligned Gatsby with international modernism, while retaining relatively conventional fiction and ordinary readers; modernist tradition does not exclude tragic or psychological readings.'],
@@ -45,8 +47,8 @@ export const approvedGenrePrimaries: Readonly<Record<string, Primary>> = {
  'raisin-sun':['Realist drama','realist-drama','https://teachers.yale.edu/curriculum/units/2007/1/9/3','Reproduced Hansberry interview: genuine realism, explicitly distinguished from naturalism.'],
  'fences':['Tragedy','tragedy','https://www.theoldglobe.org/globalassets/pdfs/programs/2026/fences-2026-final-web.pdf','Director interview discusses tragedy and Troy’s hubris; social realism and symbolic elements remain compatible.'],
  'rosencrantz-guildenstern':['Absurdist drama','absurd','https://groveatlantic.com/book/rosencrantz-guildenstern-are-dead/','Edition and critical account identify absurdist tragicomedy; dramatic comedy is retained as a valid alternative.'],
- 'top-girls':['Drama','drama'],
- 'master-harold':['Drama','drama','https://yalerep.org/seasons/1981-82-yale-repertory-theatre/','Original production archive, March 1982, written and directed by Athol Fugard: original stage drama in the broad form sense, not a narrower realist-genre claim.'],
+ 'top-girls':['Feminist drama','feminist-drama','https://www.encyclopedia.com/arts/educational-magazines/top-girls','Encyclopedia.com entry: Top Girls is a feminist drama with fantasy elements, set in contemporary times, with a non-linear form mixing past and present.'],
+ 'master-harold':['Realist drama','realist-drama','https://www.encyclopedia.com/arts/educational-magazines/master-harold-and-boys','Encyclopedia.com entry, Style section: the one-act, autobiographical play subscribes to the school of realism; its characters’ actions and dialogue closely resemble real life. The same entry says it is not overtly a drama of political protest.'],
  'bald-soprano':['Absurdist drama','absurd'],
  'crucible':['Historical drama','historical','https://arthurmillersociety.net/millers-works/','The Crucible account: dramatisation of the Salem witch trials, with a political parallel to McCarthyism, not a literal 1950s setting.'],
 };

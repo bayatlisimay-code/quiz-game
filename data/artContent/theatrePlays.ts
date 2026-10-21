@@ -1,6 +1,6 @@
 import { addGenreCompatibility } from './genreCompatibility';
 import { literaryFact, literarySource as s, pg, authorCredit, type LiteraryWork } from './literaryAuthoring';
-import { joinSets, type Source } from './sourceAuthoring';
+import { joinSets, sourceFact, type Source } from './sourceAuthoring';
 type Play=LiteraryWork & Readonly<{period:string;event:string;dateSource:Source;genre:NonNullable<LiteraryWork['genre']>;dateCertain?:boolean}>;
 const concord=(id:number,slug:string,locator='Byline, form classification and History section')=>s(`https://www.concordtheatricals.com/p/${id}/${slug}`,locator,'Concord Theatricals');
 const rsc=s('https://www.rsc.org.uk/shakespeares-plays/histories-timeline/timeline','Play chronology; estimated writing dates distinguished from documented performances','Royal Shakespeare Company');
@@ -21,7 +21,10 @@ const classics:readonly ClassicRow[]=[
  ['doctor-faustus','Doctor Faustus','Christopher Marlowe','christopher-marlowe',779,'Tragedy','tragedy',pg(779),'1604','First surviving printed edition',pg(779,'Title field: From the Quarto of 1604; not a claim about first composition or earliest performance'),true],
  ['tempest','The Tempest','William Shakespeare','william-shakespeare',23042,'Romance','romance',s('https://www.folger.edu/explore/shakespeares-works/the-tempest/','Introduction: putting romance onstage','Folger Shakespeare Library'),'1611','Approximate composition',rsc,false],
 ];
-export const classicPlays:readonly Play[]=classics.map(([id,title,author,writerId,n,label,genreId,genreSource,period,event,dateSource,dateCertain],i)=>({id,title,author,authorId:`person:${writerId}`,source:pg(n),genre:{id:genreId,label,source:genreSource},period,event,dateSource,dateCertain,priority:i<6?5:i<9?4:3}));
+// User-approved genre-only re-staging (Theatre l1): the mistaken-identity comedy joins A so a duplicate-target
+// matching set exists there; Earnest moves to B. Author and date facts keep the row-order priority.
+const genrePriorities:Readonly<Record<string,number>>={'she-stoops-conquer':5,'importance-earnest':4};
+export const classicPlays:readonly Play[]=classics.map(([id,title,author,writerId,n,label,genreId,genreSource,period,event,dateSource,dateCertain],i)=>({id,title,author,authorId:`person:${writerId}`,source:pg(n),genre:{id:genreId,label,source:genreSource},period,event,dateSource,dateCertain,priority:i<6?5:i<9?4:3,...(genrePriorities[id]===undefined?{}:{genrePriority:genrePriorities[id]})}));
 const godot=s('https://groveatlantic.com/book/waiting-for-godot/','Samuel Beckett; subtitle A Tragicomedy in Two Acts; Théâtre de Babylone beginning in 1953','Grove Atlantic');
 const glass=s('https://americanrepertorytheater.org/media/from-tom-to-tennessee/','Tennessee Williams; premiere in Chicago December 1944, before Broadway 1945','American Repertory Theater');
 const huchette=s('https://www.theatre-huchette.com/pdf/DOSSIER-PEDAGOGIQUE-2023.pdf','Pages 3, 5–6, 16–19: Ionesco, premiere 11 May 1950, theatre of the absurd','Théâtre de la Huchette');
@@ -39,12 +42,18 @@ const modern:readonly ModernRow[]=[
  ['bald-soprano','The Bald Soprano','Eugène Ionesco','eugene-ionesco',huchette,'Theatre of the Absurd','absurd','1950','First Paris performance'],
  ['crucible','The Crucible','Arthur Miller','arthur-miller',s('https://www.ibdb.com/broadway-production/the-crucible-2211','Original play by Arthur Miller; Drama; Broadway opened January 1953, Wilmington pre-Broadway January 1953','Broadway League, IBDB'),'Drama','drama','1953','Original production year'],
 ];
-export const modernPlays:readonly Play[]=modern.map(([id,title,author,writerId,source,label,genreId,period,event,dateSource],i)=>({id,title,author,authorId:`person:${writerId}`,source,genre:{id:genreId,label,source:id==='glass-menagerie'?s('https://media.milwaukeerep.com/filer_public/50/cd/50cdabfd-ea29-4766-888d-b645228ee2f7/glass_menagerie_sg.pdf','Tom’s memory structures the play’s presentation of past events','Milwaukee Repertory Theater'):source},period,event,dateSource:dateSource??source,dateCertain:true,priority:i<6?5:i<9?4:3}));
+// Genre-only re-staging (Theatre l5): the genre-matching exercise needs four mutually uncontested plays in stage A.
+// Top Girls (feminist drama) and The Crucible (historical drama) join Glass Menagerie and Birthday Party there;
+// Raisin and Fences, whose realist/tragic readings overlap the others, move later. Author and date facts keep the
+// row-order priority. Final repair: Bald Soprano moves B→A, and the Oklahoma! reserve takes the genre-only
+// Our Town slot in B. Glass Menagerie + Bald Soprano (A), Rosencrantz + Oklahoma! (B) also fit C's 2A/2B pool.
+const modernGenrePriorities:Readonly<Record<string,number>>={'top-girls':5,'crucible':5,'raisin-sun':3,'fences':3,'bald-soprano':5};
+export const modernPlays:readonly Play[]=modern.map(([id,title,author,writerId,source,label,genreId,period,event,dateSource],i)=>({id,title,author,authorId:`person:${writerId}`,source,genre:{id:genreId,label,source:id==='glass-menagerie'?s('https://media.milwaukeerep.com/filer_public/50/cd/50cdabfd-ea29-4766-888d-b645228ee2f7/glass_menagerie_sg.pdf','Tom’s memory structures the play’s presentation of past events','Milwaukee Repertory Theater'):source},period,event,dateSource:dateSource??source,dateCertain:true,priority:i<6?5:i<9?4:3,...(modernGenrePriorities[id]===undefined?{}:{genrePriority:modernGenrePriorities[id]})}));
 function playSet(level:string,plays:readonly Play[]){return joinSets(plays.flatMap(w=>{
  const event=w.event==='Approximate composition'?'writing':w.event==='First surviving printed edition'?'first publication':'first performance';
  return [
  authorCredit(w,'theatre',level,'p1','playwright'),
- literaryFact({subtopic:'theatre',level,part:'p2',id:w.id,subject:w.title,subjectId:`work:${w.id}`,subjectType:'work',answer:w.genre.label,answerId:`theatre-genre:${w.genre.id}`,answerType:'category',source:w.genre.source,qualifiers:{},scope:'',priority:w.priority,priorityReason:'Recognise a documented dramatic form while retaining overlapping classifications.'}),
+ literaryFact({subtopic:'theatre',level,part:'p2',id:w.id,subject:w.title,subjectId:`work:${w.id}`,subjectType:'work',answer:w.genre.label,answerId:`theatre-genre:${w.genre.id}`,answerType:'category',source:w.genre.source,qualifiers:{},scope:'',priority:w.genrePriority??w.priority,priorityReason:'Recognise a documented dramatic form while retaining overlapping classifications.'}),
  literaryFact({subtopic:'theatre',level,part:'p4',id:w.id,subject:w.title,subjectId:`work:${w.id}`,subjectType:'work',answer:w.period,answerId:`play-date:${w.period}`,answerType:'date',source:w.dateSource,qualifiers:{event,eventDetail:w.event},scope:`${w.event}.`,contract:{event},priority:w.priority,priorityReason:'Keep first performance, version, publication and approximate composition dates distinct.',...(w.dateCertain?{completeField:{valueIds:[`play-date:${w.period}`],reason:'The specified production or printed-edition event falls in this single documented year; other events are outside the visible scope.'}}:{})}),
 ]; }));}
 const classicSet=playSet('l1',classicPlays);
@@ -66,6 +75,16 @@ for(const [id,review] of Object.entries(approximateDateReviews)){
  });
 }
 const modernSet=playSet('l5',modernPlays);
+// Preserve the original Drama record and all its source evidence outside the active genre plan.
+// Its author and original-production facts remain active. The approved musical reserve adds a
+// useful dramatic form; with Bald Soprano in A it also bridges the B/C matching pools.
+export const retainedOurTownGenreFact=modernSet.concepts.find(c=>c.id==='art_theatre_l5_p2_our-town')!;
+const oklahomaGenre=sourceFact({reviewedAt:'2026-10-21',subtopic:'theatre',level:'l5',part:'p2',id:'oklahoma',subject:'Oklahoma!',subjectId:'work:oklahoma',subjectType:'work',
+ answer:'Musical',answerId:'theatre-genre:musical',answerType:'category',
+ source:s('https://rodgersandhammerstein.com/show/oklahoma/','Original stage work: music by Richard Rodgers, book and lyrics by Oscar Hammerstein II; integrated musical in which the creative elements support the story. Not Green Grow the Lilacs or the 1955 film.','Rodgers & Hammerstein'),
+ qualifiers:{},scope:'',priority:4,priorityReason:'Recognise the integrated stage musical; bridge memory-play and absurdist classifications without excluding their legitimate overlaps.'});
+modernSet.concepts=modernSet.concepts.map(c=>c===retainedOurTownGenreFact?oklahomaGenre.concepts[0]:c);
+modernSet.evidence.push(...oklahomaGenre.evidence);
 for(const [set,id,genre,url,locator] of [
  [classicSet,'tempest','comedy','https://www.folger.edu/blogs/collation/whats-in-a-genre/','Genre discussion: The Tempest is included among the First Folio comedies; later romance classification is additional, not exclusive.'],
  [classicSet,'tempest','tragicomedy','https://internetshakespeare.uvic.ca/doc/Tmp_GenIntro/complete/','Critical introduction, genre discussion: comedy designation and affinities with romance and tragicomedy.'],
@@ -78,5 +97,6 @@ for(const [set,id,genre,url,locator] of [
  });
 }
 addGenreCompatibility(classicSet,'theatre');
-addGenreCompatibility(modernSet,'theatre');
+// Keep the retained work's comparisons available as evidence, without putting its fact back in active lessons.
+addGenreCompatibility({...modernSet,concepts:[...modernSet.concepts,retainedOurTownGenreFact]},'theatre');
 export const theatrePlaySets=[classicSet,modernSet];

@@ -1,323 +1,175 @@
 # AI handoff — Quiz Game (Codex ⇄ Claude Code)
 
-Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE.md). This file holds **current task state only**; it links to, and does not duplicate, the application docs ([progression](quiz-learning-progression.md), [validity](quiz-validity.md), [curriculum](art-curriculum-approved.md), [Literature/Theatre status](art-literature-theatre-content.md), [genre completion report](art-genre-completion.md), [machine report](art-literature-theatre-validation.json)).
+Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE.md). This file holds **current task state only**. Application docs: [progression](quiz-learning-progression.md) · [validity](quiz-validity.md) · [curriculum](art-curriculum-approved.md) · [Literature/Theatre status](art-literature-theatre-content.md) · [genre report](art-genre-completion.md). Earlier research (matching architecture, duplicate-target design, the Codex prompt) lives in commits `2055707` and `ca8d66a`.
 
-**Last updated:** 2026-10-21, Claude Code, after independent review and the duplicate-target checkpoint commit (see `git log -1`). Earlier research and checkpoint findings below are retained.
+**Last updated:** 2026-10-21, Codex final checkpoint review. **Literature/Theatre 150/150 each.**
 
-## Current implementation — duplicate-target matching
+## Final checkpoint — local only (2026-10-21)
 
-- Started in the required worktree on `codex/literature-theatre-content`, **clean at `ca8d66a`**. Earlier work was already checkpointed; no existing uncommitted files were overwritten. HEAD is unchanged this session; no commit, push, stage, merge, reset, clean, stash or worktree/branch switch occurred. `.git_backup_corrupt/` was not touched.
-- **Before production edits:** the prerequisite identity-grading/interaction test passed (1/1, 7.842 seconds). Existing grading accepts either identical card, locks correct pairs permanently, prevents physical-card reuse, and reports wrong selections using the existing wrong state. Also saved **1,800 pre-change SHA-256 matching payload hashes**: all 600 completed-Art part/variant cases, three fixed seeds, development-image delivery. The regression test subsequently matched all hashes.
-- `relationPolicies.ts`: optional `allowDuplicateTargetAnswers`; only the two requested reviewed relations opt in. Both resolve through `reviewedPolicy`. Legacy policy definitions are unchanged: archived `genre_of_play` remains unflagged; `genre_of_novel`, which has no archived override, inherits its reviewed policy.
-- `exerciseFactory.ts`: flagged matching groups permit exact-display, same-identity, mutually verified-valid duplicate targets; different targets require mutually verified-invalid cells and the existing distinctness tests. Same identity with different display is rejected. Quartets require at least three target identities and an invalid cell. The existing permanent-lock safety check and pair/accepted-set construction remain intact. Unflagged groups retain the original compatibility expression and search behavior.
-- `matchingSafety.ts`: identical visible cards are exempt from indistinguishability only with the same defined answer identity and equal accepted-identity sets (missing list = empty). Validators and callers are unchanged.
-- New `duplicateTargetMatching.test.ts` covers policy scope, generation, both validators, real interaction/grading, all 4,096 reflexive four-card patterns (exactly **15** lockable equivalence partitions), overlaps including one-way validity, unknowns, degenerate groups, differing displays, flag-off fixtures, deterministic variation and the saved completed-Art baseline. The baseline test has a 300-second explicit allowance for its 1,800 generations; the requested full-suite command still uses `--testTimeout=60000`.
-- **No content, evidence, priorities, stages, curriculum, ordinary-question generation, grading, UI, progress, image infrastructure or production settings changed.** No new helper module, exercise metadata or engine relation-specific behavior was added. `duplicateMatching` and all existing zero-duplicate assertions are unchanged.
+This document is included in the user-authorised checkpoint **`feat(art): complete Literature and Theatre genre readiness`**, parent `b2ca62133335c30ddfa78bccced49603386bb10a`, on `codex/literature-theatre-content`. The checkpoint hash is the containing commit (`git log -1`). Its 11 explicitly staged files cover only Literature/Theatre content, evidence, regression tests and status documentation. The complete diff was reviewed; no unrelated files, temporary files or potential secrets were found. The four factual corrections below are preserved. `.git_backup_corrupt/` is untouched.
 
-### Independent review and final validation (Claude Code, 2026-10-21) — approved, committed
+Confirmed the latest full-suite and sweep logs against the unchanged implementation: **571/571 tests across 30 suites**, Literature/Theatre **150/150 combinations each**, generation and fresh progression **6,000/6,000 each in both delivery modes**, completed Art generation and fresh progression **12,000/12,000 each**, with zero validation failures or progression violations. TypeScript, lint, readiness/content audit and image validation were rerun successfully during checkpoint review; whitespace checks passed. No application code changed during this review, so the long suite and sweeps were not repeated.
 
-- **Review verdict:** no bugs. The flagged branch implements the approved rule exactly; the unflagged branch is the original expression verbatim; the identity/accepted-set exemption in `hasIndistinguishableAnswers` is correct; production quiz generation uses `activeSemanticContext` (target policies, flag present). No unintended changes (six files only).
-- **Baseline independently verified:** all 1,800 completed-Art matching hashes were regenerated from a pristine export of the pre-change commit with 0 mismatches against `completedArtMatchingBaseline.json`; the new code also matches them.
-- **Approved cleanups applied before the commit:** the policy test now sorts the relation ids and asserts only the production `targetRelationPolicies` (the incidental `legacyRelationPolicies` assertion was removed).
-- **Final results after the cleanups:** `tsc --noEmit` PASS; `npm run lint` PASS; `git diff --check` PASS; affected suites (duplicateTargetMatching, semanticValidation, answerValidation, engineHardening) 4/4 suites, 75/75 tests; **full suite 30/30 suites, 566/566 tests**. Independent sweeps matched Codex's: Literature+Theatre 5,760/6,000 ready in both delivery modes (0 failures, 0 duplicate matching, content-validation errors 0); L/T fresh learners 120 ready / 40 insufficient / 5,840 prerequisite-blocked / 0 violations; completed Art 12,000/12,000 for generation and fresh-learner sweeps.
+**Git status / exact next action:** the 11 intended files form this checkpoint; the expected post-commit working tree is clean (verified in the commit report). No push, merge or Stage 3 integration is authorised. Await the user's explicit approval before beginning Stage 3.
 
-### Literature/Theatre blockers that remain (unchanged by this engine change)
-All four genre placements still fail A/B/C safely (144/150 combinations ready per subtopic); fresh learners still stop at l1/p2/A.
-- **Literature l1/p2:** matching needs cells that cannot be honestly certified (A); severe ordinary-form shortages (5 of 6 A facts have no wrong options).
-- **Literature l5/p2:** A has a certified matching quartet; ordinary forms fail for The Great Gatsby and Their Eyes Were Watching God (no wrong options); B/C need about 6–7 more cells and have introductions with no wrong options.
-- **Theatre l1/p2:** A needs 2 cells (one — *Earnest ≠ Heroic comedy* — not certifiable); the She Stoops→A / Earnest→B re-staging plus two revenge-tragedy cells would now be viable with duplicate targets; B/C also need ordinary evidence (The Bacchae has none; four facts have one).
-- **Theatre l5/p2:** no workable path with current works and fail-closed evidence.
-Awaiting user approval before any re-staging, evidence or content work.
+**Outstanding release audit:** AI-authored semantic evidence remains provisional and needs human editorial review, including the five new work-specific comparisons below. Readability diagnostics have 79 advisory length warnings in the Literature/Theatre sample; these are editorial follow-ups, not generation violations. Matching quartet variety remains limited in the repaired placements. The older machine/status reports are historical. Literature/Theatre stay text-only; production image activation and Design availability remain unchanged. This checkpoint establishes technical readiness, not release certification.
 
-### Validation — 2026-10-21
+## Final matching repair — current status (2026-10-21)
+
+The three shortages identified in the independent review below are resolved without changing the engine, grading, quotas or curriculum relations. The four source-backed corrections remain positive and are covered by their regression test. The earlier blocked results below are historical.
+
+### Minimal genre-only changes
+
+- **Literature l1/p2:** Treasure Island C→A and The Scarlet Letter A→C via existing `genrePriority` overrides. All works, primary genres, IDs and evidence are retained. A can now match Pride and Prejudice → Novel of manners, The Moonstone → Detective fiction, and Moby-Dick / Treasure Island → two identical Adventure fiction cards. Existing evidence also supplies B/C quartets. No new Literature evidence or reserve was needed. The core Gothic/science-fiction introductions remain in A; author/publication lessons are unchanged.
+- **Theatre l5/p2:** activate the already approved **Oklahoma! → Musical** reserve in **B**, replacing **Our Town’s genre slot only**. Move The Bald Soprano B→A using its existing genre-only override. All remaining stages and primary labels stay unchanged. Our Town keeps its author/date lessons and its original Drama genre record is exported as `retainedOurTownGenreFact` outside the active plan; its original source evidence and comparisons remain registered. It was not reclassified. The original l1 reserve IDs remain inactive, and Nineteen Eighty-Four remains unscheduled.
+- Theatre B/C now match Glass Menagerie → Memory play (A), Bald Soprano → Absurdist drama (A), Rosencrantz and Guildenstern → an interchangeable Absurdist drama card (B), and Oklahoma! → Musical (B). This is exactly two A and two B facts, so the quartet fits both B and C while all ordinary-question progression quotas remain intact. Theatre A retains its prior safe quartet.
+- The existing Theatre cohort has only one certified quartet, entirely from A; re-staging alone cannot make that quartet fit B/C. The single approved reserve is therefore a necessary, bounded genre-only adjustment rather than a changed learning objective. It adds the familiar integrated-musical form in place of a generic Drama answer. No unrelated lesson changed.
+
+### Five new work-specific comparisons (provisional AI review)
+
+| Negative | Source and exact basis |
+|---|---|
+| Oklahoma! ≠ Memory play | [Creator estate’s complete two-act synopsis](https://rodgersandhammerstein.com/oklahoma-synopsis/): forward courtships, auction, wedding and departure; Laurey’s ballet is a dream about a feared wedding, not a recollection presenting the staged past. |
+| Oklahoma! ≠ Absurdist drama | [Creator estate’s show account](https://rodgersandhammerstein.com/show/oklahoma/) plus that synopsis: integrated musical narrative with intelligible causal action and stable characters, not the disrupted-language/narrative form. |
+| Glass Menagerie ≠ Musical | [Licensed original drama](https://www.concordtheatricals.com/p/98161/the-glass-menagerie) and [Court Theatre guide, PDF pp. 4–5](https://www.courttheatre.org/wp-content/uploads/2017/06/PG_GlassMenagerie.pdf): spoken memory drama; accompanying music/dance does not make an integrated sung narrative. |
+| Rosencrantz and Guildenstern ≠ Musical | [Licensed original Stoppard script](https://www.concordtheatricals.com/p/2819/rosencrantz-and-guildenstern-are-dead): spoken dramatic comedy around Hamlet; incidental player music and the recorder are not an integrated musical narrative. |
+| Bald Soprano ≠ Musical | [Licensed Ionesco script](https://www.concordtheatricals.com/p/3070/the-bald-soprano-trans-allen), corroborated by [Huchette dossier, PDF pp. 4–5](https://www.theatre-huchette.com/pdf/DOSSIER-PEDAGOGIQUE-2023.pdf): antiplay derived from language lessons and nonsense conversation, not a sung story despite the title. |
+
+These concern the original stage works, not separately musicalised adaptations or individual experimental productions. They are **not** general genre exclusions. No Oklahoma!/Historical-drama, Feminist-drama, Tragicomedy or Comedy-of-menace negative was invented; unverified relationships stay unknown. No Rosencrantz/Historical-drama or Glass-Menagerie/Realist-drama negative was added. The four previous corrections remain protected. New comparisons and the newly authored positive have 21 October review dates and do not claim human editorial certification.
+
+### Validation for the repair
 
 | Check | Result |
 |---|---|
-| Prerequisite, before production changes | PASS 1/1 |
-| Focused safety tests excluding the long baseline | PASS 15/15 |
-| Completed-Art baseline | All 1,800 matching payload hashes identical |
-| `npm test -- --runInBand --watchman=false --testTimeout=60000` | **PASS 30/30 suites, 566/566 tests**, 775.13 seconds; all existing tests unchanged |
-| `npx tsc --noEmit`, `npm run lint`, `git diff --check` | PASS |
-| `art-literature-theatre-audit.cjs --require-ready` | exit 1, expected; validation errors `[]` |
-| L/T generation, 20 attempts, production **and** development images | Each: 6,000 requests, 5,760 ready, 240 insufficient, 0 failures, 0 duplicate matching exercises; content validation errors 0. **144/150 combinations each subtopic** |
-| L/T fresh learning, 20 attempts, both delivery modes | Each: 6,000 requests, 120 ready, 40 insufficient, 5,840 prerequisite-blocked, 0 violations; exit 1 reflects existing shortages |
-| Completed Art generation, 20 attempts, development images, `--require-ready` | 12,000/12,000 ready; 0 shortages, failures or duplicates; content validation errors 0 |
-| Completed Art fresh learning, 20 attempts, development images | 12,000/12,000 ready; 0 shortages, prerequisite blocks or violations |
-| Additional flag-off versus flag-on review comparison | All 138 p3/p5/l10 cases × 20 seeds = **2,760** matching payloads identical; no readiness changes or duplicates; **61** genre-matching exercises in each run |
-| Matching variation, completed Art | 589/600 cases have multiple fact quartets across 20 seeds; range 1–20; 11 retain one available quartet |
-| `art-image-assets.cjs --check` | PASS: 19 assets, 19 staged, 0 approved, 19 staging-approved; no asset writes |
+| `npm test -- --runInBand --watchman=false --testTimeout=60000` | **PASS 30/30 suites, 571/571 tests**, 677.006 seconds; all 1,800 frozen completed-Art matching hashes pass |
+| Focused primary/staging and 120 deterministic repaired-quiz checks | PASS 12 tests |
+| L/T generation, 20 attempts, production **and** development-image delivery, `--require-ready` | Each: **6,000/6,000 ready**, 0 shortages, 0 failures; **150/150 combinations each**; 305 safe duplicate-target matching exercises |
+| L/T fresh learner, 20 attempts, both delivery modes | Each: **6,000/6,000 ready**, 0 shortages, prerequisite blocks or violations; full Level 10 reached |
+| Readiness/content audit | exit 0; 297/297 ordinary-qualified facts each; validation errors `[]` |
+| Completed Art generation and fresh progression, 20 attempts, development images | **12,000/12,000 ready each**; 0 shortages, failures, prerequisite blocks or violations; generation duplicates 0 |
+| TypeScript / lint / whitespace / images | PASS, final type/lint reruns clean; image check unchanged: 19 assets, 19 staged, 0 approved, 19 staging-approved |
 
-The four l1/p2 and l5/p2 genre placements still fail A/B/C safely; dependent reviews remain ready in isolated generation, and fresh learners still stop at l1/p2/A. This engine change alone does not resolve their matching-evidence and ordinary-question shortages. No discrepancy from the requested readiness target was observed. Initial new-test authoring failures (JSON registry typing and missing synthetic learning priorities) were corrected in the new test only; production grading and existing tests were not changed.
+Actual A/B/C quizzes were inspected from both repaired placements: approved answers appear in MCQ/True-False/blanks and matching; eight exercises, exact quotas and the four source corrections are preserved. The new regression test checks all three variants for each repaired placement over 20 seeds using both composition and semantic validators. Matching fact-set variety remains limited: each repaired variant used one quartet across the 20 production seeds; no unsupported pair was added to increase variety. All **1,764 active records outside Literature l1/p2 and Theatre l5/p2 are byte-identical to the prior reviewed snapshot**, including every author/date lesson and the four completed Art subtopics. Engine, UI, image infrastructure, progress and other content files were not edited.
 
-**Files changed (six):** the three engine files above; `src/quizEngine/__tests__/duplicateTargetMatching.test.ts`; `src/quizEngine/__tests__/fixtures/completedArtMatchingBaseline.json`; this handoff. Final `git status --short`: four modified tracked files, two untracked new files, nothing staged. HEAD remains `ca8d66a58119979193ae25eea76c00c0c93d41a9`. No other implementation file is changed. No scope deviations; the explicit long-baseline test allowance and additional read-only image/review checks are documented above.
+**Repair-session Git state (historical):** the repair ended at `b2ca621` with 11 modified tracked files, nothing staged or pushed. The user subsequently authorised the final checkpoint recorded above. Human editorial release certification remains outstanding; no production images or availability flags were enabled.
 
-**Exact next action (superseded — review completed above):** independently review these six uncommitted files, particularly the preserved unflagged expression, identity/set exemption, prerequisite test and frozen baseline. Do not commit or push without explicit user approval. Content/evidence/re-staging repairs remain separate user decisions below; do not begin them as part of this task.
+## Historical independent review outcome — BLOCKED (2026-10-21)
 
-## Repository and Git state
+Verified worktree `/Users/simaybayatli/.codex/worktrees/aeb2/quiz-game`, branch `codex/literature-theatre-content`, checkpoint `b2ca621`. The initial tree contained **11 modified files**, nothing staged. No commit, stage, push, merge, reset, clean, stash or branch switch occurred; `.git_backup_corrupt/` was left untouched.
 
-| | |
-|---|---|
-| Repo | `bayatlisimay-code/quiz-game` (origin `https://github.com/bayatlisimay-code/quiz-game.git`) |
-| Working directory | `/Users/simaybayatli/.codex/worktrees/aeb2/quiz-game` |
-| Branch | `codex/literature-theatre-content` (local only; not pushed) |
-| Checkpoints | `603e0f9` first `wip:` checkpoint (44 files, parent `43f1859`) → **second `wip:` checkpoint** (the commit directly after it; `git log -2`): R1, Literature l5 rank 1, 16 evidence assertions, tests, docs |
-| `main` / `origin/main` | unchanged at `43f1859` |
-| Documentation checkpoint | `ca8d66a` (duplicate-target decision and implementation prompt); implementation committed in the checkpoint after it (`git log -2`) |
-| `.git_backup_corrupt/` | tracked in history (98 files); **untouched — leave it that way** |
+### P1 — four incorrect genre exclusions corrected
 
-## Restrictions (explicit)
+The initial 150/150 result was reproducible, but it relied on four negative assertions contradicted by documented classifications. Engine validation cannot independently discover factual errors in evidence marked verified. This review changed those four assertions to supported **positive alternatives**, preserving their evidence IDs and every primary teaching answer:
 
-- **No push, merge, rebase, reset, clean, restore, stash, branch/worktree switch** without explicit user approval. No further commit without approval.
-- **No image activation** (no image bindings, no R2 upload, no registry/asset writes). Literature and Theatre are text-only. Design stays "Coming soon".
-- Do not touch completed Painting/Sculpture/Architecture/Design content (baseline hashes are test-guarded).
-- Do not change the 44 approved primaries; do not weaken semantic verification, the fixed 8-exercise/6-fact composition or safe matching; **fail closed on uncertain negatives**; unknown is never false.
-- Do not change what genre lessons teach (the genre of the actual work). No work-feature assessment view, and **no wrong-option-only / assessment-only labels** unless ordinary-question feasibility is still deficient after evidence and re-staging — then design first, get approval.
+| Work | Alternative previously marked incorrect | Independently checked source |
+|---|---|---|
+| The Moonstone | Historical fiction | [CiNii Books, BA23862288](https://ci.nii.ac.jp/ncid/BA23862288), Subject Headings: Historical fiction (gsafd), Everyman's Library 122 / Knopf 1992, ISBN 0679417222; corroborated by [Ohrstrom Library, record 71859](https://librarycatalog.sps.edu/cgi-bin/koha/opac-detail.pl?biblionumber=71859), Genre/Form. This is the original novel, not a graded-reader adaptation. |
+| Top Girls | Absurdist drama | [Travis Michael Holder's ArtsInLA review, hosted by Antaeus](https://antaeus.org/wp-content/uploads/2020/06/artsinla-top-girls.pdf), PDF page 1 under Top Girls: explicitly describes the work as an absurdist theatrical polemic. Feminist drama remains primary. |
+| “Master Harold”…and the Boys | Tragicomedy | [Clive Barnes, original New York Post review, 5 May 1982, reprinted with permission](https://www.enotes.com/topics/athol-fugard/criticism/fugard-athol-vol-25/clive-barnes): explicitly identifies a tragicomedy. Realist drama remains primary. |
+| A Raisin in the Sun | Feminist drama | [Hee Won Lee, Feminist Studies in English Literature 22.2 (2014), pp. 205–241](https://oak.go.kr/central/journallist/journaldetail.do?article_seq=20303), abstract and keywords explicitly document the feminist-drama reading. Realist drama remains primary. |
 
-## Decisions the user has made (authoritative)
+These are supported alternatives, not newly imposed primary classifications. Real pre-correction quizzes included Historical fiction as a wrong Moonstone MCQ option and as a competing matching card, and Absurdist drama as a wrong Top Girls MCQ option and competing matching cards. Those judgments are now forbidden. The 153 provisional AI-authored judgments remain provisional: 149 Claude-authored negatives plus four source-checked Codex positive corrections; none represent human editorial approval.
 
-1. The 44-record primary table in [approvedGenrePrimaries.ts](../data/artContent/approvedGenrePrimaries.ts) / [art-genre-completion.md](art-genre-completion.md) is final. Nineteen Eighty-Four → Dystopian fiction and Oklahoma! → Musical are approved classifications (in `genreReserves.ts`), **not** mandatory active teaching facts. The older audit/candidates documents are superseded.
-2. **"Realist drama" keeps the app's current descriptive definition** (`theatreGenres.ts`: "recognisably true to life"). Do **not** use historical chronology to certify Realist-drama negatives.
-3. **R1 adopted for Literature l1** and **Literature l5 rank 1 adopted** (both done, below).
-4. Re-staging for Literature l5 and Theatre l5: analyse exhaustively first, rank by valid matching quartets, minimal priority movement and curriculum coherence, then research only the cells the strongest candidates need. The Literature l5 re-staging was approved and applied; no Theatre l5 re-staging is approved.
-5. Wrong-option-only labels: **deferred**.
-6. Preserve legitimate genre overlap; a source calling a work one genre never proves it is not another.
+Changes made by this review: `genreCompatibility.ts` (four corrections, with accurate 21 October review dates via an optional authoring date override), one four-case regression test in `approvedGenrePrimaries.test.ts`, and these status documents. No engine, primary answer, fact identity, priority, staging, curriculum, UI, grading, progress or image code was changed by this review. Existing generation safeguards and test assertions were not weakened.
 
-## Changes made after the first checkpoint (committed in the second checkpoint)
+### P1 — three genuine matching shortages remain after the correction
 
-**A. Literature l1 R1 re-staging (approved).** Stage is priority rank inside a placement (top 6 → A, next 3 → B, rest → C; `scheduleArtLearning`). A work's `priority` also feeds its author-credit (p1) and publication (p4) facts, so changing it would have moved those too. Instead an optional `genrePriority` on `LiteraryWork` overrides only the l1/p2 genre fact ([literaryAuthoring.ts](../data/artContent/literaryAuthoring.ts), used in [literatureClassics.ts](../data/artContent/literatureClassics.ts)): Wuthering Heights `genrePriority:4` (A→B), The Scarlet Letter `genrePriority:5` (B→A). Result Literature l1/p2: **A** Dracula, Frankenstein, Jane Eyre, Moby-Dick, Pride and Prejudice, The Scarlet Letter · **B** Wuthering Heights, Huckleberry Finn, Little Women · **C** Don Quixote, Treasure Island. 6/3/2, 11 facts, all records and primaries retained; author and publication stages of both works verified unchanged. A now holds one Gothic primary (Dracula).
+- Literature **l1/p2/A**: no certified four-pair matching group. The Moonstone and The Scarlet Letter cannot be opposing exclusive targets when Historical fiction is legitimate for both.
+- Theatre **l5/p2/B and C**: no compatible quartet inside a permitted six-fact teaching pool. The eligible-pool diagnostic still finds one quartet (Glass Menagerie, The Crucible, The Birthday Party, Top Girls), but all four are A facts. B allows only three A facts and C only two, so that quartet cannot fit either six-fact pool; do not mistake eligible-pool feasibility for quiz readiness. Top Girls cannot be used opposite an Absurdist drama card as an incorrect cross-pair.
+- Literature l1 B/C, Literature l5 A/B/C, Theatre l1 A/B/C and Theatre l5 A remain ready in isolated generation. Fresh learners correctly stop at the earlier failed prerequisites; no bypass was introduced.
 
-**A2. Literature l5 rank 1 re-staging (approved).** Same genre-only mechanism in [literatureModernNovels.ts](../data/artContent/literatureModernNovels.ts) (`genrePriorities`): Riders of the Purple Sage 4→5 (B→A), The House on Mango Street 5→4 (A→B). Literature l5/p2 now: **A** Fahrenheit 451, The Great Gatsby, The Joy Luck Club, The Maltese Falcon, Riders of the Purple Sage, Their Eyes Were Watching God · **B** A Farewell to Arms, The House on Mango Street, My Ántonia · **C** Red Harvest, The Wonderful Wizard of Oz. Author (p1) and publication (p4) stages of both works verified unchanged.
+### Scope and educational review
 
-**B. 16 new work-specific negative assertions** in [genreCompatibility.ts](../data/artContent/genreCompatibility.ts) (reviewer `Claude Code — source and work-feature comparison (not independent human editorial approval)`; new optional `reviewer` field, others still stamped Codex). **All 16 remain provisional AI-authored evidence — including the 11 Literature l5 matching cells — and must not be treated as independently approved.** Sources were fetched this session (NEA Big Read, Penguin Random House, Library of Congress, Folger, Ibsen Centre, Yale, Dictionary.com); definitions reuse those already in `literaryGenres.ts`/`theatreGenres.ts`.
+Compared the active snapshot with `HEAD` by loading the five original data files through a read-only Git source overlay. All **1,742 records outside the four intended genre placements are byte-identical**; the only 11 differing concept IDs are inside those placements (including Jane Eyre removal / Moonstone addition). Evidence changes are confined to `genre_of_novel` and `genre_of_play`. In particular, author-credit and publication/date lessons remain unchanged.
 
-| Work ≠ label | Source (basis) |
-|---|---|
-| Fahrenheit 451 ≠ Family saga, Detective fiction, Western | NEA overview: one fireman, society-wide action, science fiction |
-| The Joy Luck Club ≠ Dystopian, Detective, Western | NEA overview: San Francisco / China family stories |
-| The Maltese Falcon ≠ Dystopian, Western | NEA overview: real 1928 San Francisco |
-| Riders of the Purple Sage ≠ Dystopian, Family saga, Detective | Penguin Random House description + Library of Congress (Western, 1912): moderate confidence, summary-level sources |
-| Hamlet ≠ Comedy, Comedy of manners, Heroic comedy | Folger introduction (revenge tragedy) + Folger Act 5 Sc. 2 text: four principal deaths, no comic restoration; structural comparison, not "tragedy excludes comedy" |
-| Antigone ≠ Heroic comedy | extends existing non-comedy certificate |
-| A Doll's House ≠ Comedy of manners | Ibsen Centre reception account (serious drama, nearest tragedy); moderate confidence |
+The Moonstone is an educationally appropriate detective-fiction classic ([Penguin description](https://www.penguinrandomhouse.com/books/260151/the-moonstone-by-wilkie-collins/)), but its legitimate historical classification invalidates the proposed A matching quartet. Theatre l5's order is educationally reasonable and preserves 6/3/2, although its B/C compatibility still needs resolution. Gatsby retains Modernist novel, supported by the [Cambridge chapter abstract](https://www.cambridge.org/core/books/abs/cambridge-companion-to-f-scott-fitzgerald/great-art-small-art-and-modernist-cachet/B9BE748753C881A32D64774E5577A565), and was observed as an actual blank answer. Little Women's unified Bildungsroman wording is retained. Our Town's broad Drama answer is correct, is never treated as false for other plays, and works in ordinary questions; its inability to participate in a discriminating matching quartet is not itself an assessment failure.
 
-**C. Tests.** [approvedGenrePrimaries.test.ts](../src/quizEngine/__tests__/approvedGenrePrimaries.test.ts): the 44-primary test now expects table-order stages **except** an explicit, documented override map for the two R1 facts; three new tests (R1 and l5 shape/author-publication stages unchanged; the 16 assertions are `invalid`, `verified`, honestly labelled and never contradict a documented positive).
+Inspected representative real A/B/C quizzes from all four placements before and after correction: MCQ, both truth values, blanks, and four-pair matching. The ready quizzes have eight exercises, exact quotas, six ordinary facts and safe interchangeable duplicate targets. The three blocked quizzes now explicitly return no exercises rather than invalid questions.
 
-**D. Docs.** `art-genre-completion.md` has an R1 banner and its two stage cells updated; the historical counts there are otherwise as Codex reported.
-
-## Validation — run by Claude Code, 2026-10-20 (after the changes above)
+### Independent validation after semantic correction
 
 | Check | Result |
 |---|---|
-| `npm test -- --runInBand --watchman=false --testTimeout=60000` | **PASS 29/29 suites, 550/550 tests** (547 + 3 new) |
-| `npx tsc --noEmit` / `npm run lint` / `git diff --check` | PASS |
-| `art-image-assets.cjs --check` | 19 assets, 19 staged, 0 approved — unchanged |
-| `art-literature-theatre-audit.cjs --require-ready` | exit 1 (expected readiness gate) |
-| `art-content-impact` Literature+Theatre, 20 attempts | 6,000 requests: **5,760 ready, 240 insufficient, 0 failures; validation clean**. The same 12 combinations fail (l1/p2 and l5/p2 in both subtopics, A/B/C) |
-| `art-learning-impact` Literature+Theatre | 6,000: 120 ready, 40 insufficient, 5,840 prerequisite-blocked, 0 violations — fresh learners still stop at l1/p2/A |
-| Same sweeps with development images | identical (5,760 / 6,000 ready; 0 failures) |
-| Completed Art regression (4 subtopics, dev images): content + learning | 12,000/12,000 ready, 0 failures/violations |
-| Content validation (`validateContent`) | no errors |
+| `npm test -- --runInBand --watchman=false --testTimeout=60000` | **PASS 30/30 suites, 570/570 tests**, final rerun 676.133 seconds; includes the new four-case evidence regression and all 1,800 completed-Art matching baseline hashes |
+| TypeScript / lint / whitespace | PASS after the final metadata/type check |
+| `art-literature-theatre-audit.cjs --require-ready` | exit 0; validation errors `[]`, all 297 facts per subtopic ordinary-qualified. **This script checks ordinary-fact capability, not four-pair/joint quiz readiness.** |
+| L/T generation, 20 attempts, production and development images, `--require-ready` | Each mode: **5,940/6,000 ready**, 60 explicit shortages, 0 failures, 220 safe duplicate-target matching exercises. Literature **149/150**, Theatre **148/150**; the only failing combinations are the three listed above. Exit 1 is the correct readiness gate. |
+| L/T full fresh progression, 20 attempts, both modes | Each mode: 6,000 requests, **1,340 ready, 40 shortages, 4,620 prerequisite-blocked**, 0 violations. Literature stops at l1/p2/A; Theatre at l5/p2/B. Exit 1. |
+| Completed Art generation, 20 attempts, development images, `--require-ready` | **12,000/12,000 ready**, 0 shortages/failures/duplicates; validation errors 0 |
+| Completed Art fresh progression, 20 attempts, development images | **12,000/12,000 ready**, 0 shortages/prerequisite blocks/violations |
+| Image validation | PASS: 19 assets, 19 staged, 0 approved, 19 staging-approved; no image writes |
 
-Net effect on readiness: **none yet** — Literature and Theatre remain **144/150** each. All gains are in certified cells, below.
+**Final Git status:** branch `codex/literature-theatre-content`, HEAD unchanged at `b2ca621`; the same 11 tracked files remain modified, nothing staged and no new untracked files. No commit, push or merge occurred.
 
-## Where each blocked placement stands (A stage, after this session)
+**Exact next action:** do not integrate as generation-complete. Resolve the three matching shortages with source-defensible alternatives within the current teaching pools, or obtain approval for the smallest reserve/staging adjustment if genuinely necessary. Do not reinstate any of the four contradicted negatives or narrow the question artificially. Then repeat generation and fresh-progression sweeps. Ratify the existing genre-only curriculum changes and retain a human editorial release audit for the remaining provisional evidence. No further curriculum or engine redesign was attempted in this review.
 
-Cells = off-diagonal "work ≠ label" pairs still unevidenced inside the best overlap-free matching quartet; "doubtful" = pairs I judged not honestly certifiable.
+The tables and 150/150 claims below are **Claude's pre-review results**, retained as history, not the current readiness verdict.
 
-| Placement | Status |
+## Historical pre-review status: Literature and Theatre reported generation-complete
+
+| Check (run 2026-10-21) | Result |
 |---|---|
-| **Literature l1** | R1 removed the documented Gothic/Bildungsroman overlaps; A now has one quartet needing 11 cells (B 10/20, C 34/45 pools). **But** every quartet in R1's A needs cells that cannot be honestly certified (e.g. Moby-Dick ≠ Gothic, The Scarlet Letter ≠ Gothic/Romance, Frankenstein ≠ Adventure [Arctic frame], Dracula ≠ Adventure). A search of all 4,620 arrangements, treating those doubtful pairs as blocked, finds **zero** arrangement whose A, B and C each keep a certifiable quartet. Matching therefore remains blocked; adding more ordinary-form negatives here would not unlock the lesson, so none were added beyond those listed. |
-| **Literature l5** | **Re-staged (rank 1).** A has a fully evidenced matching quartet {Fahrenheit 451, Joy Luck Club, Maltese Falcon, Riders} (all 11 cells; provisional AI-authored evidence). **Still blocked:** (1) *ordinary forms* — The Great Gatsby and Their Eyes Were Watching God have no certified wrong options among the A answers ("six assessable facts required; has 4"); each needs ≥2 sourced work ≠ label cells against Dystopian / Family saga / Detective / Western (or Modernist/Bildungsroman for each other, which are doubtful); (2) *B and C* — pools hold only three A facts, so they currently need about 6 more cells each (e.g. War-fiction cells for A Farewell to Arms). Note: before the re-staging B had a certified quartet; the move traded B for A (A was the harder blocker). |
-| **Theatre l1** | Ordinary forms: Hamlet now has 4 certified wrong options. **A** is blocked only by matching (2 cells, one — *Earnest ≠ Heroic comedy* — not certifiable; no definitional source for "heroic comedy"). **B and C are also short on ordinary forms** (The Bacchae has 0 wrong options; School for Scandal, She Stoops, Faustus, Tempest have 1) — the planner reports only the first shortage. Every other quartet needs Realist-drama cells (blocked by decision 2). See the matching-architecture section for the duplicate-card + two-fact re-staging path. **Unresolved.** |
-| **Theatre l5** | No re-staging of the existing 11 reduces the A requirement below 10 cells, and those rely on overlap-prone labels (Tragedy, Tragicomedy, Comedy of menace [also grouped with the Absurd], Memory play; Drama is valid for every play). With the Oklahoma! reserve (4 moves, Our Town leaves the plan) the best quartet still needs 12 cells including Birthday Party ≠ Absurdist drama (doubtful). **Not recommended to pursue now; unresolved.** |
+| Literature + Theatre generation, 20 attempts, production and development-image modes, `--require-ready` | **6,000/6,000 ready in each mode = 150/150 combinations per subtopic**; 0 failures; content validation 0 errors |
+| Literature + Theatre fresh-learner progression (both modes) | **6,000/6,000 ready, 0 prerequisite-blocked, 0 violations** — fresh learners now reach Level 10 |
+| Completed Painting/Sculpture/Architecture/Design (dev images) generation + fresh learner | 12,000/12,000 each, 0 failures/violations, 0 duplicate cards (unchanged) |
+| `npm test -- --runInBand --watchman=false --testTimeout=60000` | **30/30 suites, 569/569 tests** |
+| `npx tsc --noEmit` / `npm run lint` / `git diff --check` | pass |
+| `art-literature-theatre-audit.cjs --require-ready` | **exit 0**; 297/297 facts ordinary-qualified in each subtopic |
+| `art-image-assets.cjs --check` | 19 assets, 19 staged, 0 approved — unchanged (Literature/Theatre remain text-only) |
 
-## Matching-architecture investigation (read-only; findings are NOT committed)
+Real generated quizzes from all four formerly blocked placements were inspected: eight exercises, correct quotas, sensible wrong options, and duplicate-target matching shown working (e.g. *The Importance of Being Earnest* and *The School for Scandal* both → "Comedy of manners").
 
-Nothing in the engine, UI, content or evidence was changed for this investigation. All experiments ran in scratch copies (monkey-patched in memory, hypothetical evidence labelled `SIMULATION`) outside the repo.
+## Git state
 
-### A. Established facts (verified in code or by running the repo's own functions)
+Branch `codex/literature-theatre-content` at `b2ca621` (chain: `ca8d66a` docs, `2055707` docs, `e4544c2` re-staging + first evidence, `603e0f9` first checkpoint, `43f1859` baseline). `main`/`origin/main` still `43f1859`. Nothing pushed. `.git_backup_corrupt/` untouched (tracked in history).
 
-1. **Grading is already identity-based, not positional.** `isMatchingPairCorrect` ([answerValidation.ts](../src/quizEngine/answerValidation.ts)) accepts a card when its `answerIdentity` is in the left item's `acceptedAnswerIdentities`; the generator fills that list from every displayed card the evidence layer rates `valid` for that work. Duplicate-identity cards are therefore **already interchangeable at grading time**, and many-to-many acceptance already exists in the data. `attemptMatchingPair` locks left→right index and rejects an already-used right card, so identical cards are consumed one at a time. Verified with the real functions: Dracula→the *other* Gothic card locks, Wuthering→the remaining Gothic card locks, Moby→the manners card is rejected, and a swapped-Gothic assignment grades correct.
-2. **Where the engine actually forbids the proposed pattern** ([exerciseFactory.ts](../src/quizEngine/exerciseFactory.ts) `matchingCandidates`/`compatible`, [matchingSafety.ts](../src/quizEngine/matchingSafety.ts), `quizCompositionViolations`): (a) displayed answer label, answer text and `equivalentAnswers` must differ; (b) **every** cross cell must be `valid` or `invalid` — `unknown` disqualifies the pair; (c) at least one `invalid` cell; (d) the valid-matrix must be `isPermanentlyLockable`; (e) the final validator rejects identical right-hand text (`hasIndistinguishableAnswers`).
-3. **Valid overlaps are already allowed** when the quartet stays lockable. Exhaustive check of all 4,096 possible valid-patterns on four cards (own card always valid): **exactly 15 are permanently lockable — Bell(4), the number of partitions of four items.** `isPermanentlyLockable` ⇔ the "also valid for" relation is an **equivalence relation**: the four works split into blocks that accept exactly the same cards, with block size = number of cards in the block. Any partial overlap (a work valid for another work's card but not vice-versa, e.g. Jane Eyre valid for Gothic and Bildungsroman while Dracula/Wuthering accept only Gothic) makes the quartet unlockable, and no extra evidence or duplicate card can repair that.
-4. **Edge cases run against the real code:** locally-valid dead end — Jane Eyre→a Gothic card is semantically valid, is accepted, and the exercise can then **no longer be completed** (completion check false) while Jane→Bildungsroman remains completable. Fully identical quartet is lockable but discriminates nothing. Same text with different identity is correctly flagged indistinguishable. Legacy pairs without identity metadata are already text-interchangeable.
-5. **UI and persistence:** the quiz screen keys cards by `pair.id` + index, selects by index, never de-duplicates by text, and keeps matching state in React state only. [src/state/progress.ts](../src/state/progress.ts)/`lib/progress.ts` store completion, XP, streaks and `learnedFactIds` — never exercise payloads. Saved progress and the UI therefore need no migration for duplicate cards.
-6. **Global relaxation changes existing content.** An unconditional "allow identical-identity cards" patch (scratch) changed **158 of 2,880** ready Literature/Theatre quizzes and **119 of 1,800** sampled quizzes in the four completed Art subtopics (0 failures, all still valid) — e.g. two works sharing an answer now appear as two identical cards. This should therefore be opt-in per relation.
-7. **Duplicate cards alone unlock none of the four blocked placements** (prototype sweep: the same 12 combinations stay unready). Reasons are below.
+**Uncommitted (11 files):** `data/artContent/approvedGenrePrimaries.ts`, `genreCompatibility.ts`, `literaryAuthoring.ts`, `literatureClassics.ts`, `theatrePlays.ts`; tests `approvedGenrePrimaries.test.ts`, `literatureTheatreContent.test.ts`, `nonExclusiveClassification.test.ts`; docs `art-genre-completion.md`, `art-literature-theatre-content.md`, `AI_HANDOFF.md`.
 
-### B. Findings per blocked placement (current staging; evidence as committed)
+## Restrictions (unchanged)
+No push/merge/reset/clean/stash/branch switch and no commit without approval. No image activation (Literature/Theatre text-only; Design stays "Coming soon"). Do not touch completed Art content. Never invent negatives; unknown ≠ false. Keep the 8-exercise, six-fact, 6/3/2 contracts and permanent matching locks.
 
-"Cells" = still-unevidenced work ≠ label pairs inside the cheapest lockable quartet; "blocked" = pairs I judge cannot honestly be certified. Duplicate-aware rule = identical-identity cards allowed as one interchangeable block, ≥3 distinct answers per exercise.
+## What changed (all genre-lesson-only; 11 facts and 6/3/2 preserved per placement; every record retained)
 
-| Placement | Duplicates help? | Many-to-many help? | Evidence sufficient? | Can A, B, C become feasible? | Independent ordinary shortages |
-|---|---|---|---|---|---|
-| **Literature l1/p2** | Not in A (no repeated label after R1). B 11→8 cells, C 11→6, via repeated Adventure/Gothic/Bildungsroman cards. | No: the documented partial overlaps (Frankenstein/Jane Eyre/Pride and Prejudice share Gothic/Bildungsroman readings) are non-equivalence and stay unsafe. | No: A needs 11 cells, several blocked. | **No** under fail-closed. With duplicates the only arrangements need 4 stage moves and ≥10 cells per stage with most pools infeasible. | Severe: 5 of 6 A facts have 0 certified wrong options; Pride and Prejudice has 1. |
-| **Literature l5/p2** | A already certified without duplicates. Duplicates cut C 8→6 cells (Maltese/Red Harvest both Detective; Mango Street/Ántonia both Bildungsroman). | n/a | A: yes (11 AI-authored cells, provisional). B/C: ~6 cells each (War, Modernist/Bildungsroman cells — doubtful). | A yes; B/C need more sourced cells; fresh-learner path blocked until then. | **The Great Gatsby and Their Eyes have 0 wrong options** ("six assessable facts required; has 4"); B introductions A Farewell to Arms, My Ántonia, Mango Street and C's Red Harvest/Oz also have 0. |
-| **Theatre l1/p2** | **Yes — decisive** in combination with re-staging (below). Tartuffe and She Stoops to Conquer (both "Comedy") become one interchangeable block. | Not needed. | A: with re-staging only **1 cell** (She Stoops ≠ Revenge tragedy); B/C: 1 cell (School for Scandal ≠ Revenge tragedy). | **Matching: yes** (see simulation). Ordinary: B/C still blocked by The Bacchae (0 wrong options) and 1-option facts. | A none (all six have ≥2). B: Bacchae 0, School 1, She Stoops 1; C: Faustus 1, Tempest 1. |
-| **Theatre l5/p2** | No. | No. | No: most cells use overlap-prone labels (Tragedy, Tragicomedy, Drama [valid for every play], Comedy of menace ↔ Absurd). | **No** (0 arrangements under fail-closed, even with duplicates). | Severe: A facts have 0–1 wrong options. |
+| Placement | Change |
+|---|---|
+| **Theatre l1/p2** | Genre-only priorities: *She Stoops to Conquer* → A, *The Importance of Being Earnest* → B. Sourced negatives for Hamlet, Faustus, Bacchae, School for Scandal, She Stoops, Tempest — e.g. "She Stoops / School for Scandal are not revenge tragedies" using the required-main-action standard. The Bacchae and Tempest are deliberately **not** certified as "not revenge" (Dionysus's vengeance; Folger notes Prospero's appetite for revenge). |
+| **Literature l5/p2** | Riders of the Purple Sage → A, The House on Mango Street → B (committed earlier). Added ~35 plain negatives (Dystopian/Western/Detective/Family saga/War/Fantasy) for Gatsby, Their Eyes, Farewell to Arms, My Ántonia, Mango Street, Red Harvest, Oz and cross cells. **Gatsby kept as "Modernist novel"** (reliably sourced; it does not block assessment; replacing it with "tragic love story" would add overlap with Farewell to Arms/Maltese Falcon). |
+| **Literature l1/p2** | **The Moonstone** (Detective fiction; Penguin Random House/Britannica) takes Jane Eyre's slot **in the genre lesson only** (`novelSet(level, works, genreWorks)`); Jane Eyre keeps her author and publication lessons and record. 51 definition-based negatives across the 11 active works. Wuthering → B, Scarlet Letter → A (committed earlier). Little Women's display text unified to "Bildungsroman (coming-of-age fiction)". |
+| **Theatre l5/p2** | *Top Girls* → **Feminist drama** (Encyclopedia.com: "a feminist drama with fantasy elements"); *"Master Harold"* → **Realist drama** (Encyclopedia.com Style section: "subscribes to the school of realism"; app's descriptive definition, **no chronology argument**). Genre-only priorities: Top Girls and The Crucible → A; Raisin in the Sun and Fences → C; Bald Soprano → B. 46 definition-based negatives. **Our Town remains "Drama"** (no reliable narrower source found; the Wilder estate only describes a bare stage). |
 
-Hypothesis-tested end to end (scratch, **hypothetical** cells and a two-fact re-staging: She Stoops to Conquer B→A, The Importance of Being Earnest A→B): Theatre l1/p2 **A generated 20/20 through the real planner** with matching {Hamlet→Revenge tragedy, Antigone→Greek tragedy, Tartuffe→Comedy, She Stoops→Comedy}; all eight exercises, quotas and checks passed. B and C did not: B stopped on The Bacchae having no assessable form.
+Mechanism: an optional per-work `genrePriority` overrides only the genre fact's priority, so author-credit (p1) and date/publication (p4) stages never move (asserted by tests). Evidence is table-driven in `genreCompatibility.ts` (work description from a catalogue/encyclopedia/publisher source + label definition + stated reason). Duplicate-target matching (`b2ca621`) is what lets repeated labels (Comedy of manners ×2, Realist drama ×2, Adventure ×2, Absurd ×2, Bildungsroman ×2, Detective ×2) appear as interchangeable cards; the sweeps now generate 267 such exercises in Literature/Theatre and none in completed Art.
 
-### C. Answers to the ten investigation questions
+## Curriculum decisions made under delegated authority — please ratify or revert
+1. **The Moonstone replaces Jane Eyre in the Literature l1 genre lesson.** Smallest change found: the only mutually uncontested trio among the classics is Moby-Dick / Pride and Prejudice / The Scarlet Letter, and A needs a fourth uncontested work; an exhaustive search over all 11-of-12 selections and 6/3/2 arrangements under the consistent standard found none without a new work. Dracula was kept so the Gothic duplicate pair stays available. Reverting (`genreLessonNovels` in `literatureClassics.ts`) makes Literature l1 A fail again.
+2. **Theatre l5 genre staging:** Raisin in the Sun and Fences moved to stage C of the genre lesson (still taught in l5/p2; p1/p4 unchanged). 120 arrangements were certifiable; this was the lowest-movement one (5 moves).
+3. **Top Girls and "Master Harold" relabelled** (sourced). **Our Town unresolved:** still the broad "Drama" — flagged, not hidden. It cannot take part in matching (Drama is valid for every play) but is assessable in ordinary forms.
+4. Gatsby unchanged; Little Women label unified (user-approved).
 
-1. The model already identifies duplicates and valid overlaps: `answer.identity`, `context.evaluate` (valid/invalid/unknown) and `acceptedAnswerIdentities` exist. Missing: any statement that the *four-card valid relation is an equivalence relation*, and a per-relation opt-in.
-2. Duplicate cards need **no schema change**: cards already carry distinct instance `id`s (the concept id) and shared `answerIdentity`. Required: relax `compatible()` and `hasIndistinguishableAnswers` for identical-identity, mutually-valid cards.
-3. Validate by **identity + verified relationships** (already done). Fixed card-to-card assignment is not used.
-4. **Locking and feedback:** a valid pair locks permanently and turns green; an invalid pair flashes red for 800 ms; with duplicate cards either identical card is accepted and the other remains for the next work in the block.
-5. Safety is **a property of the quartet, not of the move**: pick only quartets whose valid relation is an equivalence relation (= permanently lockable), so every verified-valid move can always be completed.
-6. **Yes, certify before presenting** (offline, exhaustive over four cards). Lockability implies a complete valid assignment exists.
-7. Several works with several verified relations: allowed only if they form interchangeable blocks; otherwise exclude that quartet. Dynamic grading cannot fix it fairly (see option comparison).
-8. **Unknown is never presented.** Treating it as wrong would punish a possibly-true classification; treating it as right would certify unverified claims. A "neutral/unconfirmed" third feedback state would break red/green permanent-lock semantics.
-9. The existing structures, UI and saved progress support it; the change is confined to generation + validation. Completed subtopics stay unchanged **only if it is opt-in per relation**.
-10. One four-pair exercise, 8 exercises, A/B/C quotas and the six-fact rule are unaffected: the matching exercise still uses four of the six facts; duplicates only change which four can be chosen.
+## Evidence provenance and standard
+- 153 active assertions are **provisional AI-authored** (`reviewedBy: "Claude Code — source and work-feature comparison (not independent human editorial approval)"`). They are not independently approved.
+- **Standard for a negative (work ≠ label):** certified only if no reliable catalogue classifies the work under that label **and** the label's definition does not plainly describe its organising action. Intentionally left unknown (reasonable readings exist): e.g. Moby-Dick/Gothic, Frankenstein/Adventure, Dracula/Adventure and Detective, Godot and Rosencrantz as comedy of menace, Birthday Party as realist, Glass Menagerie as tragedy or realist, Fences as historical.
+- Sources actually opened this session: Project Gutenberg catalogue records, NEA Big Read (Their Eyes, My Ántonia, F451, Joy Luck Club, Maltese Falcon), Library of Congress, Penguin Random House, Britannica/Encyclopedia.com (fetches and search summaries), Grove Atlantic, Folger, Yale unit, Arthur Miller Society. Several pages returned 403 (NEA Gatsby/Farewell/Mango Street, Concord Theatricals, Britannica direct); descriptions for those works use alternative accessible sources named in each locator.
 
-### D. Architecture options compared
-
-| Option | Correct under verified relations | Fair (never rejects a valid answer) | Lock-compatible | Notes |
-|---|---|---|---|---|
-| 0. Status quo, add evidence only | yes | yes | yes | blocks Theatre l1 B/C-style repeated-label cases |
-| **1. Interchangeable-block matching (recommended)** | yes | yes | yes | offline certification; opt-in per relation |
-| 2. Dynamic gate: accept a valid pair only if a completion remains | yes | **no** — rejects verified-valid answers (the "hidden assignment") | yes | rejected |
-| 3. Reusable label cards (many-to-one bank) | yes | yes | no (cards not consumed) | degenerate with broad labels (Drama accepts everything); changes the exercise |
-| 4. General partial-overlap many-to-many with re-assignment/undo | yes | partly | **no** | violates permanent lock |
-
-### E. Recommended architecture (NOT implemented)
-
-**Interchangeable-block matching, opt-in per relation.** A matching exercise is certifiable iff: (i) all 12 cross cells are verified `valid` or `invalid`; (ii) the `valid` relation among the four items is an equivalence relation (blocks of interchangeable cards); (iii) at least three distinct answer identities and at least one `invalid` cell (quality rule — avoids "odd one out" exercises); (iv) subject/stimulus cards are distinct. Cards of one block share `answerIdentity`, carry distinct instance ids, and may display identical text.
-
-- **Data model:** reuse `MatchingPair`; add an opt-in flag in the relation policy (e.g. `allowInterchangeableAnswerCards`), enable first for `genre_of_novel`/`genre_of_play`. No change to `Concept`, evidence or progress.
-- **Engine:** relax `compatible()` for same-identity mutually-valid pairs when the policy flag is on; add a pure `matchingBlocks(pairs)` helper (equivalence check + ≥3 identities) used by the generator and by `quizCompositionViolations`; make `hasIndistinguishableAnswers` identity-aware (same text OK only when identities match). Seeded variation and the search budget stay as is (the pool graph grows modestly).
-- **UI:** none required (index-based selection, unique keys). Optional: accessibility labels for identical cards.
-- **Tests:** property test of the 4,096-pattern/Bell(4) characterization; interaction tests for identical cards (the cases above); dead-end quartet never generated; unknown cell never presented; opt-in off ⇒ byte-identical output for completed subtopics; coverage and fresh-learner sweeps; deterministic seeds.
-- **Roadmap link (item 4, assessment alternatives):** same identity/evidence layer; verified assessment-only alternatives would feed *ordinary* options and false statements (the Bacchae/Gatsby-type shortages above) but cannot enter matching cards, so they complement rather than replace this change.
-
-### F. Hypotheses and risks (not yet proven)
-
-- Theatre l1 would need, on top of the architecture: re-staging She Stoops→A and Earnest→B; sourced cells *She Stoops ≠ Revenge tragedy* and *School for Scandal ≠ Revenge tragedy* (same kind as the four existing required-main-action certificates); and ordinary-form evidence for The Bacchae (≥1–2 wrong options; note its Dionysus-vengeance plot makes "≠ Revenge tragedy" **not** safely certifiable) and the 1-option facts.
-- Quality: a block of three identical cards is legal but pedagogically weak — hence the ≥3-distinct-answers rule.
-- Literature l1 and Theatre l5 appear unresolvable with the current works and fail-closed evidence regardless of architecture.
-- Cell judgments marked "blocked/doubtful" are my conservative editorial calls, not source findings.
-
-## Duplicate-target matching: minimal generator change (implemented; committed after review)
-
-Implementation and current validation are recorded above. The investigation and approved prompt below are retained as the design record; their future-tense instructions have now been carried out.
-
-Direction approved by the user: support **duplicate canonical target answers** in matching (e.g. Dracula and Wuthering Heights both → "Gothic fiction"), opt-in, reusing today's identity-based grading and the unchanged red/green UI. This **supersedes** the broader "interchangeable-block" recommendation above wherever they differ; the simpler rule below is strictly safer and costs almost no feasibility.
-
-### Established facts
-- Grading, the UI and saved progress already support interchangeable identical cards (see the section above). Only generation and the final validators forbid duplicates.
-- Exact places that must change: `matchingCandidates`/`compatible()` in [exerciseFactory.ts](../src/quizEngine/exerciseFactory.ts); `hasIndistinguishableAnswers` in [matchingSafety.ts](../src/quizEngine/matchingSafety.ts) (callers unchanged); the policy type/builder in [relationPolicies.ts](../src/quizEngine/relationPolicies.ts).
-- Existing tests that must keep passing unchanged: `semanticValidation.test.ts` "matching excludes indistinguishable RHS cards…" (duplicate answers stay `unavailable` for `created_in_decade`/`painted_by`), `answerValidation.test.ts` (legacy identity grading), `engineHardening.test.ts` (duplicate values, no duplicate MCQ cards).
-- Scratch prototype of the recommended rule on the real planner (flag on `genre_of_novel`/`genre_of_play` only): Literature+Theatre 2,880/3,000 ready (identical to today), 0 failures, 0 duplicate cards generated in the currently-ready placements; completed Art sample 1,800/1,800 ready, 0 duplicates, identical counts (the unflagged path is the original expression, so output is unchanged by construction).
-
-### Smallest recommended change (rule)
-For a relation with the new opt-in flag, a matching quartet is acceptable only if:
-1. Cards with the **same canonical target** (identical `answer.identity`, verified `valid` both ways) **and exactly the same displayed text** are interchangeable; their `acceptedAnswerIdentities` are identical. Same identity with different display text is not paired (deferred).
-2. **Every pair with different targets must be verified `invalid` in both directions.** No verified-valid alternative and no `unknown` may be displayed. (Stricter than today's "valid overlap allowed if lockable"; this is what keeps the exercise unambiguous and canonical-target-only. A work's other true classifications simply cannot appear as competing cards.)
-3. At least three distinct targets (at most one duplicated pair) and at least one `invalid` cell.
-4. The existing `isPermanentlyLockable` check stays as defence in depth.
-Left-side distinctness (subject, label, stimulus) is unchanged. Unflagged relations keep today's exact code path.
-
-### Why it is safe
-- Without cross-target valid cells, the valid relation is exactly "same target", an equivalence relation (verified exhaustively: of 4,096 four-card patterns, 15 = Bell(4) are lockable), so every verified-correct selection leaves a completion and nothing is silently rejected.
-- Unknown cells cannot appear, so no unverified pair is ever graded.
-- No grading, UI, progress, content, evidence or curriculum change; existing subjects unaffected unless flagged.
-- **No `interchangeableTargets` marker is needed (decided).** The validators already check every pair against `context.evaluate`, lockability and "equivalent cards graded wrong" from the exercise's own data; identical text with the same defined `answerIdentity` and identical accepted sets is interchangeable by construction. The unflagged generator path is unchanged, and the byte-identical baseline plus the existing `duplicateMatching: 0` assertions (artPilot, artContent, architectureDesignContent tests; completed-Art scopes only) catch any leak.
-
-### Expected effect on the four placements (existing evidence only; no new research)
-| Placement | Helps? | Evidence still needed | A / B / C matching | Ordinary shortages that remain |
-|---|---|---|---|---|
-| Literature l1/p2 | B and C only (cells 11→9); A unchanged | A: 11 cells incl. uncertifiable ones | none certified | severe: 5 of 6 A facts have 0 wrong options |
-| Literature l5/p2 | marginal (C 8→7) | A certified already; B/C ≈6–7 cells | A yes; B/C no | Gatsby, Their Eyes (A); B/C introductions have 0 wrong options |
-| Theatre l1/p2 | B 3→1 cell, C 6→3; A needs re-staging to benefit | A: 2 cells, one uncertifiable (Earnest ≠ Heroic comedy) | none certified today | B/C: The Bacchae 0, four facts 1 |
-| Theatre l5/p2 | C only (9→7) | A 11 cells, overlap-prone labels | none | severe |
-**Implementing the change alone makes no blocked placement generate**; it lowers the evidence required in B/C pools and makes the Theatre l1 re-staging path viable. Ordinary-question shortages are independent and remain.
-
-### Remaining limitations and risks
-- **Final user decisions:** keep ≥3 distinct targets among the four pairs; duplicate cards must display exactly the same text; no different-label sharing for now; no new abstractions.
-- Display-different same-identity cards (e.g. "Bildungsroman" vs "Coming-of-age fiction") are intentionally NOT paired; Literature l1/l5 B/C pools containing both stay unavailable for matching until labels are unified or this is revisited.
-- Flagging the genre relations changes (narrows) the matching candidate set for genre reviews (p3/p5/l10); readiness was unchanged in the prototype, but the sweeps must be re-run after implementation.
-
-### Final Codex implementation prompt (approved direction; copy from here)
-
-```text
-TASK: Opt-in duplicate-target matching (Quiz Game). Minimal generator + safety change.
-
-Read first: AGENTS.md, CLAUDE.md, docs/AI_HANDOFF.md (section "Duplicate-target matching: minimal generator change").
-Repo: /Users/simaybayatli/.codex/worktrees/aeb2/quiz-game, branch codex/literature-theatre-content. Verify pwd, branch and `git status` first; stop and report any mismatch.
-Rules: do NOT commit, push, merge, stage, reset, clean, stash or touch .git_backup_corrupt/. Leave all work uncommitted for independent review. Do not edit content, evidence, priorities, staging, curricula, UI, grading (answerValidation.ts, matchingInteraction.ts), progress code, or MCQ / true-false / fill-blank logic. Add no new abstractions, helper modules, exercise metadata fields, or relation-specific logic in the engine (no mention of genres, Gothic fiction or specific works in engine code).
-
-GOAL
-Let a four-pair matching exercise contain two cards with the SAME canonical target answer and EXACTLY the same displayed text (e.g. two works whose taught answer is "Gothic fiction"). The two target cards are interchangeable (existing identity-based grading already does this); a correct pair locks permanently and shows the existing green feedback; a wrong choice shows the existing red feedback; the other identical card stays available for the other work. Opt-in per relation: every relation without the flag must behave exactly as today. Initially enable it only for genre_of_novel and genre_of_play.
-
-BEFORE EDITING
-1. Baseline: for painting, sculpture, architecture and design, generate matching exercises for a fixed seed set (all part/variant cases, at least 3 seeds, via buildQuizResult or measureGenerationCoverage) and save the JSON/hashes in a test fixture. After your change these must be byte-identical.
-2. Prerequisite test, written and passing BEFORE any code change: isMatchingPairCorrect, attemptMatchingPair and gradeMatchingAssignment already treat two cards with equal answerIdentity and equal acceptedAnswerIdentities as interchangeable (either card accepted for either work; locked cards cannot be reused). If this is false, STOP and report.
-
-CHANGES (all small)
-A. src/quizEngine/relationPolicies.ts: add `readonly allowDuplicateTargetAnswers?: boolean` to RelationPolicy (undefined = false). Add a small readonly list of relation ids (same style as protectedRelationIds) containing exactly "genre_of_novel" and "genre_of_play", and set the flag true for those relations only in reviewedPolicy. First verify both relations resolve through reviewedPolicy in targetRelationPolicies; change no other relation, no legacy policy.
-B. src/quizEngine/exerciseFactory.ts, matchingCandidates / compatible(a, b), applied ONLY to groups whose getRelationPolicy(...).allowDuplicateTargetAnswers === true (unflagged groups run the original expression and path unchanged):
-   - sameTarget(a, b) = context.claim(a).answer.identity === context.claim(b).answer.identity AND normalised displayed matching answer text (getAnswerLabel(x, "matching")) is exactly equal AND context.evaluate(a, b).verdict === "valid" AND context.evaluate(b, a).verdict === "valid". A sameTarget pair skips only the existing "answer label differs", "answer text differs" and "!equivalentAnswers" tests.
-   - a pair with the same identity but different displayed text is NOT compatible (do not pair it).
-   - every other pair must have evaluate(a, b) AND evaluate(b, a) === "invalid" (never "valid", never "unknown") and still pass all existing distinctness tests. Missing evidence is never treated as false.
-   - left-side distinctness (subject identity, matching label, stimulus) is unchanged for all pairs.
-   - when four concepts are selected (flagged groups only), additionally require at least 3 distinct answer identities among the 4 (so at most one duplicated pair) and at least one "invalid" cell. Keep the existing isPermanentlyLockable check and the existing pair / acceptedAnswerIdentities construction unchanged.
-C. src/quizEngine/matchingSafety.ts: change hasIndistinguishableAnswers itself (same signature, same callers, no options argument): identical normalised right-hand text is still "indistinguishable" EXCEPT when both pairs have the same defined answerIdentity and identical acceptedAnswerIdentities (as sets; treat a missing list as empty). Identical text with different or missing identity stays indistinguishable. Do not add an exercise-level marker: the validators (quizCompositionViolations, exerciseValidityViolations) already check every pair against context.evaluate, lockability and "equivalent cards graded wrong", so a duplicate that is not semantically interchangeable still fails.
-D. Leave the duplicateMatching counter and its existing `duplicateMatching: 0` assertions (artPilot, artContent, architectureDesignContent tests; completed-Art scopes) untouched. If a change makes one of them fail, report it instead of weakening it.
-
-TESTS (new file src/quizEngine/__tests__/duplicateTargetMatching.test.ts; all existing tests stay unchanged and passing)
-1. Policy: allowDuplicateTargetAnswers is true for exactly genre_of_novel and genre_of_play across targetRelationPolicies and legacy policies, and false/undefined for every other relation.
-2. Generation (synthetic certified fixtures via the existing helpers, with a policy override setting the flag): two records sharing a target and exact display text plus two distinct targets, all cross-target cells verified "invalid" -> status "generated", exactly 4 pairs, the two duplicate cards have identical right text and answerIdentity, distinct pair ids and identical acceptedAnswerIdentities, quizCompositionViolations and exerciseValidityViolations return [].
-3. Interaction with the real attemptMatchingPair / gradeMatchingAssignment: either duplicate card is accepted for either duplicated work and locks permanently; the remaining identical card is accepted for the other duplicated work; a locked card cannot be reused; a wrong card yields the existing wrong state; both card orderings grade correct.
-4. Property test: over all 4096 off-diagonal valid-patterns of four cards (own card valid), isPermanentlyLockable is true for exactly 15 patterns (the partitions of 4); every exercise generated across many seeds for the flagged fixtures has a partition structure with >= 3 distinct identities.
-5. Overlapping classifications: a flagged fixture where a work also has a verified-valid alternative shown on another card (including a one-way validity) -> generation returns "unavailable"; it never produces a quartet that grades the alternative wrong or leaves a dead end.
-6. Unknown relationships: a quartet needing any "unknown" cross cell -> "unavailable"; no generated exercise contains an unknown cell.
-7. Degenerate / unsolvable: fewer than 3 distinct targets (3+1, 2+2, 4 identical) -> "unavailable"; same identity with different displayed text is never paired.
-8. Validator: identical right text with the same defined answerIdentity and identical accepted sets is not flagged; identical text with different identity, or with missing identity, is still flagged ("Matching answers must be visibly distinct").
-9. Flag off: the existing duplicate-answer fixtures for created_in_decade and painted_by remain "unavailable"; no new duplicate cards appear for any unflagged relation.
-10. Determinism: the same seed returns the identical exercise; different seeds vary where candidates allow.
-11. Regression: the saved baseline for the four completed Art subtopics is byte-identical.
-
-VALIDATION (run all and report exact results)
-npm test -- --runInBand --watchman=false --testTimeout=60000
-npx tsc --noEmit
-npm run lint
-git diff --check
-node scripts/art-literature-theatre-audit.cjs --require-ready   (expected exit 1)
-node scripts/art-content-impact.cjs --subtopics=literature,theatre --attempts=20   (also with --development-images)
-node scripts/art-learning-impact.cjs --subtopics=literature,theatre --attempts=20   (also with --development-images)
-node scripts/art-content-impact.cjs --subtopics=painting,sculpture,architecture,design --attempts=20 --development-images --require-ready
-node scripts/art-learning-impact.cjs --subtopics=painting,sculpture,architecture,design --attempts=20 --development-images
-Expected: Literature and Theatre stay 144/150 ready each (this change alone does not unlock the blocked genre placements; evidence and ordinary-question shortages remain), 0 failures/violations, completed Art 12,000/12,000, fresh learners unchanged. Report any difference, especially in genre p3/p5/l10 review matching and any newly generated duplicate cards.
-
-DELIVER
-List the changed files with a one-line rationale each, the test and validation results, and any deviation from this prompt. Update docs/AI_HANDOFF.md (what changed, results, exact next action, git status). Leave everything uncommitted.
-```
-
-## Remaining decisions for the user
-
-1. **Independent review of the uncommitted implementation above.** The user approved and Codex implemented the minimal prompt; no checkpoint or push is authorised. The broader interchangeable-block architecture is NOT being pursued.
-2. **Theatre l1:** approve re-staging She Stoops to Conquer→A / The Importance of Being Earnest→B (only meaningful once duplicate-target matching exists) and authorise sourcing the two revenge-tragedy cells plus Bacchae/ordinary-form evidence.
-3. **Literature l5:** authorise ≥2 wrong-option cells each for The Great Gatsby and Their Eyes Were Watching God, then the B/C cells.
-4. **Literature l1 and Theatre l5:** accept as unresolved (recommended) or direct a broader change (new works / reserves).
+## Known limitations / for Codex's review
+- Review is by Claude Code only; there is no independent human editorial certification. Spot-check locators' factual claims, especially the "plain" definition-based negatives and descriptions taken from encyclopedia search summaries.
+- Matching pools are thin in places (Literature l1 B has a single feasible pool; Theatre l5 C has one), so matching variety there is limited, though every exercise is verified.
+- `art-literature-theatre-validation.json` and the older sections of `art-genre-completion.md` are historical reports, not regenerated; current diagnostics come from the scripts below.
 
 ## Exact next actions
-
-1. Return to finishing Literature and Theatre only with the user's approval of each step: (a) Theatre l1 re-staging (She Stoops to Conquer→A, The Importance of Being Earnest→B) with sourced cells and Bacchae/ordinary-form evidence; (b) Literature l5 wrong-option evidence for Gatsby and Their Eyes, then B/C cells; (c) accept Literature l1 and Theatre l5 as unresolved or direct a broader change.
-2. No push or merge to `main` without approval; leave `.git_backup_corrupt/` untouched. Always update this file before ending a session.
+1. Codex: independent review of the uncommitted diff (start with `genreCompatibility.ts` locators and the decisions above), then re-run the validation commands.
+2. User: ratify or amend the curriculum decisions; approve a checkpoint commit (explicit paths) and, later, any push/merge to `main`.
+3. Optional follow-ups: a reliable narrower label for Our Town; a human editorial pass on the AI-authored evidence.
 
 ## Validation commands
-
 ```sh
 npm test -- --runInBand --watchman=false --testTimeout=60000
 npx tsc --noEmit && npm run lint && git diff --check
 node scripts/art-image-assets.cjs --check
-node scripts/art-genre-compatibility.cjs          # matrices; read-only
-node scripts/art-literature-theatre-audit.cjs --require-ready   # exits 1 until all genre shortages are repaired
-node scripts/art-content-impact.cjs --subtopics=literature,theatre --attempts=20
+node scripts/art-genre-compatibility.cjs                        # per-placement status and shortages
+node scripts/art-literature-theatre-audit.cjs --require-ready   # exits 0 now
+node scripts/art-content-impact.cjs --subtopics=literature,theatre --attempts=20 --require-ready
 node scripts/art-learning-impact.cjs --subtopics=literature,theatre --attempts=20
 node scripts/art-content-impact.cjs --subtopics=painting,sculpture,architecture,design --attempts=20 --development-images --require-ready
 node scripts/art-learning-impact.cjs --subtopics=painting,sculpture,architecture,design --attempts=20 --development-images
 ```
-
-Reviews in this repo are source/work-feature comparisons by Codex or Claude Code, **not independent human editorial certification**.
+(Repeat the Literature/Theatre sweeps with `--development-images`.) Reviews here are source/work-feature comparisons by Codex or Claude Code, **not independent human editorial certification**.

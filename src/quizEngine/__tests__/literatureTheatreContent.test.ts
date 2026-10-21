@@ -53,10 +53,10 @@ test('reviews reuse exact original teaching records and the new subtopics remain
 });
 
 test('open overlaps stay unknown, while exact script and writer constraints support reviewed contrasts',()=>{
- const jane=find('art_literature_l1_p2_jane-eyre'),frankenstein=find('art_literature_l1_p2_frankenstein');
- expect(context.evaluate(jane,frankenstein).verdict).toBe('unknown');
+ const moby=find('art_literature_l1_p2_moby-dick'),frankenstein=find('art_literature_l1_p2_frankenstein');
+ // Moby-Dick is read as Gothic by some critics, so that negative is deliberately not certified.
+ expect(context.evaluate(moby,find('art_literature_l1_p2_dracula')).verdict).toBe('unknown');
  const formerLoveStory=literatureClassicsSet.concepts.find(c=>c.id==='art_literature_l1_p2_pride-prejudice')!;
- expect(context.evaluate(jane,formerLoveStory).verdict).toBe('valid');
  expect(context.evaluate(frankenstein,find('art_literature_l1_p2_dracula')).verdict).toBe('valid');
  expect(context.evaluate(find('art_literature_l1_p2_wuthering-heights'),formerLoveStory).verdict).toBe('valid');
  const ismene=find('art_theatre_l7_p1_ismene'),laertes=find('art_theatre_l7_p1_laertes');

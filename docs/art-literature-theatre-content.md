@@ -1,5 +1,11 @@
 # Current implementation status — final editorial genre corrections
 
+> **Final matching repair, 21 October 2026:** Literature and Theatre are each **150/150 ready**, with 6,000/6,000 generation and fresh-learner requests passing in each delivery mode. Treasure Island enters Literature A, The Scarlet Letter moves to C; Oklahoma! enters Theatre l5 B in the genre-only Our Town slot, and Bald Soprano moves to A. Our Town’s Drama record and other lessons are retained. All four factual corrections remain positive. See [the current handoff](AI_HANDOFF.md). Earlier blocked reports below are historical.
+
+> **Independent review, 21 October 2026 — completion is blocked.** Four contradicted genre exclusions were corrected to documented valid alternatives without changing primary answers. Current generation readiness is **Literature 149/150; Theatre 148/150**. Literature l1/p2/A and Theatre l5/p2/B–C now fail safely on matching; full fresh progression is blocked. See [the independent review and evidence](AI_HANDOFF.md#independent-review-outcome--blocked-2026-10-21). The 150/150 results below are historical, before these corrections.
+
+> **Update, 21 October 2026:** the four genre placements that blocked completion are resolved. Literature and Theatre are each **150/150 ready**, with fresh learners reaching Level 10 and zero violations. See [AI_HANDOFF.md](AI_HANDOFF.md) for the changes, the curriculum decisions awaiting ratification, and the validation results. The status text below is the historical report before that work.
+
 **All 44 approved primary genres are applied; complete generation readiness remains blocked.** Literature and Theatre each remain **144/150** ready. Fresh learners still stop at l1/p2/A. Original evidence, active fact identities, stages and priorities are retained; two verified reserves remain unscheduled. See [the complete implemented primary table, validation, changed files and remaining limitations](art-genre-completion.md).
 
 The report below is preserved as the **historical status before the final editorial implementation**. Its proposed answers and earlier evidence/test counts do not override the current report.

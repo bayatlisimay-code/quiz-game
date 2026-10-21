@@ -1,5 +1,5 @@
 import { literatureModernNovelsSet } from '../../../data/artContent/literatureModernNovels';
-import { theatrePlaySets } from '../../../data/artContent/theatrePlays';
+import { theatrePlaySets, retainedOurTownGenreFact } from '../../../data/artContent/theatrePlays';
 import { approvedArtContent } from '../../../data/activeArtContent';
 import { activeSemanticContext as context } from '../contentSnapshot';
 import { getAssessmentTemplate } from '../assessmentTemplates';
@@ -59,9 +59,9 @@ test('parent genres and sourced critical overlaps remain valid in every assessme
   for(const [subject,answer] of [
     ['theatre_l1_p2_hamlet','theatre_l1_p2_doctor-faustus'],
     ['theatre_l1_p2_cyrano','theatre_l1_p2_tartuffe'],
-    ['theatre_l5_p2_glass-menagerie','theatre_l5_p2_our-town'],
-    ['literature_l1_p2_frankenstein','literature_l1_p2_jane-eyre'],
+    ['literature_l1_p2_frankenstein','literature_l1_p2_little-women'],
   ])expect(context.evaluate(fact(subject),fact(answer)).verdict).toBe('valid');
+  expect(context.evaluate(fact('theatre_l5_p2_glass-menagerie'),retainedOurTownGenreFact).verdict).toBe('valid');
   const formerLoveStory=literatureModernNovelsSet.concepts.find(c=>c.id==='art_literature_l5_p2_farewell-arms')!;
   expect(context.evaluate(fact('literature_l5_p2_maltese-falcon'),formerLoveStory).verdict).toBe('valid');
   expect(context.evaluate(fact('theatre_l5_p2_fences'),fact('theatre_l5_p2_glass-menagerie')).verdict).toBe('invalid');
