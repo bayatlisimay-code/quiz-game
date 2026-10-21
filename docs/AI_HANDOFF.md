@@ -2,7 +2,13 @@
 
 Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE.md). This file holds **current task state only**. Application docs: [progression](quiz-learning-progression.md) · [validity](quiz-validity.md) · [curriculum](art-curriculum-approved.md) · [Literature/Theatre status](art-literature-theatre-content.md) · [genre report](art-genre-completion.md). Earlier research (matching architecture, duplicate-target design, the Codex prompt) lives in commits `2055707` and `ca8d66a`.
 
-**Last updated:** 2026-10-21, Codex Stage 3 integration review. **Safe to merge; Literature/Theatre 150/150 each. Integration awaits explicit approval.**
+**Last updated:** 2026-10-21, Codex approved local integration. **Literature/Theatre 150/150 each; local fast-forward authorised. No push or Stage 4.**
+
+## Approved integration — in progress (2026-10-21)
+
+The user authorised integration of `e79efc6` without rewriting history. The pending Stage 3 review note was committed separately on the development branch as `5231e16`. Both starting worktrees were verified: development at `e79efc6` with only that pending note, and main clean at `43f1859` in `/Users/simaybayatli/Developer/quiz-game`.
+
+Updated `AGENTS.md` for the main checkout, retained development worktree and current technical/editorial status, preserving the repository and quiz safeguards. `CLAUDE.md` now follows those current checkout locations instead of its obsolete development-only pin. Next: fast-forward the existing main checkout, run full tests, TypeScript, lint and readiness/regression checks there, then record the results. No push, Stage 4, reset or history rewrite is authorised. `.git_backup_corrupt/` must remain unchanged.
 
 ## Stage 3 integration review — passed (2026-10-21)
 
@@ -12,7 +18,7 @@ All checks were rerun: **30/30 suites, 571/571 tests** (545.981 seconds); TypeSc
 
 **Verdict: safe to merge, not release-certified.** Human editorial review of provisional evidence and the already documented readability/variation follow-ups remain release-audit items, not newly discovered integration blockers. `AGENTS.md` still pins the development worktree/branch; adapt that guidance during an authorised integration task before asking an agent to work on `main`.
 
-**Git / exact next action:** checkpoint and both main refs are unchanged. Only this necessary handoff review note is uncommitted; no code changed, and no commit, stage, push, merge, rebase, reset or Stage 4 action occurred. Await explicit user approval to integrate checkpoint `e79efc6` into `main`, with a decision on checkpointing this review note. Do not integrate automatically.
+**Review-session Git state (historical):** checkpoint and both main refs were unchanged; only this review note was uncommitted. The user subsequently approved committing the note and fast-forward integration, recorded above. No push or Stage 4 is authorised.
 
 ## Final checkpoint — local only (2026-10-21)
 
