@@ -2,7 +2,17 @@
 
 Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE.md). This file holds **current task state only**. Application docs: [progression](quiz-learning-progression.md) · [validity](quiz-validity.md) · [curriculum](art-curriculum-approved.md) · [Literature/Theatre status](art-literature-theatre-content.md) · [genre report](art-genre-completion.md). Earlier research (matching architecture, duplicate-target design, the Codex prompt) lives in commits `2055707` and `ca8d66a`.
 
-**Last updated:** 2026-10-21, Codex final checkpoint review. **Literature/Theatre 150/150 each.**
+**Last updated:** 2026-10-21, Codex Stage 3 integration review. **Safe to merge; Literature/Theatre 150/150 each. Integration awaits explicit approval.**
+
+## Stage 3 integration review — passed (2026-10-21)
+
+Reviewed all 49 changed paths and all six commits from `main` to checkpoint `e79efc685648ab5fcfba3c311bd079da96818428`. Started on the required branch with a clean working tree. Local `main`, cached `origin/main` and a fresh read-only GitHub `ls-remote` check all resolve to `43f1859a4a825f10841a8dc29a343865a01053f0`, an ancestor of the checkpoint: integration can fast-forward without conflicts. No dependency/configuration changes, unrelated content edits, missing modules, temporary/intermediate-only files or detected secrets were found. `.git_backup_corrupt/` has the identical tree hash on both branches and no changes in the branch history. Completed-Art records/evidence are unchanged; the required shared non-exclusive wording and opt-in matching changes are included. The four factual corrections remain protected.
+
+All checks were rerun: **30/30 suites, 571/571 tests** (545.981 seconds); TypeScript, lint, content/readiness audit, genre compatibility, image validation and branch-diff whitespace checks passed. Literature/Theatre each have **150/150 combinations ready**; generation and full fresh progression each pass **6,000/6,000 requests in both delivery modes**, zero shortages/blocks/violations. Completed Art generation and fresh progression each pass **12,000/12,000**, zero violations and zero duplicate matching exercises; all 1,800 frozen matching payloads pass. Existing composition, semantic verification, interchangeable target grading and permanent matching locks remain intact.
+
+**Verdict: safe to merge, not release-certified.** Human editorial review of provisional evidence and the already documented readability/variation follow-ups remain release-audit items, not newly discovered integration blockers. `AGENTS.md` still pins the development worktree/branch; adapt that guidance during an authorised integration task before asking an agent to work on `main`.
+
+**Git / exact next action:** checkpoint and both main refs are unchanged. Only this necessary handoff review note is uncommitted; no code changed, and no commit, stage, push, merge, rebase, reset or Stage 4 action occurred. Await explicit user approval to integrate checkpoint `e79efc6` into `main`, with a decision on checkpointing this review note. Do not integrate automatically.
 
 ## Final checkpoint — local only (2026-10-21)
 
@@ -10,7 +20,7 @@ This document is included in the user-authorised checkpoint **`feat(art): comple
 
 Confirmed the latest full-suite and sweep logs against the unchanged implementation: **571/571 tests across 30 suites**, Literature/Theatre **150/150 combinations each**, generation and fresh progression **6,000/6,000 each in both delivery modes**, completed Art generation and fresh progression **12,000/12,000 each**, with zero validation failures or progression violations. TypeScript, lint, readiness/content audit and image validation were rerun successfully during checkpoint review; whitespace checks passed. No application code changed during this review, so the long suite and sweeps were not repeated.
 
-**Git status / exact next action:** the 11 intended files form this checkpoint; the expected post-commit working tree is clean (verified in the commit report). No push, merge or Stage 3 integration is authorised. Await the user's explicit approval before beginning Stage 3.
+**Checkpoint-session Git state (historical):** the 11 intended files form this checkpoint; the post-commit working tree was clean. No push or merge occurred. The user subsequently authorised the Stage 3 review recorded above; actual integration still requires explicit approval.
 
 **Outstanding release audit:** AI-authored semantic evidence remains provisional and needs human editorial review, including the five new work-specific comparisons below. Readability diagnostics have 79 advisory length warnings in the Literature/Theatre sample; these are editorial follow-ups, not generation violations. Matching quartet variety remains limited in the repaired placements. The older machine/status reports are historical. Literature/Theatre stay text-only; production image activation and Design availability remain unchanged. This checkpoint establishes technical readiness, not release certification.
 
