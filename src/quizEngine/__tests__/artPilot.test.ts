@@ -29,7 +29,7 @@ test("production pilot has 18 sourced originals, 54 teaching facts and four term
   expect(validateContent(approvedArtContent, targetRelationPolicies, undefined, { evidence: approvedArtEvidence }).filter(i => i.severity === "error")).toEqual([]);
   expect(() => createActiveArtSets(approvedArtContent)).not.toThrow();
   expect(approvedArtEvidence.every(e => e.sourceUrl.startsWith("https://") && !e.sourceUrl.includes("example.invalid") &&
-    (e.id.startsWith("manual-editorial:2026-10-23:")
+    (e.id.startsWith("manual-editorial:2026-10-23:") || e.id.startsWith("manual-editorial:2026-10-26:music:")
       ? e.reviewedBy === "User — manual editorial approval (not external source verification)" &&
         e.locator.startsWith("Manual editorial approval: user request") && e.locator.includes("not external verification")
       : e.reviewedBy?.includes("not independent human")))).toBe(true);

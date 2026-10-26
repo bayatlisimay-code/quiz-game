@@ -1,0 +1,24 @@
+// Read-only draft/release diagnostics. Does not register content or write assets.
+const fs=require('node:fs');
+const ts=require('typescript');
+require.extensions['.ts']=(module,filename)=>module._compile(ts.transpileModule(fs.readFileSync(filename,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText,filename);
+const {musicContent,musicTeachingContent,musicReserveConcepts}=require('../data/artContent/musicContent.ts');
+const {createActiveArtSets}=require('../data/activeArtContent.ts');
+const {TOPIC_BY_ID}=require('../data/catalog.ts');
+const {createSemanticContext}=require('../src/quizEngine/semanticValidation.ts');
+const {targetRelationPolicies}=require('../src/quizEngine/relationPolicies.ts');
+const {catalogCoverageCases,measureGenerationCoverage}=require('../src/quizEngine/generationCoverage.ts');
+const {measureLearningCoverage}=require('../src/quizEngine/learningCoverage.ts');
+const {validateContent}=require('../src/quizEngine/contentValidation.ts');
+const {buildQuizResult}=require('../src/quizEngine/buildQuiz.ts');
+const attempts=Number(process.argv.find(a=>a.startsWith('--attempts='))?.split('=')[1]??20);
+if(!Number.isInteger(attempts)||attempts<1)throw new Error('Positive integer attempts required');
+const context=createSemanticContext(musicContent.concepts,{policies:targetRelationPolicies,evidence:musicContent.evidence});
+const topic={...TOPIC_BY_ID.art,subtopics:TOPIC_BY_ID.art.subtopics.filter(s=>s.id==='music')};
+const cases=catalogCoverageCases(topic,createActiveArtSets(musicTeachingContent.concepts));
+const coverage=measureGenerationCoverage(cases,context,attempts);
+const learning=measureLearningCoverage(cases,context,attempts);
+const validation=validateContent(musicContent.concepts,targetRelationPolicies,undefined,{evidence:musicContent.evidence});
+const samples=cases.filter(c=>c.mode==='teaching').map(c=>({id:c.id,variant:c.variant,result:buildQuizResult({...c,context,seed:`music-editorial:${c.id}:${c.variant}`})}));
+console.log(JSON.stringify({registration:'draft-only; not in activeArtContent',concepts:musicContent.concepts.length,taught:musicTeachingContent.concepts.length,reserves:musicReserveConcepts.length,evidence:musicContent.evidence.length,evidenceIssues:context.evidenceIssues,validation,coverage,learning,samples},null,2));
+if(context.evidenceIssues.length||validation.some(i=>i.severity==='error')||coverage.counts.failures||learning.counts.violations||(process.argv.includes('--require-ready')&&(coverage.counts.insufficient||learning.counts.insufficient||learning.counts.prerequisiteBlocked)))process.exitCode=1;

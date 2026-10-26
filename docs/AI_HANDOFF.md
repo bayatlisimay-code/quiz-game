@@ -2,6 +2,74 @@
 
 Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE.md). This file holds **current task state only**. Application docs: [progression](quiz-learning-progression.md) · [validity](quiz-validity.md) · [curriculum](art-curriculum-approved.md) · [Literature/Theatre status](art-literature-theatre-content.md) · [genre report](art-genre-completion.md). Earlier research (matching architecture, duplicate-target design, the Codex prompt) lives in commits `2055707` and `ca8d66a`.
 
+**Last updated:** 2026-10-26 (Claude Code) — **Music is registered as the seventh active Art subtopic**, with the user's approval. It is 150/150 ready through the production context with complete fresh progression. Baseline `9359a38a0e8075790e94c410f9d13cce9bdb37c8`, branch `main` in `/Users/simaybayatli/Developer/quiz-game`. Committed locally as a checkpoint; not pushed.
+
+## Current state — Music registered (2026-10-26)
+
+- **Registration:** `data/activeArtContent.ts` appends `musicTeachingContent` (297 facts) and all Music evidence to `approvedArtContent` / `approvedArtEvidence`.
+  - It is added *after* the Art-wide `scheduleArtLearning`, `accessibilityWording` and Baroque passes, so Music's own validated 6/3/2 scheduling and wording stay exactly as audited.
+  - The 189 reserves stay in `musicContent` and never enter review.
+  - `artAvailability` already treated Music as available (only Design is "coming soon"). No catalog or UI change was needed.
+- **Accessibility fix found by registration:** Art's learner-text rule (`accessibilityCleanup.test.ts`) flagged the formation-year wording for the 36 band facts, previously “What date or period is documented for the formation of…”.
+  - Fix: `formation: "formed"` added to `eventVerbs` in `src/quizEngine/assessmentTemplates.ts`. The question now reads “When was “The Beatles” formed?”.
+  - Only Music uses the `formation` event (22 active facts), so the six other subtopics are unaffected.
+  - The 8 Claude-selected approvals now use the standard `User — manual editorial approval (not external source verification)` label and locator prefix, tagged “selected by Claude Code” in the locator.
+- **Baseline scoping (no expected values changed):** five frozen tests and `scripts/art-literature-theatre-audit.cjs` hashed or counted "all Art except Literature/Theatre", or all evidence.
+  - Those filters now also exclude Music: by subtopic for concepts, and by the actual Music evidence-id set for evidence.
+  - Every original hash and count still matches, which proves the six completed subtopics are unchanged.
+  - Two whitelists now admit Music: the subtopic list in `artContent.test.ts`, and the `manual-editorial:2026-10-26:music:` provenance check in `artPilot.test.ts`.
+  - The Music "unregistered" assertion is replaced by a registration test covering all 50 level/part sets, `ACTIVE_CONCEPT_SETS` and `activeSemanticContext`.
+- **Results 2026-10-26 (after registration):**
+  - Full Jest **640/640, 36/36 suites** (617 s).
+  - tsc, lint, `git diff --check`, image check (19 staged / 0 approved), genre-compatibility and the Literature/Theatre audit all pass.
+  - Music audit: exit 0.
+  - Production-context sweeps (`art-content-impact` / `art-learning-impact`, 20 attempts):
+
+| Scope | Generation | Fresh progression | Shortages / violations |
+|---|---|---|---|
+| Music | 3,000/3,000 | 3,000/3,000 | 0 / 0 |
+| Literature + Theatre | 6,000/6,000 | 6,000/6,000 | 0 / 0 |
+| Painting, Sculpture, Architecture, Design | 12,000/12,000 | 12,000/12,000 | 0 / 0 |
+
+- **Git:** the user authorised a checkpoint commit on `main`, made on top of `9359a38` as “feat(art): register Music as the seventh active Art subtopic” (27 files). **Not pushed; the user said not to push yet.**
+- **Exact next action:** wait for the user's approval before any push. `AGENTS.md`'s "Current project status" still describes only Literature/Theatre; update it on request.
+
+## Music approvals implemented (earlier today)
+
+- **Applied:** see the [decision record](art-music-editorial-approval.md).
+  - L2/p4: Callas → Opera introduced (A); Shakira → Pop moved to reserve.
+  - L6/p4: Umm Kulthum C → A; Björk A → C.
+  - L6/p4: Caetano → Brazilian popular music replaced by **João Gilberto → Bossa nova** (B), with a new `joao-gilberto-genre` source review.
+  - **98 user-approved** manual-editorial negatives (L2 38 / L6 26 / L8 34).
+  - **8 Claude-selected** negatives, **approved by the user 2026-10-26** and recorded with the standard user manual-editorial label (locator: “selected by Claude Code”): João's own pool ×4, plus Dolly, Umm Kulthum, Enya and Teresa Teng ≠ Bossa nova. Teresa's is required for L6/p4/C.
+  - **8 obsolete comparisons removed:** Caetano's 4 and four Brazilian popular music negatives.
+  - Wording for `genre_associated_with_solo_artist` / `notable_musician_of_instrument` is now “known for” / “famous for playing”.
+- **Results 2026-10-26:**
+  - Music audit `--attempts=20 --require-ready` **exit 0**: 3,000/3,000 generated; fresh progression 3,000/3,000 with 0 blocked and 0 violations.
+  - Full Jest **639/639, 36/36 suites**: 549 s, and again in 513 s after the 8 approvals were recorded. All other gates were also rerun after the approvals, with identical results.
+  - tsc, lint, `git diff --check`, image check (19 staged / 0 approved), genre-compatibility and the Literature/Theatre audit all pass.
+  - Six-subtopic Art generation and fresh progression are **18,000/18,000** each, with 0 shortages and 0 violations.
+- **Test changes:** one pre-approval assertion (Guitar vs Itzhak Perlman = unknown) now uses an unlisted pair, because that comparison is now approved. Added 2 Music tests. No frozen Art expectations changed.
+- (Superseded: Music has since been registered with the user's approval; see above.)
+
+### Earlier Codex state (superseded by the section above)
+
+- **486 concepts**, 18 × 27 teaching placements; 351 source-review entries. Production teaching selection is **297 facts**, with **189 retained reserves excluded from review**. Exact approved curriculum is unchanged. No audio/images or runtime searches.
+- Source corrections and accessibility cleanup are implemented in the new `music*.ts` modules. See [Music implementation/status](art-music-content.md) for corrections, coverage by level, limitations and the complete file manifest. AI source comparison is not independent human editorial certification.
+- Music's named-artist/song examples reuse the existing project/credit focus. Shared executable changes are limited to Music-specific recording wording and the existing focus action `recorded`/noun `act`; `SourceFact` also accepts the Music subtopic. No grading, matching, progression or selection algorithm changes.
+- **Current isolated readiness: 141/150.** Only **L2/p4, L6/p4, L8/p4 A/B/C** remain blocked by missing genre/instrument association negatives. Broad unsupported exclusion tables were rejected by automatic approval review and were **not installed**. Unknown remains unknown. Music is deliberately **not registered in `activeArtContent.ts`** yet.
+- The user answered **“Prepare a short comparison list for my editorial approval.”** [Approval shortlist](art-music-editorial-approval.md) has **106 proposed comparisons across 33 artist/musician rows**, conditional matching groups and **two separate staging/selection proposals**. **None is implemented.** The Maria Callas/Shakira genre-only selection and Umm Kulthum/Björk stage swap also await approval. Do not silently approve the Teresa Teng/Brazilian popular music comparison or any other uncertain judgment.
+- **Validation:** full Jest **637/637 tests, 36/36 suites** (original 604 plus 33 Music tests); The final full rerun after Music wording polish passed in 442.043 s. TypeScript, lint, schema/content/evidence and whitespace PASS. Images unchanged: 19 staged assets, none production-approved.
+- Music 20-attempt isolated audit: **2,820/3,000 generated**, 180 explicit shortages, **0 violations**. Fresh progression: **480 ready / 20 shortages / 2,500 prerequisite-blocked / 0 violations**; first block **L2/p4/A**. `node scripts/art-music-audit.cjs --attempts=20 --require-ready` correctly exits **1**. Do not describe Music as 150/150 or fresh-progression complete.
+- Six completed Art regressions remain **150/150 each**, generation **18,000/18,000**, fresh progression **18,000/18,000**, zero violations. Frozen baselines/test expectations were not changed. Literature/Theatre duplicate-target support remains safe and unchanged; Music has no new duplicate-target opt-in.
+- **Git:** `main`/HEAD `9359a38`, 19 intended modified/new files, all unstaged. No commit/push, image activation, progress reset or backup-directory change. No temporary artifacts are included.
+
+**Exact next action:** wait for the user's comparison/staging decisions; implement only approved work-specific assertions with manual-editorial provenance. Preserve known positives. Run focused Music checks, then register its 297 teaching facts only after all 150 combinations and complete fresh progression are ready. Finish with the full regression gates. The earlier Art checkpoint below is history, not permission to commit this Music work.
+
+---
+
+### Previous completed Art checkpoint (retained history)
+
 **Last updated:** 2026-10-26, approved Art accessibility and genre-readiness checkpoint. All six subtopics retain **150/150** readiness, **604/604 tests** and **18,000/18,000** generation/fresh progression with zero violations. The user has authorized this checkpoint commit and a normal push of `main` to its existing remote.
 
 ## Approved Art checkpoint — 2026-10-26

@@ -51,6 +51,7 @@ import { literatureModernNovelistsSet } from './artContent/literatureModernNovel
 import { literatureModernNovelsSet } from './artContent/literatureModernNovels';
 import { literaturePoetrySet } from './artContent/literaturePoetry';
 import { theatreVenueSet } from './artContent/theatreVenues';
+import { musicTeachingContent } from './artContent/musicContent';
 
 // Production authoring boundary. Source-checked teaching facts, including preserved pilot originals;
 // synthetic engine fixtures never enter this list. No image approvals implied.
@@ -76,8 +77,11 @@ const authoredArtContent: readonly Concept[] = scheduleArtLearning([...sculpture
 const authoredArtEvidence: readonly SemanticEvidence[] = Object.freeze([...sculpture.evidence, ...painting.evidence, ...terminologyPilotEvidence, ...expandedArtEvidence, ...progressionWorkEvidence, ...termSets.flatMap(set => set.evidence), ...architectureDesignSets.flatMap(set => set.evidence), ...literatureTheatreSets.flatMap(set => set.evidence), ...genreCompletionFacts.evidence]);
 
 const baroqueDecades = authorBaroqueDecades(authoredArtContent, authoredArtEvidence);
-export const approvedArtContent: readonly Concept[] = Object.freeze(baroqueDecades.concepts);
-export const approvedArtEvidence: readonly SemanticEvidence[] = Object.freeze([...authoredArtEvidence, ...baroqueDecades.evidence]);
+// Music is already scheduled and worded by its own modules (6/3/2 over the 11
+// introduced facts per placement). Its 189 reserves stay in musicContent and
+// never enter review. Registered after the Art-wide passes so neither changes it.
+export const approvedArtContent: readonly Concept[] = Object.freeze([...baroqueDecades.concepts, ...musicTeachingContent.concepts]);
+export const approvedArtEvidence: readonly SemanticEvidence[] = Object.freeze([...authoredArtEvidence, ...baroqueDecades.evidence, ...musicTeachingContent.evidence]);
 
 export function createActiveArtSets(records: readonly Concept[]) {
   const sets: Record<string, { id: string; concepts: Concept[] }> = {};

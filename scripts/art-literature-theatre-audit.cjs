@@ -57,9 +57,10 @@ const rows = selected.flatMap(subtopic => Array.from({ length: 9 }, (_, i) => i 
 })));
 const validationErrors = validateContent(approvedArtContent, context.policies, undefined, { evidence: approvedArtEvidence }).filter(i => i.severity === 'error');
 const baseline = { concepts: 1192, evidence: 4730,
-  conceptHash: hash(approvedArtContent.filter(c => !selected.includes(c.subtopicId))), evidenceHash: hash(approvedArtEvidence.slice(0, 4730)) };
+  // The four earlier completed subtopics; Music was registered later with its own audit.
+  conceptHash: hash(approvedArtContent.filter(c => !selected.includes(c.subtopicId) && c.subtopicId !== 'music')), evidenceHash: hash(approvedArtEvidence.slice(0, 4730)) };
 // Stage 6 permits only these authored display edits; retain the original factual baseline.
-baseline.nonWordingConceptHash = hash(approvedArtContent.filter(c => !selected.includes(c.subtopicId)).map(concept => {
+baseline.nonWordingConceptHash = hash(approvedArtContent.filter(c => !selected.includes(c.subtopicId) && c.subtopicId !== 'music').map(concept => {
   const c = JSON.parse(JSON.stringify(concept));
   if (c.subtopicId === 'painting' && c.levelId === 'l1' && ['p2', 'p4'].includes(c.partId)) {
     delete c.assessment.presentation.scope.text; delete c.assessment.presentation.scope.reviewedAt;

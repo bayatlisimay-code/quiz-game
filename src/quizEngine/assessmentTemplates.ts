@@ -67,7 +67,7 @@ function fromDate(answer: string): string {
 }
 const eventVerbs: Readonly<Record<string, string>> = {
   creation: "created", completion: "completed", "first performance": "first performed", "first publication": "first published",
-  writing: "written", introduction: "introduced", "historical period": "built",
+  writing: "written", introduction: "introduced", "historical period": "built", formation: "formed",
 };
 
 export function getAssessmentTemplate(concept: Concept): RelationTemplate {
@@ -152,7 +152,7 @@ export function getAssessmentTemplate(concept: Concept): RelationTemplate {
   const attributionWording = qualified ?? creatorWording;
   const focus = concept.assessment.focus;
   const action = focus?.action ?? "designed";
-  const contributor = focus?.collectiveCredit ? "team" : action === "wrote" ? "writer" : action === "designed" ? "designer" : "figure";
+  const contributor = action === "recorded" ? "act" : focus?.collectiveCredit ? "team" : action === "wrote" ? "writer" : action === "designed" ? "designer" : "figure";
   // “Product design” + designer reads as “Product designer”.
   const who = (subject: string) => contributor === "designer" && subject.endsWith(" design") ? `${subject}er` : `${subject} ${contributor}`;
   const focused = focus?.kind === "example-credit" ? {

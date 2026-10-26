@@ -7,7 +7,7 @@ export type AuthoredSet = { concepts: Concept[]; evidence: SemanticEvidence[] };
 export const architectureDesignReview = Object.freeze({ reviewStatus: "verified" as const,
   reviewedBy: "Codex — institutional-source comparison (not independent human editorial approval)", reviewedAt: "2026-10-16" });
 export type SourceFact = Readonly<{
-  subtopic: "architecture" | "design" | "literature" | "theatre"; level: string; part: TeachingPart; id: string;
+  subtopic: "architecture" | "design" | "literature" | "theatre" | "music"; level: string; part: TeachingPart; id: string;
   subject: string; subjectId: string; subjectType: EntityType;
   answer: string; answerId: string; answerType: EntityType; source: Source;
   qualifiers: Readonly<Record<string, QualifierValue>>; scope: string;

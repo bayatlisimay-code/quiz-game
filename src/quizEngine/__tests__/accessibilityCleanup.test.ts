@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { approvedArtContent as facts, approvedArtEvidence as evidence } from '../../../data/activeArtContent';
 import { retiredEarlySculptures } from '../../../data/artContent/ancientSculpture';
+import { musicTeachingContent } from '../../../data/artContent/musicContent';
 import { getAssessmentTemplate, getMatchingLabel, getVisibleAssessmentScope } from '../assessmentTemplates';
 import { getAnswerLabel } from '../learnerText';
 import { activeSemanticContext as context } from '../contentSnapshot';
@@ -116,7 +117,9 @@ test('simplified definitions and introductory design names actually reach displa
 
 test('all 7554 pre-cleanup evidence identities remain, including retired and provisional assertions',()=>{
  const added=/^genre-completion:|^institution-check:art_(?:literature_l1_p2_robinson-crusoe|theatre_l1_p2_twelve-angry-men)$|^manual-editorial:2026-10-23:|^final-genre:positive:art_theatre_l1_p2_hamlet:revenge-tragedy$|^final-genre:positive:art_theatre_l1_p2_(?:antigone|bacchae):greek-tragedy$|^final-genre:positive:art_theatre_l1_p2_importance-earnest:comedy-manners$|^(?:decade-containment:|accessibility:)|^source-check:art_sculpture_l1_p[124]_(?:great-sphinx|hongshan-jade-dragon)$/;
- const retained=evidence.filter(e=>!added.test(e.id)).map(e=>e.id).sort();
+ // Music was registered after this cleanup baseline and is excluded by identity.
+ const music=new Set(musicTeachingContent.evidence.map(e=>e.id));
+ const retained=evidence.filter(e=>!added.test(e.id)&&!music.has(e.id)).map(e=>e.id).sort();
  expect(retained).toHaveLength(7554);
  expect(createHash('sha256').update(JSON.stringify(retained)).digest('hex')).toBe('94e2c47202a5ff0a8a31cabf0cf089faee7deccc511844d12e840e033a5d6590');
 });

@@ -27,8 +27,9 @@ const editorialIdentity = (concept: (typeof approvedArtContent)[number]) => {
 
 test('completed Art matches the reviewed accessibility content and evidence baseline',()=>{
  const hash=(value:unknown)=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
- expect(hash(approvedArtContent.filter(c=>!['literature','theatre'].includes(c.subtopicId)))).toBe('ddedc9f8399b9e9e5a362d37191c176797257136ad08afdf13e656d53840aaf1');
- expect(hash(approvedArtContent.filter(c=>!['literature','theatre'].includes(c.subtopicId)).map(editorialIdentity))).toBe('75f93c18f6b9a1eae4ff7c283255395f105b8ae2d4943c81823499a642b35580');
+ // The four earlier completed subtopics; Music (registered later) has its own suite.
+ expect(hash(approvedArtContent.filter(c=>!['literature','theatre','music'].includes(c.subtopicId)))).toBe('ddedc9f8399b9e9e5a362d37191c176797257136ad08afdf13e656d53840aaf1');
+ expect(hash(approvedArtContent.filter(c=>!['literature','theatre','music'].includes(c.subtopicId)).map(editorialIdentity))).toBe('75f93c18f6b9a1eae4ff7c283255395f105b8ae2d4943c81823499a642b35580');
  expect(hash(approvedArtEvidence.slice(0,4730))).toBe('18eea856b7b59d367b16a268cdd33cde1db2174f5a800652c77104126dd8c5ae');
  expect(artAvailability.design).toBe('coming-soon');
 });
