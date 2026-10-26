@@ -12,11 +12,12 @@ export type RelationDefinition = Readonly<{
 const spec = (family: RelationFamily, question: string, statement: string, blank: string, inverse?: RelationDefinition["inverse"]): RelationDefinition => Object.freeze({ family, question, statement, blank, inverse });
 // Roles, rather than relation IDs, determine grammar. Unrecognised and qualified
 // credits retain the conservative attribution wording.
-const creatorVerbs: Readonly<Record<string, { active: string; passive: string }>> = {
+export const creatorVerbs: Readonly<Record<string, { active: string; passive: string }>> = {
   painter: { active: "painted", passive: "painted" },
   sculptor: { active: "sculpted", passive: "sculpted" },
   author: { active: "wrote", passive: "written" },
   poet: { active: "wrote", passive: "written" },
+  playwright: { active: "wrote", passive: "written" },
   director: { active: "directed", passive: "directed" },
   designer: { active: "designed", passive: "designed" },
   architect: { active: "designed", passive: "designed" },
@@ -42,13 +43,13 @@ export const familyDefinitions = {
   representative: (noun: string, criterion: string) => spec("representative", `Which ${noun} was ${criterion} “{s}”?`, `{a} was ${criterion} “{s}”.`, `One ${noun} who was ${criterion} “{s}” is _____.`),
   country: (event: "birth" | "formation" | "location" | "base") => {
     const questions = { birth: "was {s} born", formation: "was the band or group {s} formed", location: "is {s} located", base: "is the award institution or festival {s} based" };
-    const statements = { birth: "The birthplace of {s} is in", formation: "The band or group {s} was formed in", location: "{s} is located in", base: "The award institution or festival {s} is based in" };
-    return spec("country", `Using present-day countries, in which country ${questions[event]}?`,
-      `Using present-day countries: ${statements[event]} {a}.`, `Using present-day countries: ${statements[event]} _____.`);
+    const statements = { birth: "{s} was born in", formation: "The band or group {s} was formed in", location: "{s} is located in", base: "The award institution or festival {s} is based in" };
+    return spec("country", `In which present-day country ${questions[event]}?`,
+      `${statements[event]} present-day {a}.`, `${statements[event]} present-day _____.`);
   },
   first: (criterion: string) => spec("first-work", `What was the first ${criterion} by {s}?`, `The first ${criterion} by {s} was “{a}”.`, `The first ${criterion} by {s} was _____.`),
   character: (work: string) => spec("character", `In which ${work} does the character “{s}” appear?`, `The character “{s}” appears in “{a}”.`, `The character “{s}” appears in _____.`),
   association: (work: string) => spec("association", `Which character has the specified relationship with “{s}” in this ${work}?`, `“{s}” has the specified relationship with “{a}” in this ${work}.`, `In this ${work}, “{s}” has the specified relationship with _____.`),
   prize: () => spec("prize", `Which award category or festival prize is associated with “{s}”?`, `An award category or festival prize associated with “{s}” is “{a}”.`, `An award category or festival prize associated with “{s}” is _____.`),
-  period: (label: string) => spec("period", `Which historical period or date range describes ${label} “{s}”?`, `A historical period or date range describing ${label} “{s}” is {a}.`, `A historical period or date range describing ${label} “{s}” is _____.`),
+  period: (label: string) => spec("period", `Which period or date range is associated with ${label} “{s}”?`, `A period or date range associated with ${label} “{s}” is {a}.`, `A period or date range associated with ${label} “{s}” is _____.`),
 };

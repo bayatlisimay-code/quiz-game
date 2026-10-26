@@ -1,3 +1,6 @@
+import { accessibilityWording } from '../../../data/artContent/learnerWording';
+import { authorAncientWorks } from '../../../data/artContent/authoring';
+import { retiredEarlySculptures } from '../../../data/artContent/ancientSculpture';
 import { approvedArtContent, approvedArtEvidence } from '../../../data/activeArtContent';
 import { sculpturePilotWorks } from '../../../data/artPilot/sculpture';
 import { paintingPilotWorks } from '../../../data/artPilot/painting';
@@ -10,7 +13,7 @@ import { getCurriculumPool } from '../curriculumPool';
 import { catalogCoverageCases, measureGenerationCoverage, exerciseValidityViolations } from '../generationCoverage';
 import { getExerciseCapabilities } from '../exerciseFactory';
 import { buildQuizResult, quizCompositionViolations } from '../buildQuiz';
-import { getAssessmentTemplate, getVisibleAssessmentScope, reverseConcept } from '../assessmentTemplates';
+import { getAssessmentTemplate, reverseConcept } from '../assessmentTemplates';
 import { validateContent } from '../contentValidation';
 import { isMatchingPairCorrect } from '../answerValidation';
 import { isPermanentlyLockable } from '../matchingSafety';
@@ -31,7 +34,7 @@ test('all 54 teaching placements are populated in their approved positions; pilo
   const baseline = [...authorArtworkPilot(sculpturePilotWorks, 'sculpture', 'l3').concepts,
     ...authorArtworkPilot(paintingPilotWorks, 'painting', 'l2').concepts, ...terminologyPilotConcepts];
   const factual = (c: typeof baseline[number]) => { const { introducedIn: _stage, learning: _priority, ...rest } = c; return rest; };
-  expect(approvedArtContent.slice(0, baseline.length).map(factual)).toEqual(baseline.map(factual));
+  expect(approvedArtContent.slice(0, baseline.length).map(factual)).toEqual(baseline.map(accessibilityWording).map(factual));
   const example = approvedArtContent.find(c => c.id === 'art_painting_l1_p2_pop-art')!;
   const recognition = approvedArtContent.find(c => c.id === 'art_painting_l8_p1_moma-476-1996')!;
   expect(example.semantic?.value?.id).toBe(recognition.semantic?.value?.id);
@@ -85,12 +88,12 @@ test('source-qualified ancient cultural attribution is not modern nationality or
   const cultures = pool('sculpture', 'l2', 'p2'), buddha = cultures.find(c => c.subject.startsWith('Seated Buddha'))!;
   expect(buddha.object).toBe('Gandhara');
   const wording = getAssessmentTemplate(buddha);
-  expect(wording.question(buddha.subject)).toContain('Which specific primary cultural-attribution label is given');
-  expect(wording.statement(buddha.subject, buddha.object)).toContain('primary label at its stated specificity');
+  expect(wording.question(buddha.subject)).toBe('Which culture does “Seated Buddha (bronze)” come from?');
+  expect(wording.statement(buddha.subject, buddha.object)).toBe('The culture of “Seated Buddha (bronze)” is Gandhara.');
   expect(buddha.subject).not.toContain(buddha.object);
   const early = pool('sculpture', 'l1', 'p2');
-  const gudea = early.find(c => c.object === 'Neo-Sumerian')!, sumerian = early.find(c => c.object === 'Sumerian')!;
-  expect(getAssessmentTemplate(gudea).statement(gudea.subject, sumerian.object)).toContain("account's specific primary cultural-attribution label");
+  const gudea = early.find(c => c.id.endsWith('_met-59-2'))!, sumerian = authorAncientWorks(retiredEarlySculptures, 'l1').concepts.find(c => c.object === 'Sumerian')!;
+  expect(getAssessmentTemplate(gudea).statement(gudea.subject, sumerian.object)).toContain("The culture of");
   const unqualified = { ...gudea, semantic: { ...gudea.semantic!, qualifiers: { assessmentScope: 'unqualified-cultural-membership' } } };
   expect(context.evaluate(unqualified, sumerian).verdict).toBe('unknown');
 
@@ -101,7 +104,9 @@ test('source-qualified ancient cultural attribution is not modern nationality or
 test('date prompts retain complete uncertain and version-specific labels without printing the answer in version notes', () => {
   for (const c of approvedArtContent.filter(c => c.tags?.includes('verified-art-content') && c.assessment?.dateInterpretation)) {
     const t = getAssessmentTemplate(c);
-    expect(t.statement(c.subject, c.object)).toContain(c.object);
+    // Statements keep the complete label; only “probably” moves before the verb.
+    expect(t.statement(c.subject, c.object)).toContain(c.object.replace(/^probably /, ''));
+    if (c.object.startsWith('probably ')) expect(t.statement(c.subject, c.object)).toContain('was probably');
     expect(t.question(c.subject)).not.toContain(c.object);
     expect(t.blank(c.subject)).not.toContain(c.object);
     expect(getExerciseCapabilities(c, pool(c.subtopicId, c.levelId, c.partId), context).forms.blank_typed.available).toBe(false);
@@ -115,12 +120,13 @@ test('date prompts retain complete uncertain and version-specific labels without
 test('readymades, welded works and installed constructions use created grammar in both directions', () => {
   for (const c of pool('sculpture', 'l7', 'p2').filter(c => c.assessment?.attribution?.verb === 'created')) {
     const t = getAssessmentTemplate(c);
-    expect(t.question(c.subject)).toMatch(/^Who created/);
-    expect(t.statement(c.subject, c.object)).toContain(`${c.object} created`);
-    expect(t.blank(c.subject)).toContain('was created by');
+    expect(t.question(c.subject)).toBe(`Who created “${c.subject}”?`);
+    expect(t.statement(c.subject, c.object)).toContain(`${c.object} created “${c.subject}”`);
+    expect(t.blank(c.subject)).toContain('was created by _____');
     const reverse = reverseConcept(c)!;
     expect(getAssessmentTemplate(reverse).question(reverse.subject)).toContain(`created by ${c.object}`);
-    expect(t.question(c.subject)).toContain(getVisibleAssessmentScope(c)!);
+    expect(t.question(c.subject)).not.toContain("sculpted");
+    expect(c.semantic!.qualifiers!.assessmentScope).toBe("principal-catalogue-credit");
   }
   expect(pool('sculpture', 'l7', 'p2').find(c => c.id.endsWith('met-53-87'))?.subject).not.toContain('Noguchi');
   const pelagos = pool('sculpture', 'l7', 'p2').find(c => c.id.endsWith('hepworth-pelagos'))!;
@@ -129,11 +135,11 @@ test('readymades, welded works and installed constructions use created grammar i
     const cast = approvedArtContent.find(c => c.id === id)!;
     const wording = getAssessmentTemplate(cast);
     expect(cast.assessment?.attribution?.status).toBe('certain');
-    expect(wording.question(cast.subject)).toContain('Which sculptor is credited');
+    expect(wording.question(cast.subject)).toContain('Who sculpted');
     expect(wording.statement(cast.subject, cast.object)).not.toContain('created');
-    expect(wording.blank(cast.subject)).toContain('credited');
+    expect(wording.blank(cast.subject)).toContain('was sculpted by');
     const inverse = reverseConcept(cast)!;
-    expect(getAssessmentTemplate(inverse).question(inverse.subject)).toContain('credited to');
+    expect(getAssessmentTemplate(inverse).question(inverse.subject)).toContain(`sculpted by ${inverse.subject}`);
   }
 
 

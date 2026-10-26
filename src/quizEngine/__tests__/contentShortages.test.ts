@@ -10,11 +10,11 @@ const additions=approvedArtContent.filter(c=>['architecture','design'].includes(
 const find=(id:string)=>{const c=additions.find(c=>c.id===id);if(!c)throw new Error(id);return c;};
 const pool=(s:string,l:string,p:string)=>getCurriculumPool(ACTIVE_CONCEPT_SETS,{topicId:'art',subtopicId:s,levelId:l,partId:p});
 
-test('all 583 records outside the authorized l6p2 classification correction retain their canonical fields',()=>{
+test('583 records outside l6p2 match the authorized accessibility name and canonical-identity baseline',()=>{
  const rows=additions.filter(c=>!(c.subtopicId==='design'&&c.levelId==='l6'&&c.partId==='p2')).map(c=>({id:c.id,subject:c.subject,object:c.object,relation:c.relation,subjectId:c.semantic!.subject!.id,valueId:c.semantic!.value!.id,factId:c.assessment!.factId,priority:c.learning!.reinforcementPriority,introducedIn:c.introducedIn}));
  expect(additions).toHaveLength(594);
  expect(rows).toHaveLength(583);
- expect(createHash('sha256').update(JSON.stringify(rows)).digest('hex')).toBe('b6c12c02e076955c88baec97a9448cebe29072527eecc39fb3e4673f96cf8fa5');
+ expect(createHash('sha256').update(JSON.stringify(rows)).digest('hex')).toBe('1c1ba5ebd306e41b083c86812a648851ee0447f08fa290e4f28e196467b62c58');
 });
 
 test('original cultural-producing traditions have scoped contradictions without making successor cultures disjoint',()=>{
@@ -24,7 +24,7 @@ test('original cultural-producing traditions have scoped contradictions without 
  expect(context.evaluate(greek,khmer).verdict).toBe('invalid');
  const giza=find('art_architecture_l2_p2_giza-pyramids'),abu=find('art_architecture_l2_p2_abu-simbel');
  expect(context.evaluate(giza,abu).verdict).toBe('valid');
- expect(getAssessmentTemplate(khmer).question(khmer.subject)).toContain('not later alterations or cultural influence');
+ expect(getAssessmentTemplate(khmer).question(khmer.subject)).toBe('Which building tradition does “Angkor Wat temple” belong to?');
  const armenian=find('art_architecture_l3_p2_haghpat'),byzantine=find('art_architecture_l3_p2_hagia-sophia');
  expect(context.evaluate(armenian,byzantine).verdict).toBe('unknown');
  const cordoba=find('art_architecture_l3_p2_cordoba-mosque');
@@ -34,7 +34,7 @@ test('original cultural-producing traditions have scoped contradictions without 
 
 test('field examples require their visible project credit, not an exclusive field membership',()=>{
  const type=find('art_design_l2_p2_type'),graphic=find('art_design_l2_p2_graphic');
- expect(getAssessmentTemplate(type).question(type.subject)).toContain('credited to Matthew Carter');
+ expect(getAssessmentTemplate(type).question(type.subject)).toContain('by Matthew Carter');
  expect(context.evaluate(type,graphic).verdict).toBe('invalid');
  const evidence=approvedArtEvidence.filter(e=>!(e.kind==='assertion'&&e.verdict==='invalid'&&e.subjectId===type.semantic!.subject!.id&&e.predicateId===type.relation&&e.valueId===graphic.semantic!.value!.id));
  const partial=createSemanticContext(approvedArtContent,{policies:context.policies,evidence});
@@ -49,8 +49,8 @@ test('contributor scope preserves collaborations and does not credit Bedin’s l
  expect(context.evaluate(memphis,postmodern).verdict).toBe('valid');
  expect(postmodern.assessment!.focus!.label).toBe('Carlton room divider');
  const school=find('art_design_l3_p4_bauhaus');
- expect(getAssessmentTemplate(school).question(school.subject)).toContain('credited with founding');
- expect(getMatchingLabel(school)).toContain('MoMA');
+ expect(getAssessmentTemplate(school).question(school.subject)).toBe('Which Bauhaus figure founded “the Bauhaus school”?');
+ expect(getMatchingLabel(school)).toBe('Bauhaus — founded the Bauhaus school');
  expect(school.assessment!.focus!.label).toContain('school');
  const p2=find('art_design_l3_p2_postmodernism');
  expect(getAssessmentTemplate(p2).question(p2.subject)).toContain('Martine Bedin');
@@ -58,7 +58,7 @@ test('contributor scope preserves collaborations and does not credit Bedin’s l
  const evidence=approvedArtEvidence.find(e=>e.id===joint.assessment!.evidenceIds[0]);
  expect(evidence).toMatchObject({kind:'complete-set',valueIds:expect.arrayContaining(['person:lilly-reich','person:ludwig-mies-van-der-rohe'])});
  const nls=find('art_design_l2_p4_interaction');
- expect(getAssessmentTemplate(nls).question(nls.subject)).toContain('team is credited with developing');
+ expect(getAssessmentTemplate(nls).question(nls.subject)).toContain('design team developed');
  expect(context.evaluate(nls,find('art_design_l2_p4_graphic')).verdict).toBe('unknown');
  const teamCredit=approvedArtEvidence.find(e=>e.id===nls.assessment!.evidenceIds[0]);
  expect(teamCredit).toMatchObject({kind:'complete-set',valueTypes:['group'],valueIds:[nls.semantic!.value!.id]});
@@ -102,9 +102,10 @@ test('project fields leave overlapping disciplines unknown and project periods d
  expect(dressBound).toMatchObject({kind:'date-bound',start:1910,end:1971});
  expect(getMatchingLabel(chair)).toContain('Red Blue Chair');
  expect(getAssessmentTemplate(dress).question(dress.subject)).not.toContain('1926');
- expect(getAssessmentTemplate(chair).question(chair.subject)).toContain('Which period is documented');
- expect(getAssessmentTemplate(chair).statement(chair.subject,chair.object)).toContain('documented dating');
- expect(getAssessmentTemplate(dress).question(dress.subject)).toContain('not the entire career');
+ // The question names the single project, so career bounds are not implied.
+ expect(getAssessmentTemplate(chair).question(chair.subject)).toBe('When did Gerrit Rietveld create “Red Blue Chair”?');
+ expect(getAssessmentTemplate(chair).statement(chair.subject,chair.object)).toBe('Gerrit Rietveld created “Red Blue Chair” in 1918–1923.');
+ expect(getAssessmentTemplate(dress).question(dress.subject)).toBe('When did Gabrielle Chanel create “Evening dress”?');
  const dates=approvedArtEvidence.filter(e=>e.kind==='date-bound'&&e.predicateId==='design_period_of_designer');
  expect(dates).toHaveLength(11);
  expect(dates.every(e=>'qualifiers' in e&&typeof e.qualifiers.projectId==='string')).toBe(true);

@@ -5,6 +5,7 @@ import { getAnswerLabel, presentationProblems } from "./learnerText";
 import { isPermanentlyLockable } from "./matchingSafety";
 import type { Concept, Exercise, MatchingExercise } from "./conceptTypes";
 import { hasRelationTemplate } from "./templates";
+import { relationDefinitions } from "./relationCatalogue";
 import { getRelationPolicy } from "./relationPolicies";
 import { createSemanticContext, equivalentAnswers, normalizeSemanticText } from "./semanticValidation";
 import type { SemanticContext } from "./semanticValidation";
@@ -42,6 +43,14 @@ function uniqueCandidates(candidates: readonly Concept[], context: SemanticConte
     return true;
   });
 }
+type YearSpan = Readonly<{ start: number; end: number }>;
+/** First displayed year or range (“1888–1898”, “1620s”, “c. 1340 BCE”); centuries and free text give none. */
+function displayedYears(label: string): YearSpan | undefined {
+  const m = /(?<!\d)(\d{3,4})(s?)(?:\s*[–-]\s*(\d{3,4})(?!\d))?(\s*BCE)?/.exec(label);
+  if (!m) return undefined;
+  const sign = m[4] ? -1 : 1, start = sign * Number(m[1]), end = m[3] ? sign * Number(m[3]) : m[2] ? start + 9 : start;
+  return { start: Math.min(start, end), end: Math.max(start, end) };
+}
 export function getExerciseCapabilities(concept: Concept, pool: readonly Concept[], context: SemanticContext, optionCount = 3): ExerciseCapabilities {
   const policy = getRelationPolicy(concept.relation, context.policies);
   const claim = context.claim(concept);
@@ -66,13 +75,40 @@ export function getExerciseCapabilities(concept: Concept, pool: readonly Concept
       displays.get(normalizeSemanticText(getAnswerLabel(c)).toLowerCase())!.every((other) =>
         context.claim(other).answer.identity === context.claim(c).answer.identity || decisions.get(other)!.verdict === "invalid");
   });
+  // A presentation preference only: prefer certified negative dates that do
+  // not overlap the answer (or each other) and start at least ten years apart,
+  // so 1498 is not offered beside 1500. Insufficient pools follow the original
+  // fallback. No new negative is inferred.
+  // Many date records carry no structured interval, so the displayed year(s)
+  // are read for this ordering only; grading never uses them.
+  const span = (c: Concept) => displayedYears(getAnswerLabel(c)) ?? context.claim(c).answer.temporal;
+  const dated = ["date", "period"].includes(relationDefinitions[concept.relation]?.family ?? "");
+  const date = dated ? span(concept) : undefined;
+  const wellSeparated = (a: YearSpan, b: YearSpan) =>
+    (a.end < b.start || b.end < a.start) && Math.abs(a.start - b.start) >= 10;
+  const sameDateKind = (candidate: Concept) => candidate.relation === concept.relation &&
+    (!concept.distractorGroup || candidate.distractorGroup === concept.distractorGroup);
+  const datedOptions: Concept[] = [];
+  if (date) {
+    const chosen = [date];
+    for (const candidate of allowed) {
+      const other = span(candidate);
+      if (!sameDateKind(candidate) || !other || !chosen.every((t) => wellSeparated(t, other))) continue;
+      chosen.push(other); datedOptions.push(candidate);
+    }
+  }
+  const separatedFalse = date ? allowed.filter((c) => {
+    const other = span(c);
+    return sameDateKind(c) && !!other && wellSeparated(date, other);
+  }) : [];
   // Filtering and deduplication precede sampling within each preferred bucket.
   const buckets = [
+    datedOptions,
     allowed.filter((c) => !!concept.distractorGroup && c.distractorGroup === concept.distractorGroup),
     allowed.filter((c) => c.relation === concept.relation), allowed,
   ].map((bucket) => uniqueCandidates(bucket, context));
-  const optionCandidates = buckets.find((bucket) => bucket.length >= Math.max(1, optionCount - 1)) ?? buckets[2];
-  const falseCandidates = uniqueCandidates(allowed, context);
+  const optionCandidates = buckets.find((bucket) => bucket.length >= Math.max(1, optionCount - 1)) ?? buckets[buckets.length - 1];
+  const falseCandidates = uniqueCandidates(separatedFalse.length ? separatedFalse : allowed, context);
   const hasOptions = Number.isInteger(optionCount) && optionCount >= 3 && optionCandidates.length >= optionCount - 1;
   const acceptedValues = context.acceptedAnswers(concept);
   const acceptedForms = acceptedValues.flatMap((a) => a.forms);

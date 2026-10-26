@@ -2,7 +2,519 @@
 
 Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE.md). This file holds **current task state only**. Application docs: [progression](quiz-learning-progression.md) · [validity](quiz-validity.md) · [curriculum](art-curriculum-approved.md) · [Literature/Theatre status](art-literature-theatre-content.md) · [genre report](art-genre-completion.md). Earlier research (matching architecture, duplicate-target design, the Codex prompt) lives in commits `2055707` and `ca8d66a`.
 
-**Last updated:** 2026-10-21, Codex completed local integration. **Literature/Theatre integrated into `main`, 150/150 each. All post-integration checks pass. No push or Stage 4.**
+**Last updated:** 2026-10-26, approved Art accessibility and genre-readiness checkpoint. All six subtopics retain **150/150** readiness, **604/604 tests** and **18,000/18,000** generation/fresh progression with zero violations. The user has authorized this checkpoint commit and a normal push of `main` to its existing remote.
+
+## Approved Art checkpoint — 2026-10-26
+
+This commit records the completed accessibility cleanup, genre evidence/manual approvals, safe genre content selections, learner-facing wording/date-option improvements, editorial gate corrections and their regression tests. Commit message: **`Complete Art content accessibility and genre readiness`**. No content or engine behavior was changed during checkpoint preparation; only this handoff was updated.
+
+**Review:** all 44 intended files belong to this completed Art work. No unrelated file, secret, temporary report, build output, image asset or `.git_backup_corrupt/` change is included. The matching JSON fixture is maintained regression-test data for the authorized accessibility revision, not a build/report artifact. Source/evidence snapshots still match the validated 2026-10-23 baseline byte-for-byte. No executable/content/test file changed after the passing full test run.
+
+**Validation:** the saved full run passed **604/604 tests across 35 suites**; all six Art subtopics **150/150**, generation **18,000/18,000**, fresh progression **18,000/18,000**, zero violations. Production L/T additionally passed **6,000/6,000** generation and progression. TypeScript, lint, content, image and whitespace checks passed. During checkpoint preparation, TypeScript and the stage-aware authoring audit were rerun successfully; content/evidence hashes were rechecked against the saved validation snapshot. The expensive full simulations were not repeated for this documentation-only checkpoint step.
+
+**Remaining editorial limitations:** the three documented judgment-only facts retain their safe MCQ/blank limitations. All 58 historical pending assertions remain quarantined; 29 still have no separate verified/manual decision and are unused by active quizzes. Manual decisions and AI source comparisons do not constitute independent human factual certification. Production image settings and Design's Coming soon flag remain unchanged.
+
+**Git / next action:** checkpoint on `main`, parent `4c1fa8f`; configured upstream `origin/main` at `https://github.com/bayatlisimay-code/quiz-game.git`. Fetch confirmed the remote is an ancestor; the normal push includes the nine previously local integration/history commits plus this checkpoint, preserving their history. The exact checkpoint hash and verified push outcome are reported in the completion message and available through `git log -1`. No force-push, merge, rebase, reset, backup-directory change or additional development was performed. Continue release/editorial review only as instructed.
+
+### Checkpoint file manifest (44 files)
+
+```text
+data/activeArtContent.ts
+data/artContent/ancientSculpture.ts
+data/artContent/approvedGenrePrimaries.ts
+data/artContent/architectureHistorical.ts
+data/artContent/architectureMaterials.ts
+data/artContent/baroqueSculpture.ts
+data/artContent/designFamous.ts
+data/artContent/designIdentity.ts
+data/artContent/designTypefaces.ts
+data/artContent/genreCompatibility.ts
+data/artContent/genreReserves.ts
+data/artContent/index.ts
+data/artContent/learnerWording.ts
+data/artContent/learningPriorities.ts
+data/artContent/literatureClassicNovelists.ts
+data/artContent/literatureModernNovels.ts
+data/artContent/paintingMovements.ts
+data/artContent/progressionMovements.ts
+data/artContent/theatreVenues.ts
+data/artRelations.ts
+docs/AI_HANDOFF.md
+docs/art-stage6-evidence-review.md
+scripts/art-literature-theatre-audit.cjs
+src/quizEngine/__tests__/accessibilityCleanup.test.ts
+src/quizEngine/__tests__/approvedGenrePrimaries.test.ts
+src/quizEngine/__tests__/architectureDesignContent.test.ts
+src/quizEngine/__tests__/artContent.test.ts
+src/quizEngine/__tests__/artPilot.test.ts
+src/quizEngine/__tests__/assessmentWording.test.ts
+src/quizEngine/__tests__/contentShortages.test.ts
+src/quizEngine/__tests__/duplicateTargetMatching.test.ts
+src/quizEngine/__tests__/evidenceReadiness.test.ts
+src/quizEngine/__tests__/finalGenreCleanup.test.ts
+src/quizEngine/__tests__/fixtures/completedArtMatchingBaseline.json
+src/quizEngine/__tests__/genreCompletion.test.ts
+src/quizEngine/__tests__/learnerText.test.ts
+src/quizEngine/__tests__/literatureTheatreContent.test.ts
+src/quizEngine/__tests__/manualGenreApprovals.test.ts
+src/quizEngine/__tests__/nonExclusiveClassification.test.ts
+src/quizEngine/__tests__/typefaceClassification.test.ts
+src/quizEngine/assessmentTemplates.ts
+src/quizEngine/assessmentTypes.ts
+src/quizEngine/exerciseFactory.ts
+src/quizEngine/relationDefinitions.ts
+```
+
+## Final Art validation issues — evidence gate and per-fact format limitations (2026-10-23)
+
+**Scope:** validation and documentation only. No content, evidence, canonical answer, curriculum, engine, grading, matching, progression, image binding, frozen fixture or manual approval changed in this task. All prior uncommitted work is preserved. No stage/commit/push.
+
+### Editorial gate: required evidence versus quarantined history
+
+The failing Claude-provenance test mistakenly required every historical assertion to be verified and counted pending assertions as established negatives when checking positive conflicts. Runtime semantic evaluation already excludes pending evidence. The test now checks conflicts using **verified negatives only**, while retaining the historical provenance checks. New regression tests enforce that every active/retained assessment evidence reference is verified and that no pending record participates in an evaluated decision.
+
+All **58** historical assertions remain pending, unchanged. **29** have a separate verified source/manual decision; **29** have no separate decision and remain unverified. Five pending comparisons refer to subjects no longer selected in the active genre lessons. These are inventories, not new factual approvals. In particular, the pending Moonstone/Adventure exclusion does not override its separately approved **valid** Adventure classification.
+
+There are **zero active/retained assessment references to pending evidence**. Removing all pending evidence gives identical results for **968 active genre comparisons** and byte-identical generated results for **all 12 genre lesson A/B/C cases** at the regression seed. Negative regression tests prove that quarantining a required positive anchor disables the fact, and quarantining required negatives makes retrieval/false questions unavailable and otherwise-ready quizzes fail closed. No runtime guard was changed.
+
+### Three genuine, explicitly documented format limitations
+
+| Fact | Canonical answer | Only distinct wrong target in its teaching pool | Supported ordinary forms |
+|---|---|---|---|
+| `art_literature_l1_p2_moonstone` — The Moonstone | Detective fiction | Science fiction | Positive and negative True/False |
+| `art_theatre_l1_p2_dolls-house` — A Doll's House | Realist drama | Comedy | Positive and negative True/False |
+| `art_theatre_l1_p2_tempest` — The Tempest | Comedy | Realist drama | Positive and negative True/False |
+
+Three-option MCQ/option-blank needs **two** distinct certified wrong targets in the eligible pool. These facts each have one. Other approved wrong labels do not automatically become standalone candidates outside the lesson pool. Typed blank is unsafe because the non-exclusive accepted genre set is not certified complete. Moonstone's Adventure classification stays valid; Doll's House/Tragedy and Tempest/Tragedy stay unverified. No exclusion, answer-set completeness claim or additional format was manufactured.
+
+The quiz contract requires exact format quotas **per quiz**, and the repeated fact must use different formats; it does not require every canonical fact to have every format. The three facts are safely taught/assessed through judgments, while other facts provide retrieval and the multi-format repeat. New tests show each appears in an actual valid ordinary question, prove unsafe retrieval remains unavailable, and preserve the joint quotas.
+
+`art-literature-theatre-audit.cjs` keeps the strict all-format inventory (**Literature 296/297, Theatre 295/297**) and exact missing-form reasons. `--require-ready` now accepts only these three documented judgment-only limitations, rejects any unexpected capability gap, and additionally generates/validates **all 162 teaching A/B/C quizzes** with stage-aware selection. Any authored shortage, joint shortage, content error, invalid composition or semantic/matching violation still fails. `--require-all-forms` retains the stricter optional gate and intentionally exits 1 for these three limitations; it is not a claim that every fact now has MCQ/blank support. Repeated-attempt and fresh progression sweeps remain separately required.
+
+### Validation results
+
+| Check | Result |
+|---|---|
+| Formerly failing editorial test + new regressions | **15/15 tests, 2/2 suites**, 75.433 s |
+| Full Jest suite | **604/604 tests, 35/35 suites PASS**; no snapshot updates |
+| TypeScript / lint / whitespace | PASS |
+| Authoring audit `--require-ready` | **Exit 0**; **162/162** stage-aware teaching quizzes ready; zero content errors/unexpected capability gaps; three explicit format limitations |
+| Optional strict `--require-all-forms` inventory | **Exit 1 as intended**, solely the three documented format limitations; all missing-form reasons retained |
+| All six Art, 20 attempts, development images | Generation **18,000/18,000**, fresh progression **18,000/18,000**, all six **150/150**, zero shortages/blocks/violations |
+| L/T, 20 attempts, production | Generation **6,000/6,000**, fresh progression **6,000/6,000**, both **150/150**, zero shortages/blocks/violations |
+| Completed-Art regression | Painting/Sculpture/Architecture/Design **12,000/12,000** generation and progression within the all-six sweep; frozen matching fixtures unchanged |
+| Matching / composition | **339** safe duplicate-target exercises per delivery mode in L/T; zero semantic/grading/composition/matching violations; exact eight exercises and A/B/C/6-3-2 rules preserved |
+| Images | **19 assets / 19 staged / 0 production-approved**, unchanged |
+
+Detailed read-only reports: `/tmp/final-gates-{audit,generation-dev,learning-dev,generation-production,learning-production}.json`; full tests `/tmp/final-gates-full-tests.log`; strict-format inventory `/tmp/final-gates-strict-form-inventory.json`.
+
+**Preservation proof:** all **1,786 active facts / 7,706 evidence records** are byte-identical to task start. SHA-256: facts `976ca6b192f6aebcd9abe434d2a1059894ab3cb9c874af954699acd7a4968545`; evidence `f4f5ce1c8eb020e1afbcb806e804219b071a6d7ddb8cc7fe5aacbc418c6e8a33`. This includes all 101 manual negatives, the Moonstone positive, the four factual corrections and all pending records. No frozen expectations were updated.
+
+**Files changed in this task:** `src/quizEngine/__tests__/approvedGenrePrimaries.test.ts` (verified versus pending editorial gate); new `src/quizEngine/__tests__/evidenceReadiness.test.ts` (pending-evidence isolation/fail-closed and safe format-limitation regressions); `scripts/art-literature-theatre-audit.cjs` (explicit limitations plus real joint teaching checks); this handoff.
+
+**Remaining limitations / next action:** the three individual MCQ/blank limitations remain intentional and visible; 29 unresolved historical comparisons remain unverified and unused. Manual approvals are not external source verification, and Codex/Claude evidence reviews are not independent human editorial certification. Human release/editorial review remains distinct from technical readiness. Review the preserved uncommitted changes; commit/push only after explicit approval. No further engine or curriculum work is required to clear these two validation issues.
+
+**Git:** main checkout `/Users/simaybayatli/Developer/quiz-game`, branch `main`, HEAD `4c1fa8f`; **38 modified tracked / 6 untracked / 0 staged**. `.git_backup_corrupt/`, credentials and the retained development checkout untouched. No stage/commit/push/merge/reset.
+
+
+## Final six genre quiz variants — generation and progression repaired (2026-10-23)
+
+**All six requested quiz shortages are fixed. Literature and Theatre now each generate 150/150 combinations and complete fresh progression through Level 10.** This is generation readiness, not a claim that every historical editorial gate or every individual fact's recall formats is complete. No engine, grading, matching, quota, progress, image or production-availability changes were made. No commit/stage/push.
+
+### Causes and the implemented fixes
+
+- **Literature l1:** the former pool contained only one certified quartet (Pride / Frankenstein / Moby-Dick / Huckleberry Finn). A needed all four in A, while C may reinforce only two A facts, so stage shuffling alone could not solve A and C together. Added **Robinson Crusoe → Adventure fiction** in the genre-only Dracula slot, introduced in **B**, and moved **Wuthering Heights B → A**. This gives two A Adventure examples (Moby-Dick/Treasure Island) and two B examples (Huckleberry Finn/Crusoe), with Pride and Frankenstein as familiar anchors. Added three specific source-feature contrasts: Treasure Island / Novel of manners; Crusoe / Novel of manners; Crusoe / Science fiction. The central survival/treasure-seeking action is compared with the actual defining requirements, not excluded by its Adventure label. Colonial/social themes and practical use of tools are not denied.
+- **Theatre l1:** Comedy/Tragedy alone supply only two targets, below the preserved three-target minimum. The sole Realist target, A Doll's House, cannot safely be paired with Tragedy while that comparison remains unknown. Added **Twelve Angry Men → Courtroom drama** in the genre-only Cyrano slot, in **A**. This widely recognised modern stage classic adds a clear, familiar legal-drama example rather than an obscure formal subgenre. Added eight specific contrasts: the new play / Comedy and Tragedy; Hamlet, Antigone, Bacchae, Tartuffe, Earnest and She Stoops / Courtroom drama. These compare their documented organising action with judicial case deliberation. A royal court, a punishment, property dispute, arrest or a murder allegation alone does not determine the legal-drama or tragic genre. No general Comedy/Tragedy exclusion was introduced; Twelve Angry Men / Realist drama remains unknown, not false.
+- **Theatre l5:** an existing certified quartet could work in A if Rosencrantz arrived earlier, while C needed a different 2A/2B combination. Swapped **Rosencrantz B → A** and **Bald Soprano A → B**. No new evidence or work replacement was needed in this lesson. Godot, Glass and Oklahoma keep their exact approved answers.
+
+The two displaced records are explicitly exported as **`retainedGenreSelections`**, still **Dracula → Gothic fiction** and **Cyrano → Comedy**. Their author/date teaching placements remain active and unchanged; all existing valid alternatives and all source/manual evidence remain intact. They are not silently relabelled or deleted. Each affected genre lesson still has **11 active facts, 6/3/2 stages**. All other active concepts are unchanged apart from the three explicitly restaged records. The original full content hash is still asserted after reconstructing those five declared selection/stage changes.
+
+**Evidence preservation:** all **7,692 pre-task evidence records**, including all 101 manual negatives, the Moonstone Adventure positive and the pending historical assertions, remain byte-identical. Added **14** records: two source-anchored primaries, 11 work-specific source-feature negatives and a sourced broad Drama positive for Twelve Angry Men. Total **7,706** evidence records / **1,786** active facts. No conflicts with recorded positive classifications; no unresolved cell was converted to false merely to improve coverage. New source-feature reviews are labelled Codex review, not manual approval or independent human editorial certification.
+
+Sources are embedded in each locator: original [Crusoe](https://www.gutenberg.org/ebooks/521) and [Treasure Island](https://www.gutenberg.org/ebooks/120) texts; [Harmon/Holman’s defining requirements reproduced by ReadWriteThink](https://www.readwritethink.org/sites/default/files/resources/lesson_images/lesson1171/NovelMannersDef.pdf); [Ford’s Theatre’s stage production and complete synopsis](https://fords.org/performance/twelve-angry-men/); [Concord’s licensed stage play](https://www.concordtheatricals.com/p/9922/twelve-angry-men); [Folger’s Hamlet text and synopsis](https://www.folger.edu/explore/shakespeares-works/hamlet/read/); the original Greek/French/Wilde texts and Bloomsbury's Goldsmith description. The new negative judgments are explicit work-feature inferences, not claims that these sources print exhaustive genre lists. They remain eligible for human editorial review.
+
+### Actual matching / readiness
+
+All proposals first passed **180/180 in-memory trials** (20 seeds × nine variants), zero composition/semantic violations. Applied content then passed all nine in both modes in the new regression test.
+
+| Lesson | Before A/B/C | After A/B/C |
+|---|---|---|
+| Literature l1/p2 | blocked / ready / blocked | **ready / ready / ready** |
+| Theatre l1/p2 | blocked / blocked / blocked | **ready / ready / ready** |
+| Theatre l5/p2 | blocked / ready / ready | **ready / ready / ready** |
+
+Representative certified quartets:
+- Literature A: Pride → Novel of manners; Frankenstein → Science fiction; Moby-Dick and Treasure Island → Adventure fiction.
+- Literature B/C: Pride / Frankenstein plus Huckleberry Finn and Robinson Crusoe → Adventure fiction. C uses exactly two A and two B matching facts; its two new C facts remain in ordinary questions.
+- Theatre l1 A: Antigone → Tragedy; Twelve Angry Men → Courtroom drama; Tartuffe and She Stoops → Comedy.
+- Theatre l1 B/C: Twelve Angry Men → Courtroom drama; Earnest → Comedy; Antigone and Bacchae → Tragedy. C's quartet is exactly 2A/2B.
+- Theatre l5 A: Godot and Rosencrantz → Absurdist drama; Glass → Memory play; Crucible → Historical drama.
+- Theatre l5 B/C: Rosencrantz and Bald Soprano → Absurdist drama; Glass → Memory play; Oklahoma → Musical. C's quartet is exactly 2A/2B.
+
+All remain four pairs from the quiz's six canonical facts, with at least three distinct target identities. Duplicate cards stay identical/interchangeable; accepted locks remain permanent. No matching or grading code changed.
+
+### Final validation
+
+| Check | Result |
+|---|---|
+| L/T production generation, 20 attempts | **6,000/6,000 ready**, Literature **150/150** (was 148), Theatre **150/150** (was 146); zero shortages/failures; 339 safe duplicate-target matching exercises |
+| L/T production fresh progression, 20 attempts | **6,000/6,000 ready**, reaches Level 10, zero prerequisite blocks or violations |
+| All six Art, development-image generation | **18,000/18,000 ready**, zero failures/shortages; all six **150/150** |
+| All six Art, development-image fresh progression | **18,000/18,000 ready**, zero blocks/violations |
+| Painting / Sculpture / Architecture / Design | **12,000/12,000** generation and progression, unchanged; completed-Art frozen matching expectations untouched |
+| Full Jest run | **596/601 passed**, 30/34 suites, 485.869 s initially. Four failures were stale test assumptions: manual approvals treated as AI review; retained Dracula/Cyrano looked up only in active records; Antigone/Realist still expected unknown despite explicit manual approval. Corrected these with exact provenance checks, retained-record lookups and a preserved Hamlet/Realist unknown guard. No runtime safety/readiness assertions were relaxed. |
+| Final affected reruns | **57/57** tests across four suites (21.146 s), plus **12/12** across two suites (10.122 s). The four corrected failures pass. All other tests passed in the full run. **One unchanged pre-existing editorial gate remains failing**: `approvedGenrePrimaries.test.ts` requires every historical Claude assertion to be verified although 58 preserved records remain pending. No full-suite rerun after these test-only corrections; do not claim 601/601 in a single run. |
+| TypeScript / lint / whitespace | PASS after final changes |
+| Content validation | Zero errors; no contradictory evidence or unsupported new identity |
+| Image validation | **19 assets, 19 staged, 0 production-approved**, unchanged |
+| Strict per-fact readiness audit | **Exit 1**, preserved and reported. Moonstone, A Doll's House and Tempest lack enough eligible wrong labels for individual MCQ/blank forms (Literature **296/297**, Theatre **295/297** ordinary-qualified). They safely support both True/False truth values; complete quizzes satisfy every quota. This stricter per-fact recall requirement is distinct from demonstrated **150/150 joint quiz and fresh progression readiness**. No audit gate was weakened. |
+
+Real quizzes from all nine genre variants were inspected for actual questions, options, corrections and matching cards. Across 20 seeds: Pride displays **6** distinct MCQ option sets / **4** false statements; Antigone **3/3**; Glass **6/4**. Crusoe and Twelve Angry Men each have **1** distinct MCQ option set / **2** false statements, with shuffled order. Fixed seeds reproduce exactly; no pool was padded to six distractors. Detailed reports: `/tmp/finish-generation*.json`, `/tmp/finish-learning*.json`, `/tmp/finish-player-review.json`, `/tmp/finish-audit.json`, `/tmp/finish-full-tests.log`, `/tmp/finish-final-focused.log`, `/tmp/finish-compatibility-tests.log`.
+
+### Files / remaining work
+
+Changed in this task: `data/activeArtContent.ts`, `data/artContent/genreReserves.ts`; new `src/quizEngine/__tests__/genreCompletion.test.ts`; affected expectations/lookups in `approvedGenrePrimaries.test.ts`, `manualGenreApprovals.test.ts`, `accessibilityCleanup.test.ts`, `finalGenreCleanup.test.ts`, `literatureTheatreContent.test.ts`, `nonExclusiveClassification.test.ts`; provenance-only assertion in `artPilot.test.ts`; this handoff. No frozen hashes, matching counters, engine, curriculum configuration, completed-Art content, credentials, images or progress files changed.
+
+**No remaining quiz-generation blocker.** Keep the historical pending-evidence test and strict per-fact audit concerns visible for release review. Do not mark pending claims externally verified, broaden wrong-answer selection or make further curriculum changes just to silence those checks. New source-feature evidence is not human editorial certification. No further engine-development cycle is required by the six-variant task.
+
+**Git:** main checkout `/Users/simaybayatli/Developer/quiz-game`, branch `main`, HEAD **4c1fa8f**, **38 modified tracked / 5 untracked / 0 staged**. All prior Codex/Claude work preserved. No commit, push, merge, reset, progress write or worktree edit; `.git_backup_corrupt/` untouched.
+
+## Manual genre distractor approvals — implemented (2026-10-23)
+
+**Partial readiness improvement, not release completion.** Added exactly **101 user-approved incorrect comparisons + 1 explicit positive (Moonstone → Adventure fiction)**, covering the 33 works in the three requested genre lessons. No approval conflicts or unsupported genre identities were found. Every existing active concept, canonical answer, stable identity, priority and introduction stage is byte-identical to the pre-task snapshot. All **7,590 earlier evidence records** remain byte-identical; the active evidence count is now **7,692**. No engine, grading, progression, image, completed-Art content or frozen matching fixture changed.
+
+### Provenance / scope
+
+Reused `addGenreCompatibility` and its existing evidence fields; no schema or engine change was necessary. New IDs start `manual-editorial:2026-10-23:`; reviewer is **User — manual editorial approval (not external source verification)**. Each locator names the exact user task, date, work and verdict. `sourceUrl` retains the work's existing source anchor solely to identify the work; the locator explicitly says that link **does not externally verify the manual exclusion**. No universal genre exclusions were added. A negative conflicting with an existing verified positive is not added; tests check all 102 exact expected IDs/verdicts, zero conflicts and runtime evaluation against qualified answer identities.
+
+All 58 historical quarantined assertions remain stored with their original pending status. **28 now have separate manual decisions** (including Moonstone's positive); **30 have no new approval**. No pending assertion was silently upgraded or discarded. Existing valid alternative readings remain accepted, and Moonstone's Adventure answer is excluded from false options and unsafe cross-target matching.
+
+### Actual readiness (20 deterministic attempts per combination)
+
+| Lesson | Before A/B/C | After A/B/C |
+|---|---|---|
+| Literature l1/p2 | blocked / blocked / blocked | **blocked / ready / blocked** |
+| Theatre l1/p2 | blocked / blocked / blocked | **blocked / blocked / blocked** |
+| Theatre l5/p2 | blocked / blocked / blocked | **blocked / ready / ready** |
+
+Full generation, production and development-image modes: **Literature 148/150 (2,960/3,000 requests)**; **Theatre 146/150 (2,920/3,000)**. Before this task: Literature 147/150, Theatre 144/150. Combined **5,880/6,000**, 120 explicit shortages, **zero validation failures/violations**, 169 safe duplicate-target exercises per mode. The all-six development sweep is **17,880/18,000**, with the same 120 shortages and zero failures. Painting, Sculpture, Architecture and Design remain **150/150 each: 12,000/12,000 requests**, no shortages.
+
+Generated matching examples:
+- Literature B: Pride and Prejudice → Novel of manners; Frankenstein → Science fiction; Moby-Dick / Huckleberry Finn → Adventure fiction.
+- Theatre l5 B/C: Glass Menagerie → Memory play; Oklahoma! → Musical; Bald Soprano / Rosencrantz and Guildenstern Are Dead → Absurdist drama. Another B-eligible quartet uses Crucible → Historical drama, Glass → Memory, Godot / Rosencrantz → Absurdist.
+
+The limited duplicate-target rules, accepted-card interchangeability, permanent locks, six ordinary facts, exact quotas and 6/3/2 progression remain enforced. Literature C has an eligible-pool quartet, but it contains **three A facts**, exceeding C's two-A reinforcement allowance; it cannot certify the joint quiz.
+
+### Exact remaining blockers (NOT approved exclusions)
+
+No further negatives were inferred. These are concrete unknown cells in otherwise promising stage-compatible groups, **not requests to label a possibly valid genre false**:
+
+- Literature A: Pride / Frankenstein / Moby-Dick / Treasure Island needs **Treasure Island → Novel of manners** resolved.
+- Literature C: Pride (A) / Treasure Island (A) / Wuthering Heights (B) / Huckleberry Finn (B) needs **Treasure Island → Novel of manners**, **Pride → Gothic fiction**, **Wuthering Heights → Novel of manners** resolved. An alternative involving Dracula needs its unapproved Adventure comparison. Neither group is certified.
+- Theatre l1 A/B/C: viable Comedy/Tragedy/Realist groups still need **A Doll's House → Tragedy** resolved. The sole Realist target cannot be matched with Tragedy while this cell is unknown.
+- Theatre l5 A: Godot / Glass / Bald Soprano / Crucible needs **Bald Soprano → Historical drama** resolved. Oklahoma is introduced in B, so its safe Musical quartet cannot solve A.
+
+**Existing selection limitation:** certified wrong-answer records do not automatically introduce standalone options. The engine selects candidate labels from the currently eligible teaching pool. Thus Moonstone's approved Fantasy/Western/Dystopian/War/Family-saga options are stored and semantically available but not displayed in its l1 pool, which contains none of those canonical targets. No out-of-stage candidate injection, extra teaching fact, or selection redesign was added. With current rules it has only Science fiction as a distinct wrong label in this lesson; MCQ remains unavailable for that individual fact, while true/false is usable.
+
+### Validation / displayed variety
+
+- Focused final regression run: **44/44 tests, 5/5 suites**, 120.068 s (`manualGenreApprovals`, `finalGenreCleanup`, `duplicateTargetMatching`, `literatureTheatreContent`, `artContent`). Includes all **1,800 unchanged completed-Art matching hashes**, all 4,096 lockability patterns / 15 safe partitions, manual-provenance checks, the original four factual corrections, determinism, actual MCQ/true-false/blank output and semantic/composition validation.
+- Broader editorial/wording run retained **two pre-existing release-gate failures** in `approvedGenrePrimaries.test.ts`: blanket verification of Claude's pending evidence, and full genre readiness. Neither gate was weakened. Its Antigone ordinary-form expectation now correctly accepts the manually approved Realist wrong option; the accessibility evidence-identity guard excludes only the separately tested new manual IDs and retains its original hash. An initial new assertion required both source works carrying the same wrong label; corrected it to check the existing deduplicated answer identity, then the final 44-test run passed. No full-suite rerun was claimed.
+- TypeScript / lint / whitespace: PASS. Content integrity: zero errors. Image check: **19 assets, 19 staged, 0 production-approved**, unchanged.
+- Readiness audit `--require-ready`: correctly **exit 1**; Literature l1 has one whole-pool ordinary-unqualified record and Theatre l1 has four. This ordinary-capability audit does not supersede joint matching readiness.
+- Fresh Literature/Theatre, both modes: **120/6,000 ready**, 40 direct shortages, 5,840 prerequisite blocks, **0 violations**; both still stop at l1/p2/A. All-six development progression: **12,120/18,000 ready**, same L/T blocks, **0 violations**. The other four Art subtopics complete **12,000/12,000**, unchanged. No learner prerequisites were bypassed.
+- Across 20 seeds, Glass Menagerie displays **6 distinct MCQ option sets and 4 distinct false statements**; Antigone displays **1 option set (permuted) and 2 false statements**; Moonstone displays **0 MCQ sets and 1 false statement** in its current l1 pool. Fixed seeds reproduce exactly. Do not claim every approved label is displayed in every stage.
+
+**Files changed in this task:** `data/artContent/genreCompatibility.ts`; new `src/quizEngine/__tests__/manualGenreApprovals.test.ts`; affected expectations in `approvedGenrePrimaries.test.ts`, `accessibilityCleanup.test.ts`, `finalGenreCleanup.test.ts`; this handoff. Temporary detailed reports live under `/tmp/manual-genre-*`, not in Git.
+
+**Next action:** review the remaining specific unknown comparisons or explicitly decide how approved labels outside the current eligible pool should be used. Do not infer that any listed unknown is false. Do not change answers, stages or safeguards merely to reach 150/150. Preserve this implementation and all earlier uncommitted work.
+
+**Git:** main checkout, branch `main`, HEAD **4c1fa8f**; **36 modified tracked files, 4 untracked, 0 staged**. No commit, push, merge, reset or worktree edit; `.git_backup_corrupt/` untouched.
+
+## Bounded content-selection trial — no active replacement certified (2026-10-23)
+
+**Outcome: still blocked, not implementation-complete.** Kept all approved broad primaries, existing uncommitted work and safeguards. No active content, evidence, priorities, stages, code, tests or frozen hashes changed in this task. Only this handoff was updated. No commit/push/stage; `.git_backup_corrupt/` untouched.
+
+Tested new selections **in memory before any content edit**. Candidate positives used institutional/publisher sources; no unverified negative was supplied. Each candidate was tried in each of its lesson's eleven slots, checking full-pool matching. All **33 single-slot trials had zero certified quartets**. Consequently no introduction-stage permutation can fix those particular trial pools with the evidence reviewed. This is an evidence-limited result, **not proof that every possible replacement is infeasible**, and no minimum replacement count has been established.
+
+| Placement | Bounded candidate / nominal replacement | Verified source | Result and unresolved comparisons |
+|---|---|---|---|
+| Literature l1/p2 | The Murder of Roger Ackroyd → Detective fiction / Dracula | [Christie estate shop](https://shop.agathachristie.com/products/the-murder-of-roger-ackroyd): description explicitly discusses the detective novel and Poirot's village investigation; [estate story page](https://www.agathachristie.com/stories/the-murder-of-roger-ackroyd) confirms the work | No quartet. A possible Detective/Detective/Science/Adventure group is Moonstone, Ackroyd, Frankenstein, Moby-Dick; Moonstone→Adventure, Frankenstein→Adventure, Ackroyd→Adventure and Ackroyd→Science fiction are not certified negatives. Replacing a Gothic example with another detective does not remove those requirements. No replacement applied. |
+| Theatre l1/p2 | Wait Until Dark → Thriller / Cyrano | [Concord original Knott edition](https://www.concordtheatricals.co.uk/p/7428/wait-until-dark): explicit thriller/Mystery-Thriller classification | No quartet, zero eligible MCQ facts in A/B/C under reviewed evidence. Hamlet/Antigone/She Stoops/Wait Until Dark would supply Tragedy/Tragedy/Comedy/Thriller, but the first three→Thriller and Wait Until Dark→Comedy/Tragedy are unverified. Primary Thriller is not a reciprocal-negative certificate. Also a modern play entering the Classics lesson is a content tradeoff, not a free repair. No replacement applied. |
+| Theatre l5/p2 | Dancing at Lughnasa → Memory play / Glass Menagerie | [Concord](https://www.concordtheatricals.com/p/11202/dancing-at-lughnasa): explicit memory-play description. [Queen's University Friel archive](https://www.qub.ac.uk/sites/friel-reimagined/friel-papers/dancing-at-lughnasa/) documents recollection and dance | No quartet. Lughnasa/Oklahoma/Godot/Bald Soprano still needs Lughnasa→Absurdist and Lughnasa→Musical resolved. Neither a Memory primary nor the use of radio music proves those negatives. Oklahoma A / Birthday Party B was also simulated, not applied: A still has only five assessable facts; B/C still lack matching. C additionally must fit 2A/2B/2C; an A-only quartet would not solve progression. No replacement applied. |
+
+**Before/after active matching groups:** none / none in all three eleven-fact pools. **Before/after readiness:** Literature l1/p2 **0/3 → 0/3**, Theatre l1/p2 **0/3 → 0/3**, Theatre l5/p2 **0/3 → 0/3**. Tested all nine combinations with 20 fixed seeds in each delivery mode: baseline **0/180 per mode**; nominal candidate selections also **0/180 per mode**. All results explicitly unavailable, no padded quiz. These are focused counts, not a fresh full-subtopic readiness certificate.
+
+**Exact constraints:** matching requires four of the six ordinary facts, at least three distinct answer identities, every cross-target cell certified invalid in both directions, and permanent lockability. Same-target duplicates already work and do not waive cross-target evidence. MCQ needs two distinct certified wrong labels in the currently introduced pool. Literature A and modern-Theatre A additionally have only five assessable facts; classic-Theatre has zero MCQ-capable facts. A successful quartet alone is insufficient.
+
+**Validation:** 22/22 tests in `duplicateTargetMatching.test.ts` and `finalGenreCleanup.test.ts` pass (61.82 s). Includes the full **1,800 completed-Art matching hashes**, 4,096 safety matrices / 15 safe partitions, actual duplicate-card interaction/grading, preserved unknowns, and Literature l5's existing 20-seed A/B/C composition regression. TypeScript and whitespace pass. `art-literature-theatre-audit.cjs --require-ready` correctly exits **1**. No full suite or fresh-learning sweep repeated because no runtime/content change was applied. Current snapshot remains **1,786 active facts / 7,590 evidence records**, byte-identical to task start (SHA256 facts `6f1337a605ba47172057f96092890ce922c0144dba27be87d72bfea17b2c60f2`, evidence `cda6ec500a9eae550f8601ec570c12aae010a19286bbd1ea877277d5678ee93a`). Temporary detailed trial report: `/tmp/genre-selection-20261023-results.json`; no temporary files added to Git.
+
+**Stopped at the requested safety boundary.** Best next alternative under unchanged engine rules: establish a small replacement cohort with its actual reciprocal comparisons and stage-compatible A/B/C six-fact selections verified together before activation. None of the three single-work proposals above qualifies yet. Do not keep swapping names or mark the listed unknowns false to obtain readiness. No curriculum change is recommended as a proven fix here, and no permission to redesign matching is inferred.
+
+**Git:** main checkout `/Users/simaybayatli/Developer/quiz-game`, branch `main`, HEAD `4c1fa8f`; same **36 modified tracked / 3 untracked / 0 staged** as task start. The retained worktree was not edited. All prior uncommitted work preserved.
+
+## Approved manual genre decisions — implemented (2026-10-23)
+
+Applied the straightforward supported changes first; **readiness remains blocked**. No engine, grading, matching, curriculum structure, image settings, progress, other Art content, negative assertions or pending assertions changed. All earlier uncommitted work is preserved.
+
+### Exact content changes
+
+Seven Theatre primary answers changed through the existing approved-primary overlay:
+
+| Work | Before | Now |
+|---|---|---|
+| Antigone | Greek tragedy | **Tragedy** |
+| The Bacchae | Greek tragedy | **Tragedy** |
+| The Importance of Being Earnest | Comedy of manners | **Comedy** |
+| The School for Scandal | Comedy of manners | **Comedy** |
+| Cyrano de Bergerac | Heroic comedy | **Comedy** |
+| The Tempest | Shakespearean romance | **Comedy** |
+| Waiting for Godot | Tragicomedy | **Absurdist drama** |
+
+Cyrano’s broad answer uses its existing supported comedy classification; The Tempest’s uses the existing Folger/First Folio comedy evidence. These changes implement the requested accessible broad genres, rather than keeping specialist labels to manufacture target variety. Hamlet stays Tragedy; A Doll’s House stays Realist drama; Glass Menagerie stays Memory play; Oklahoma stays Musical. **Literature, including Moonstone/Frankenstein/Don Quixote and all Adventure examples, is byte-identical to the start of this task.**
+
+All previous positive classifications remain supported. Added three preservation assertions for Antigone/Bacchae → Greek tragedy and Earnest → Comedy of manners, whose former overlay primaries were their only explicit positive assertions. Other narrower answers, including Godot’s Tragicomedy, already survive in the original authored evidence. All 58 quarantined comparisons and every existing negative assertion are byte-identical. No work was replaced, and no actual priority/introduction-stage change was made: every teaching placement keeps 6/3/2.
+
+### Focused verification
+
+- Checked all nine blocked part/variant combinations **20 times in each delivery mode**: **0/180 generated per mode**, 180 explicit shortages, **0 invalid quiz failures**. Zero certified quartets in each full eleven-fact pool; matching search did not exhaust its budget. No invalid or padded quiz was emitted.
+- Tried the proposed modern-Theatre change **in memory only**: Oklahoma → A, Birthday Party → B, alongside the now-approved Godot → Absurdist drama. A/B/C still fail matching. Since it does not fix readiness, the stage swap was **not applied**.
+- Compared all active records against a pre-edit snapshot: exactly the seven rows above differ, and only their displayed answer/value identity differs. All fact IDs, source-work identities, priorities, stages and other active facts remain identical. Every previous verified positive classification is still positive; every negative and pending assertion is unchanged.
+- Editorial/wording tests: **27/29 passed** across three files. The two failures are the unchanged release gates for verified Claude evidence and repaired genre readiness. Updated explicit primary expectations and tests that now correctly expect unavailable Hamlet/Antigone MCQ/option-blank forms. The Master Harold factual-correction test now uses the original source-anchored Godot **Tragicomedy** view, rather than inadvertently testing Godot’s new Absurdist primary; all four factual corrections remain asserted.
+- Matching safeguards: **15/15 passed** (the 1,800-payload sweep was deliberately not repeated); includes interchangeable duplicate cards, permanent locks, unknown-cell rejection and 4,096 matrices / 15 safe partitions.
+- Completed-Art frozen content/evidence baseline: **1/1 passed**, other seven tests in that file not rerun. No frozen hashes were changed in this task.
+- TypeScript, lint and whitespace: PASS. The existing full 590-test and 18,000-request sweeps were **not repeated** for this focused task.
+
+### Exact remaining manual decisions
+
+1. **Literature l1:** the closest A/B quartet uses Moonstone → Detective, Frankenstein → Science fiction, plus two Adventure works. **Moonstone → Adventure** and **Frankenstein → Adventure** are still unverified; do not sign them off as false from primary labels. Keep the approved canonical answers and Don Quixote → Satirical. No replacement was activated without a demonstrated safe alternative and progression proof. C still needs its own stage-compatible quartet; the earlier optional Don Quixote → Adventure proposal is now explicitly rejected by the user.
+2. **Theatre l1:** current targets are Tragedy, Comedy and Realist drama. Any three-target quartet must include A Doll’s House, but its Comedy/Tragedy comparisons and the other plays’ Realist comparisons are unverified. MCQ additionally has **zero eligible facts** in A/B/C: most works have only one certified different wrong target (Comedy or Tragedy), and Realist cannot be made false automatically. The smallest *candidate* replacement proposal is one genre-only slot, **Cyrano → Wait Until Dark (Frederick Knott), Thriller**. [Concord](https://www.concordtheatricals.co.uk/p/7428/wait-until-dark) explicitly licenses it as Mystery/Thriller. **Not activated or certified as a solution**: it introduces a modern work into the Classics lesson, and its reciprocal comparisons with the actual quartet partners still need to be defensible. A primary Thriller label does not establish that other classifications are false. Do not promise one replacement is sufficient before that check.
+3. **Theatre l5:** Oklahoma / Glass Menagerie / Godot / Bald Soprano supplies Musical / Memory / Absurdist / Absurdist, but **Glass Menagerie → Absurdist remains unknown**. Replacing Glass with Master Harold does not yet solve it: **Oklahoma → Realist** and **Master Harold → Musical** are unknown. For C, swapping in Raisin leaves the analogous unknowns. Keep Glass → Memory and do not mark Realist false for it. Three Absurdist cards plus Musical are still disallowed by the existing limited-duplicate rule (only two distinct targets). A currently also lacks enough MCQ/ordinary eligibility; this is not matching alone.
+
+**Next action:** choose the specific remaining content/comparison decisions above, then implement only a defensible, stage-compatible group. No broad investigation, engine redesign, unsupported negative certificates or silent cohort replacement. Do not claim 150/150 or fresh progression from the focused results. Files changed in this task: `data/artContent/approvedGenrePrimaries.ts`, its explicit editorial tests, `accessibilityCleanup.test.ts`, `finalGenreCleanup.test.ts`, and this handoff. Main remains `4c1fa8f`, all changes unstaged/uncommitted; `.git_backup_corrupt/` untouched.
+
+## Final genre/accessibility follow-up — Codex (2026-10-22)
+
+**Partial completion, not a release pass.** Preserved all prior Codex/Claude uncommitted work in the main checkout. No engine, grading, progress, image or availability code changed in this follow-up. The retained development worktree and `.git_backup_corrupt/` were untouched. The four previous positive factual corrections remain protected by passing regression tests. Hamlet remains **Tragedy**, Little Women **Coming-of-age fiction**, Arial **Sans-serif**; Our Town’s retained Drama record is unchanged.
+
+### Implemented
+
+- Screened all **60** quarantined comparisons against their recorded reasons and the current compatibility matrices. **2 resolved, 0 replaced by different comparison IDs, 58 remain unverified** (29 Literature / 29 Theatre). The Moonstone / Coming-of-age fiction is now **positive** on Ilsu Sohn’s 2018 journal abstract; Detective fiction stays primary. Godot / Historical drama is **negative** on Pearson’s explicit unspecified time/place and timeless setting, addressing periods as well as events. No other quarantine was approved. Details and the complete disposition table: [Stage 6 review](art-stage6-evidence-review.md). The publisher-hosted Moonstone abstract was available through search indexing; the direct PDF fetch timed out. This is not certification of the whole paper or all provisional evidence.
+- **Literature l5/p2 B repaired** without new negative evidence: The Wonderful Wizard of Oz moves **C → B**, My Ántonia **B → C**. Fantasy arrives earlier; all eleven existing facts and their identities remain, stages stay **6/3/2**, and author/publication lessons retain their original priorities/stages. The already certified Detective / War / Western / Fantasy quartet now fits all A/B/C requests. Gatsby stays Modernist novel. No teaching facts added or replaced.
+- Shortened display names in **10 Literature/Theatre relationship records**, removing shared-surname clues. Examples: Elizabeth → Jane; Victor → William; Nora → Torvald; Hardcastle → Kate. Full canonical answers remain stored and accepted; the short responses are aliases. Existing typed-recall restrictions remain unchanged. Applied through the existing reviewed wording boundary.
+- Removed the confirmed designer-name cue in **one Design concept**: the generated “work by Verner Panton” options now show **S-shaped stacking chair**, not Panton Chair. Product designer questions already use a neutral name. Before changing expectations, compared all **1,800 completed-Art matching payloads**: exactly **8 right-card text fields** and that single concept’s display object differ; all selections, identities, accepted sets, stimuli, evidence and other facts are byte-identical. Updated only those eight reviewed matching hashes, the right-text-sensitive aggregate and three content snapshot hashes; recorded the exact intentional change in fixture metadata. No unexpected behavior was rebaselined.
+- Existing catalogue-wording and date-spacing cleanup remains intact. The few date pools with insufficient separated certified alternatives retain their honest fallback; no new negative dates were invented.
+
+### Validation
+
+| Check | Result |
+|---|---|
+| Full Jest | **588/590 passed**, **31/32 suites**, 623.496 s. The two unweakened failures remain the blanket verified-Claude-evidence gate and repaired-genre-readiness gate in `approvedGenrePrimaries.test.ts`. |
+| Affected tests after the final product wording edit | **45/45 passed**, **5/5 suites**, 91.286 s; includes all 1,800 matching expectations, duplicate-target interchangeability, 4,096 lockability matrices / 15 safe partitions, source safeguards, wording and stage regressions. No second full-suite run. |
+| TypeScript / lint / whitespace | PASS, including affected-code rechecks after the final wording edit. |
+| Content / genre diagnostics | Zero content errors; compatibility diagnostic exits 0 while explicitly reporting unavailable genre cases. Readiness audit exits **1** as required for remaining shortages, with the reviewed accessibility baseline matching. Whole-pool ordinary-qualified: Literature **294/297**, Theatre **289/297**; these counts do not certify staged quiz composition. |
+| Image regression | PASS: **19** assets, 19 staged/staging-approved, **0** production-approved. No image files/bindings changed. |
+| Six-subtopic generation, 20 attempts per combination, both delivery modes | **17,820/18,000 ready in each mode**, **180 shortages**, **0 violations/failures**, 17,820 safe matching exercises, 0 duplicate-target exercises selected. Literature **147/150** (2,940/3,000), Theatre **144/150** (2,880/3,000). Improvement: +20 ready requests per mode over the starting tree. |
+| Six-subtopic fresh progression, 20 attempts, both modes | **12,120/18,000 ready**, 40 direct shortages, 5,840 prerequisite blocks, **0 violations**. Literature/Theatre still stop at l1/p2/A; no bypass. |
+| Completed four Art subtopics | **12,000/12,000** generation and fresh progression in each delivery mode; 150/150 each. After the final label-only edit, Design additionally reran **3,000/3,000 generation** and **3,000/3,000 fresh progression**, zero violations. |
+| Actual displayed exercises | Inspected focused MCQ, true/false, blank and matching examples for the four genre placements and name fixes. Unavailable forms remained unavailable. L5 A/B/C display the certified quartet; family and product options show the neutral wording. |
+
+### Remaining exact blockers / next action
+
+Nine combinations: **Literature l1/p2 A/B/C; Theatre l1/p2 A/B/C; Theatre l5/p2 A/B/C**. There is **no certified quartet in any of these full eleven-fact pools**, so stage-only changes cannot solve them. Literature l1 A and Theatre l5 A also lack ordinary-form eligibility; do not describe the remaining work as matching alone.
+
+Closest full-pool quartets expose the actual unresolved distinctions (not proposals to mark them false):
+
+- Literature: Moonstone / Frankenstein / Moby-Dick / Huckleberry Finn needs **Moonstone vs Adventure fiction** and **Frankenstein vs Adventure fiction** resolved. Dangerous journeys and pursuit make blanket exclusions questionable. The second comparison is outside the original 60.
+- Theatre l1: Antigone / Earnest / Cyrano / Bacchae needs **Earnest vs Heroic comedy** and **Cyrano vs Comedy of manners** resolved, then still needs staged-progression proof. These technical distinctions are poor beginner distractors and are outside the 60; do not restore Revenge tragedy to avoid them.
+- Theatre l5: Oklahoma / Glass Menagerie / Rosencrantz / Bald Soprano needs **Glass Menagerie vs Absurdist drama** resolved, then staged-progression proof. Metatheatrical/non-realistic form is not enough for a negative; the comparison remains unknown.
+
+Further repair requires a **specific source-backed, educationally sensible genre-only cohort proposal and a demonstrated safe quartet**, preserving original records outside any replaced active selection. No such reserve quartet has been established here. Do not mass-approve the remaining 58, infer exclusions from primary labels, relax matching’s three-identity minimum, add extra assessed facts or change progression. The definition of done has **not** been reached; do not commit/push or claim release readiness.
+
+Git: `main`, HEAD `4c1fa8f`; all work unstaged/uncommitted. This follow-up additionally changes `literatureModernNovels.ts`, the two existing wording/evidence modules, explicit stage/content expectations, eight fixture entries, the audit’s reviewed content hashes, the Stage 6 review and this handoff, and adds `finalGenreCleanup.test.ts`. Existing uncommitted files are preserved.
+
+## Art accessibility cleanup — completed by Claude Code (2026-10-22)
+
+Session ran from the retained worktree but, as Codex did, edited the **main checkout** (`/Users/simaybayatli/Developer/quiz-game`, `main`, HEAD `4c1fa8f`), where all of Codex's uncommitted work lives. The worktree itself is clean and unchanged. Codex's work (section below) was preserved and built on; nothing was reverted, staged or committed. `.git_backup_corrupt/` untouched. The 60 quarantined Stage 6 assertions and all evidence classifications are unchanged (no evidence entries added or edited).
+
+### What was still wrong when Codex stopped
+
+Codex's text screen passed, but real generated questions still showed ~2,000 boilerplate qualifiers per 900 quizzes (“(Present-day borders.)” ×394, “(Date of this version.)” ×372, “(Original design.)” ×302, “(Main culture listed for this work.)” ×101, “(MoMA; full dating label. Model and cast dates.)”, …), catalogue-style stems (“recorded creation date”, “culture listed for”, “Using present-day countries: … (Present-day borders.)”, “first reliably documented play written”, “has the specified relationship with … in this play”, “credited as the main painter of”), catalogue codes in Design names (“desk, about 1895 (V&A O60314)”, “tea set (MAK GO 2005)”, “writing table (V&A CIRC.363)”), technical name qualifiers (“Colosseum (Flavian fabric)”, “Versailles (seventeenth-century palace envelope)”) and **195 MCQ/blank option sets with dates under ten years apart** (1498 / 1500; 1888–1898 / 1898). Codex's decade preference never applied to most dates because those records carry no structured interval.
+
+### What this session changed (presentation only)
+
+- **Question stems** (`assessmentTemplates.ts`, `relationDefinitions.ts`, `artRelations.ts`): plain credits (“Who painted/sculpted/wrote/designed/created …?”; characters: “Who created the character …?”), dates (“When was … created/completed/first performed/written/introduced/built?”, “When did … open?”, sculpture “When was … made?” / “dates from …”), with a small preposition helper (“in the 1620s”, “in about 1750”, “around 1601”, “was probably created in …”, “about 29,500 years ago”). Culture (“Which culture does … come from?”), building tradition, ancient-work tradition, “In which present-day country …?”, “What was the first play written by …?”, “Who is the elder sister of …?” (from the authored relationship qualifier), design/genre credits (“Which Product designer designed …?”, “Which work by Molière is an example of Comedy?”), project periods (“When did Rietveld create …?”). Qualified/disputed attribution wording is unchanged.
+- **Scopes** (`learnerWording.ts`): hidden (made internal) where the new stem already states them or they only repeated catalogue/version boilerplate; museum + “full dating label” prefixes removed while the context stays (“Model and cast dates.”). Meaningful distinctions remain visible (e.g. “Architectural appearance, rather than structural engineering”, “The 1668 extension”, “First Chicago performance”, “Approximate date”, “Remodelling”). Remaining qualifier count in the 900-quiz dump: a few dozen meaningful ones.
+- **Names**: ~60 display-only renames (Colosseum, Parthenon, Villa La Rotonda, Palace of Versailles, Panton Chair, Copacabana promenade, Bolshoi Theatre, Terracotta Army, “Desk (c. 1895)”, “Tea set (1903)”, …), plus “Bildungsroman” → “Coming-of-age fiction” everywhere for consistency with the Little Women answer. Focus labels that would leak the answer were deliberately kept neutral (no “Guimard desk” for “Which Art Nouveau designer…?”, no “Chanel evening dress”, no “National Theatre of Japan” for a country question); an answer-leak scan found no new leaks.
+- **Recognition clues**: the 66 that ended in authoring instructions (“Identify the Met's stele.”) now read as information (“This is the Met's stele.”), keeping every version distinction; the Three Graces clue no longer mentions joint ownership.
+- **Date distractors** (`exerciseFactory.ts`): replaced Codex's decade rule with a presentation-only preference for certified negative dates that do not overlap the answer or each other and start ≥10 years apart, reading years from the displayed label when no structured interval exists; applied to MCQ/blank options and false statements, restricted to date/period relations, with the original fallback. **Close-date option sets: 195 → 3** (the 3 are pools with too few separated negatives). No new negatives; grading untouched.
+
+### Verification that only presentation changed
+
+Identity-only comparison against `HEAD` for all 1,800 frozen completed-Art seeds (matching pair IDs/answer identities and ordinary-fact composition) differs **only** in Codex's documented placements (Design l6/p2 Arial, Sculpture l1/p2 culture swaps, Sculpture l4/p4 decades, and their p3/p5/l10 reviews). Record-level non-display fields (relation, semantic IDs/qualifiers, fact/evidence IDs, priorities, stages, attribution, events, scope text) differ from `HEAD` only in those placements plus Design l9/p4 calendar metadata. On that basis the frozen expectations were refreshed: matching fixture hashes (169 of 1,800 changed in the final pass), three record-snapshot hashes, and the audit script's accessibility-revision hashes. Evidence hashes were not touched and still pass.
+
+### Validation (2026-10-22, main checkout)
+
+| Check | Result |
+|---|---|
+| Full Jest, `--runInBand --testTimeout=60000` | **584/586 passed, 30/31 suites**, 513.8 s. The only failures are the two pre-existing, deliberately unweakened `approvedGenrePrimaries.test.ts` gates (Claude negatives must be verified → 60 are pending; repaired genre placements must be ready). Includes all 1,800 matching hashes and the new accessibility regressions (forbidden-phrase screen over every rendered field, natural stems, date spacing). |
+| TypeScript / lint / `git diff --check` | PASS / PASS / PASS |
+| Images | PASS: 19 assets, 19 staged, 0 approved, 19 staging-approved |
+| Readiness audit `--require-ready` | exit 1 (honest): validation errors `[]`, matches the refreshed accessibility revision; Literature 294/297, Theatre 289/297 whole-pool ordinary-qualified (unchanged from Codex) |
+| Generation, six subtopics, 20 attempts, production / development images | **17,800/18,000 ready in each mode**; 200 shortages = exactly the 10 blocked Literature/Theatre combinations × 20; **0 failures**, 0 content-validation errors; 17,800 matching, 0 duplicate-target; Painting/Sculpture/Architecture/Design 150/150 each. Exit 1 is the honest `--require-ready` gate. Identical to Codex’s pre-session counts. |
+| Fresh progression, six subtopics, 20 attempts, both modes | **12,120/18,000 ready in each mode**, 40 direct shortages, 5,840 prerequisite blocks, **0 violations**; Literature and Theatre stop at l1/p2/A, no bypass. Identical to Codex’s counts. |
+| 900-quiz player-facing dump (one per level/part/variant) | 890 ready, the same 10 blocked combinations as before this session; read-through of beginner Sculpture/Design and samples from all six subtopics |
+
+### Remaining problems (not fixed here, by instruction)
+
+1. **Theatre l1/p2 A/B/C** (regression from Codex's requested Hamlet → Tragedy). The “Tragedy” card legitimately also fits Antigone, Cyrano and Doctor Faustus, so a safe quartet needs partners certified as *not* tragedies. Only She Stoops and School for Scandal have that, and those two overlap with each other. Restoring it needs new work-level comparisons (e.g. Tartuffe ≠ Tragedy alone gives Hamlet/Faustus/Tartuffe/She Stoops, but that set cannot fit A, B or C stage limits; A Doll's House ≠ Tragedy is contestable, as it was received as “nearest a tragedy”). This belongs to the separate genre-evidence review. No negative was invented and Hamlet's broad answer was not narrowed.
+2. Literature l1/p2 A/B/C, Literature l5/p2 B, Theatre l5/p2 A/B/C: unchanged Stage 6 blockers caused by the 60 quarantined comparisons.
+3. Minor, pre-existing: in “work by author is an example of genre” items a false statement can swap in another author's work (still certified false); a few real product names reveal their designer (Panton Chair); family surnames shared between a character and the answer.
+4. `AGENTS.md` “Current project status” still says Literature/Theatre 150/150; update when this work is checkpointed.
+
+**Exact next action:** user review of the diff, then the separate genre-evidence review (the 60 pending comparisons plus the Theatre l1/p2 Tragedy comparisons above), then rerun the full gate. Commit only with explicit approval; stage explicit paths (35 modified + 2 untracked; no new files this session).
+
+## Art accessibility cleanup — Codex implementation, superseded where noted above (2026-10-22)
+
+Actual checkout: `/Users/simaybayatli/Developer/quiz-game`, **main**, HEAD **4c1fa8ff8fa38abbbd286e1538b24032c3a28427**. Preserved all 16 previously modified tracked files and the provisional-evidence audit document. No stage, commit, push, reset, progress reset or image write. `.git_backup_corrupt/` and the retained development worktree were untouched. The user's accessibility task authorises these completed-Art content edits; earlier restrictions on such edits are superseded for this task.
+
+### Changes and scope
+
+- **908 retained records edited**, chiefly authored presentation/scope/clue wording, plus **two culture-record replacements**; still **1,786 active records**. Of the retained records, 93 subject fields and 63 canonical answer fields changed (overlapping counts, including names, genres, the notable novel and eleven chronology answers). This is curated editing, not regenerated curricula. Relations, levels, priorities of retained facts and the six/three/two per-quiz progression remain intact.
+- Removed catalogue codes, museum-credit boilerplate and retain/preserve instructions from rendered text. Full source qualifications remain internal. Essential version, attribution, event and uncertainty distinctions remain visible in plain language; museum/version and product-model names are retained where needed to identify the actual work. Required-feature definitions now ask naturally about **essential features**, including on matching cards; the required-feature semantic qualifier and all underlying contrasts remain enforced.
+- **Hamlet → Tragedy**, with an explicit retained positive for **Revenge tragedy** (Folger introduction). **Little Women → Coming-of-age fiction**, consistently using that English label for the four active Bildungsroman answers, retaining their shared canonical identity. **Arial → Sans-serif**; fixed width is never used to refute this broad label. Existing compound typography facts retain their meaning but display everyday explanations such as “Serif with variable-width letters” and “Monospaced (equal-width letters)”.
+- **Dostoevsky notable novel → Crime and Punishment**, sourced to the Penguin Random House edition/author credit. The first-published-novel relation remains **Poor Folk**, with its accepted forms preserved.
+- **Sculpture l1/p2 only:** Great Sphinx of Giza / Ancient Egyptian replaces the Bactria-Margiana composite figure's culture fact; Jade dragon fragment / Hongshan culture (ancient China) replaces the Ushumgal stele's Sumerian culture fact. This removes the Bactria-Margiana terminology and the competing Sumerian/Neo-Sumerian beginner answer pair. Sources: [Egyptian Ministry](https://egymonuments.gov.eg/monuments/the-great-sphinx/) and [British Museum](https://www.britishmuseum.org/collection/object/A_1973-0726-140). The dragon is explicitly a **fragment**. Original recognition/date records and their image bindings remain active; original culture records remain recoverable in authored source data. Existing two C-stage reserves in each l1 recognition/date placement are preserved; each generated teaching trajectory still selects eleven facts.
+- **Sculpture l4/p4:** eleven source date ranges are taught as their containing decades. Each conversion has an explicit positive and source bounds, with the event/version preserved. Apollo and Daphne now assesses **1620s**, rather than distinguishing 1622–1625 from 1623–1624. No year was invented or uncertainty silently converted to certainty.
+- Simplified introductory Design names (including Anglepoise desk lamp), nine Architecture material definitions, ancient-culture geographic context and identification clues. Gypsum's plain use description is corroborated by [USGS](https://www.usgs.gov/centers/national-minerals-information-center/gypsum-statistics-and-information) and its [plaster/wallboard summary](https://pubs.usgs.gov/periodicals/mcs2021/mcs2021-gypsum.pdf).
+- A **small existing-candidate preference** in `exerciseFactory.ts` prefers certified incorrect calendar answers from different decades when at least two exist. It respects existing content groups, uses only the supplied fact pool and falls back to the original candidates otherwise. Explicit sourced calendar metadata was added to logo introduction years. Example generated IBM question: **1986 / 2016 / 1972**, replacing 1961 / 1971 / 1972. This also improves Theatre/date options. False-assertion certification, matching generation, duplicate-target policy, permanent locks, grading and progress logic were not changed; no new alternatives framework was added.
+
+All **7,554 prior evidence IDs remain**; current evidence count **7,587**. The 33 additions are six source records for the two new works (only their culture facts enter the active plan), eleven decade positives plus eleven bounds, four typography positives, and Hamlet's narrower positive. The **60 pending assertions** and **four earlier factual corrections** are byte-preserved. No quarantined genre exclusion was restored. New claims are AI source comparisons, not independent human certification.
+
+### Review and validation
+
+Text-screened all 1,786 active records and their rendered prompts, answers, scopes and recognition clues: no catalogue-code / retain-preserve / “Defining requirements” boilerplate matches remain. Manually inspected **60 generated quizzes / 348 distinct ordinary facts**, including 60 MCQs plus 12 each of TF, blanks and four-pair matching, across all six subtopics and Levels 1–10; additional targeted previews cover the approved answers. This is sampled editorial review, not exhaustive factual certification. Advanced specialist vocabulary remains where it distinguishes the approved higher-level techniques; do not remove those distinctions by silently broadening definitions.
+
+| Check | Final result |
+|---|---|
+| Full Jest command | Completed **31 suites / 584 tests**, **580 passed, 4 failed**, 465.003 s. Two failures were wording/test-fixture regressions subsequently fixed. Final affected rerun: **7/7 suites, 100/100 tests**, 370.784 s, including all 1,800 matching hashes. Passing results therefore cover **582/584** tests; the two unchanged `approvedGenrePrimaries.test.ts` evidence/readiness gates still fail. There was no extra full-suite rerun after the final copy/fixture fixes; do not describe this as a green full suite. |
+| TypeScript / lint / whitespace | PASS; the transient unused test import was removed, final lint has no warnings |
+| Content / semantic integrity | Zero validation errors; readiness audit exits **1** honestly, with the approved accessibility baseline recognised. Whole-pool ordinary-qualified counts: Literature **294/297**, Theatre **289/297**. |
+| Images | PASS: **19 assets, 19 staged, 0 production-approved**, all existing bindings/settings preserved |
+| Generation, 20 deterministic attempts per combination, **each** production/development-image mode | **17,800/18,000**, 200 shortages, **0 failures / semantic / matching / composition violations**; same ready rows in both modes |
+| Fresh progression, 20 attempts, **each** mode | **12,120/18,000**, 40 direct shortages, 5,840 prerequisite blocks, **0 violations**. Both Literature and Theatre stop honestly at **l1/p2/A**. |
+| Painting / Sculpture / Architecture / Design subset | Each **150/150**, generation and fresh progression **12,000/12,000** per mode; zero duplicate matching |
+| Final copy-only smoke, after essential-feature wording | Generation **890/900**, fresh **606/900**, 2 direct shortages / 292 prerequisite blocks; zero violations, identical blocked combinations |
+| Matching | Quotas, four safe pairs, permanent locks and interchangeable-card tests pass. All 4,096 reflexive matrix patterns still recognise exactly the 15 safe partitions. Current sweeps select **0 duplicate-target exercises** (previously 119 before this cleanup); no unsafe duplication or artificial variation was forced. Matching variations remain where available. |
+
+Exact snapshots were intentionally updated for authorised content/wording changes. They no longer claim the original content/structure is unchanged. The historical audit comparison remains false, with a separately frozen accessibility revision; the strict readiness failure is preserved. Existing completed-Art `duplicateMatching: 0` assertions remain untouched.
+
+### Remaining blockers and next action
+
+**Not release-ready.** Readiness before this task was Literature **146/150**, Theatre **147/150**, rather than the older historical 150/150 claims. Literature remains **146/150**. Theatre is now **144/150**: the requested broader Hamlet answer removes revenge-tragedy-only distractors and creates legitimate overlaps, blocking l1/p2 **A/B/C** matching. With the whole teaching pool, Tartuffe, Earnest, A Doll's House and Cyrano also lack two certified incorrect options under their current primary answers. A broad true classification must not be graded false to restore coverage.
+
+Blocked teaching combinations: Literature **l1/p2 A/B/C**, **l5/p2 B**; Theatre **l1/p2 A/B/C**, **l5/p2 A/B/C**. Raw p3/p5/l10 reviews still generate, but fresh learners cannot bypass these teaching blocks. Narrow genre distractor pools and the previously quarantined interpretive exclusions therefore remain unresolved.
+
+**Exact next action:** review the smallest genre-only selection/reserve decision and the specific work-level comparisons needed for these placements. Preserve Hamlet → Tragedy and the other requested answers; do not revive unsupported exclusions, silently substitute whole cohorts, weaken the permanent-lock rules or start another engine architecture project. Any substantial curriculum change needs the user's decision. Movies/Music have no active served Art content and were left untouched; Design remains Coming soon, and Literature/Theatre/Design remain text-only.
+
+Final Git state: **main at 4c1fa8f, 35 modified tracked files + 2 untracked intended files**, nothing staged. The untracked files are the preserved `docs/art-stage6-evidence-review.md` and new `src/quizEngine/__tests__/accessibilityCleanup.test.ts`. All temporary diagnostics are outside the repository. No commit or push.
+
+
+## Stage 6 finalisation — factual gate blocked (2026-10-22)
+
+Verified the actual main checkout `/Users/simaybayatli/Developer/quiz-game`, branch `main`, HEAD `4c1fa8ff8fa38abbbd286e1538b24032c3a28427`. The 15 pending Stage 6 files were preserved. The user authorised commit/push only if validation passes and no critical factual blockers remain; that condition is **not satisfied**, so nothing was staged, committed or pushed. `.git_backup_corrupt/`, credentials, image files/settings, progress, curricula and the retained development worktree were untouched.
+
+### Evidence review and correction
+
+Reviewed the recorded sources, locators and inference for all **149** remaining Claude-authored negative assertions; researched the material interpretive risks rather than repeating the 900-quiz audit. Complete disposition table and source-access limits: [Stage 6 evidence review](art-stage6-evidence-review.md).
+
+- **1 corrected positive:** Dracula/Bildungsroman. Dejan Kuzmanovic's Cambridge journal article (online 1 September 2009), footnote 2, documents Alan Johnson's education-novel reading. The same evidence ID now records a valid alternative; Gothic fiction remains the primary teaching answer.
+- **60 quarantined negatives** (30 Literature, 30 Theatre) now use the existing `pending` status. Brief synopses and catalogue omissions do not support these interpretive exclusions. Historical-drama rationales also exclude events while their definition includes periods. These claims are unresolved, not asserted false or silently promoted to positive. All 60 evaluate as `unknown`, including the three belonging to the retained inactive Our Town genre record; none supports incorrect grading.
+- **88 negatives retained** on their existing work-specific evidence. This is a disposition review, not fresh independent human certification of all 88. Two She Stoops to Conquer rationales were corrected against Goldsmith's title and Acts I/V: rely on the comic resolution rather than an unsupported claim that Tony only imagines retaliation and never acts. Their judgments did not change.
+- All **1,786 teaching records** remain serialized-identical to the pending Stage 6 baseline, all **7,554 evidence IDs** remain present, and the four earlier positive corrections are byte-preserved: Moonstone/historical, Top Girls/absurdist, Master Harold/tragicomedy, Raisin/feminist. No primary genre, teaching selection, priority or stage changed. No engine, matching, interaction, grading or progression change was introduced in this finalisation review; the earlier Stage 6 copy changes remain pending.
+
+### Validation of the corrected semantic state
+
+| Check | Result |
+|---|---|
+| Full Jest command, 60-second test timeout | **573/575 passed**, **29/30 suites passed**, 467.038 s. Exactly two failures in `approvedGenrePrimaries.test.ts`: blanket assertion that Claude negatives are verified, and repaired-genre readiness. The gates were **not weakened** to hide quarantine or shortages. All other tests, including matching safety/interchangeability and the revised completed-Art frozen hashes, passed. The final two locator-only clarifications do not change semantic verdicts/candidates; final content/static checks cover their metadata. |
+| TypeScript / lint / whitespace | PASS |
+| Content validation / original completed-Art factual baseline | No content errors; factual projection/evidence baseline PASS. Readiness audit exits **1** honestly: Literature **294/297**, Theatre **293/297** whole-teaching-pool ordinary-qualified facts. |
+| Images | PASS: 19 assets, 19 staged, 0 production-approved, 19 staging-approved; no image writes |
+| Six-subtopic generation, 20 attempts per combination, **each** production/development-image mode | **17,860/18,000 ready**, 140 shortages, 0 failures/semantic/composition/matching violations. Matching: 17,860 exercises, 119 safe duplicate-target exercises (all Literature/Theatre; previously 305 before quarantine). The complete coverage rows/counters are identical across modes. |
+| Six-subtopic fresh learning, 20 attempts, **each** mode | **13,320/18,000 ready**, 40 direct shortages, 4,640 prerequisite blocks, **0 violations**. Literature stops at l1/p2/A; Theatre at l5/p2/A. No blocked placement was skipped. |
+| Completed Painting/Sculpture/Architecture/Design subset | Each **150/150**; generation and fresh progression **12,000/12,000** in each mode; zero duplicate matching and zero violations. All 1,800 frozen matching payload checks and original structure guards pass. |
+
+Final isolated readiness is **Literature 146/150 (2,920/3,000 attempts)** and **Theatre 147/150 (2,940/3,000 attempts)** in each mode. Blocked combinations:
+
+- Literature **l1/p2/A**: only five assessable eligible facts; **B/C**: no certified four-pair group.
+- Literature **l5/p2/B**: no certified four-pair group compatible with the six-fact selection.
+- Theatre **l5/p2/A**: insufficient MCQ/blank candidates and only five assessable facts; **B/C**: no certified four-pair group.
+
+Raw p3/p5/l10 review generation still passes; that does not demonstrate fresh progression past the teaching blocks. Matching/quiz invariants remain enforced: unavailable quizzes are empty rather than padded. The first partial full-suite launch was stopped when the last semantic quarantine was added; only the completed 575-test run above is counted. Final full sweeps were run after that semantic change.
+
+### Outstanding decision and exact next action
+
+**Do not release, commit or push this as completed Stage 6.** Obtain work-specific support for the pending comparisons actually needed by these three genre teaching placements, or seek approval for the smallest defensible content decision. Do not restore provisional negatives for coverage, weaken the tests or redesign the engine. The full 60-assertion pending list and 149-row disposition record are in the evidence review. The remaining AI-reviewed evidence is not human editorial certification.
+
+Git remains `main` at `4c1fa8f`: **16 modified tracked files plus one new audit document**, nothing staged. This finalisation adds only `data/artContent/genreCompatibility.ts`, `docs/art-stage6-evidence-review.md`, and this handoff to the preserved Stage 6 work. No commit hash or push exists for Stage 6. Re-run the full release gate once the factual blockers are resolved; then review/stage explicit intended paths before the conditionally authorised commit and normal push.
+
+## Stage 6 — consolidated editorial audit and fixes (2026-10-21)
+
+Worked in `/Users/simaybayatli/Developer/quiz-game` on `main`, initially clean at `4c1fa8f`. The user authorised edits across the six completed Art subtopics for this audit, superseding the earlier prohibition on editing completed-Art content. No commit, stage, push, merge, reset or progress change occurred. The retained development worktree was not edited.
+
+### Review scope and limits
+
+- Generated and screened **900 quizzes**, one for every six-subtopic level/part/A–B–C combination, with composition and semantic validators: all ready, zero violations. These exercised **1,782 ordinary facts**; all **1,786 authored records** were included in the structural screen (including retained pilot records).
+- Editorial sample: **60 quizzes** (ten levels per subtopic, rotating parts 1–5 and variants A/B/C), covering **354 distinct ordinary facts**, their four-pair matching exercises, and **56 unique descriptive clues**. The extra 180-case sample selection in the temporary diagnostic was not all manually reviewed; the 60/354 counts are the actual detailed sample.
+- Reviewed wording, visible qualifications, canonical-answer reinforcement, plausible alternatives, repetition and difficulty. This was a sampled editorial audit, not independent factual certification of every record or every negative assertion. Previous Stage 4/5 findings were used rather than repeated: no simplification or assessment-alternatives framework was introduced.
+
+### Issues fixed
+
+1. **Painting movement scope:** only Cubism now mentions foundational Cubist experiments. The other movements say “Original historical development; not later revivals or influences.” The full canonical scope and original historical qualifiers remain unchanged. Twenty-two scope presentations received the current editorial-review date; twenty displayed scope strings changed.
+2. **Sculpture cultural-attribution copy:** replaced the technical “specific primary cultural-attribution label” construction with “Which primary cultural attribution is listed…?” Statements and blanks retain the source's primary attribution and its stated specificity; no culture, nationality or attribution answer changed.
+3. **Literature/Theatre notable works:** removed tautologies such as “Which novel is a notable novel by…” and “One play that is a notable play written by…”. The direct prompts still teach the same notable work and writer.
+4. **Period copy:** replaced “A historical period or date range describing…” with more natural associated-period wording. Approximate ranges, composition/tradition distinctions, textual versions and uncertainty notes remain visible.
+5. **Architecture clues:** corrected “the1889Paris” and “the1910centenary” spacing in the Eiffel Tower and Santiago museum clues. Dates and descriptions were not changed factually.
+6. **Theatre venue distractors:** ten modern opening-year records now use the existing `distractorGroup` preference, so MCQ/options blanks prefer other verified opening years over the ancient construction-century label. For example, a Bolshoi opening question now offers **1863 / 1888 / 1856**, rather than an obviously remote BCE alternative. This is content curation, not new evidence or engine logic. False statements retain the existing verified candidate selection; occasional broad chronological contrasts remain possible there.
+
+No new teaching facts, replacements, primary classifications, sources, negative judgments, priorities, stages or accepted answer forms were introduced. All four previous factual corrections remain intact. No image registry, image binding, production activation or availability flag changed; Literature/Theatre are text-only and Design stays Coming soon.
+
+### Baseline integrity and tests
+
+Verified the pre-edit 1,800 matching payloads against the existing frozen hashes. Comparing actual post-edit payloads showed **52 intentional display-only hash changes**: Painting left-card scope wording and the two Architecture clue texts. Pair selections/order, identities, accepted identities, answer text, images and all remaining fields were unchanged. Updated only those hashes and added an aggregate guard for the original non-wording matching structure. The new complete payload hashes remain exact.
+
+Compared all 1,786 final records with the original checkpoint: **24 display-record edits plus ten venue distractor-group annotations**, with every other field unchanged. All **7,554 evidence entries** remain byte-equivalent as serialized data. Added an original-data projection guard that excludes only the explicitly reviewed display fields; exact full-record wording hashes are also checked. Historical 598-record and 1,192-record snapshots were updated for these authorised editorial changes; their evidence checks were preserved. No semantic safeguard, quota, grading rule or matching constraint was relaxed.
+
+Four new editorial regression tests cover movement-specific scope, direct notable-work/period copy, Architecture spacing, and the venue opening-year preference (40 real generated MCQ/blank cases with semantic validation).
+
+### Final validation
+
+| Check | Result |
+|---|---|
+| Full Jest suite | 30 suites / 575 tests exercised; **574 passed and one old Painting/Sculpture wording hash failed** (528.174 s). After verifying and updating that final historical expectation, the affected Architecture/Design suite passed **13/13** (68.347 s). All 575 tests are covered by passing results; there was no second full-suite rerun after this test-expectation-only correction. |
+| Earlier focused editorial suites | 3/3 suites, 25/25 tests passed before the final venue test was added; the final full run passed that new venue test too |
+| TypeScript / lint | PASS on the final application changes; an initial readonly type issue in the new test guard was corrected before the final run |
+| Generation, all six subtopics, 20 attempts, production and development-image modes | Each **18,000/18,000 ready**, **150/150 combinations per subtopic**, 0 shortages/failures, 0 content-validation issues; 305 safe duplicate-target matching exercises, all in Literature/Theatre |
+| Fresh progression, all six, 20 attempts, both modes | Each **18,000/18,000 ready**, 0 shortages/prerequisite blocks/violations; every subtopic reaches Level 10 |
+| Completed Painting/Sculpture/Architecture/Design regression subset | **12,000/12,000 ready** for both generation and fresh progression in each mode; zero duplicate matching exercises; all 1,800 frozen matching checks pass with the reviewed wording revision and original structure guard |
+| Content/readiness / genre compatibility | PASS; 297/297 ordinary-qualified facts per Literature/Theatre subtopic; no errors or blocked genre combinations |
+| Images | PASS: 19 assets, 19 staged, 0 production-approved, 19 staging-approved; no image writes |
+| Whitespace | PASS |
+
+The first partial full-suite/sweep launch was deliberately stopped before the final venue curation change; it is not counted as final validation. The only failure in the completed full run was the stale wording snapshot described above.
+
+### Remaining risks and decisions
+
+**Independent factual/editorial verification remains outstanding.** In particular, the **149 Claude-authored negative assertions** remain provisional, as does other AI-reviewed evidence without independent human certification. This audit did not certify them all. Keep the four previously corrected valid alternatives: Moonstone/historical fiction, Top Girls/absurdist drama, Master Harold/tragicomedy, and Raisin/feminist drama.
+
+Targeted source checks illustrate why interpretive genre negatives need expert review: the [Boston University/Huntington interview](https://www.bu.edu/articles/2013/huntington-restages-a-raisin-in-the-sun/) compares directing Raisin to Greek tragedy, while the [University of Delaware symposium](https://www.udel.edu/udaily/2020/february/saturday-symposium-arthur-millers-the-crucible/) discusses feminist contexts for The Crucible. These contextual/critical readings do **not** by themselves establish the exact alternative genre under the app's scope. They were not promoted into new positive classifications or used to invent new negatives. Categorical exclusions such as Raisin/tragedy and Crucible/feminist-drama should receive independent editorial judgment before an unconditional factual sign-off. If that review rejects an exclusion, quarantine it and rerun coverage rather than preserve it for readiness.
+
+**Optional after-release improvements:** Theatre l1 still has a thin certified pool (She Stoops to Conquer repeatedly uses Comedy / Greek tragedy / Revenge tragedy). Some catalogued titles, full collective credits and exact dates are demanding; some late units revisit basic terminology. These are existing curriculum/difficulty tradeoffs, not newly found factual errors. No curriculum substitution or reordering is justified solely by this audit; substantive changes require the user's decision.
+
+**Release verdict:** the sampled learner-facing problems are corrected and all six subtopics remain technically ready. This is **not unconditional content-release certification** while the stated provisional genre-evidence review remains open. Proceed to a bounded human editorial sign-off, not another engine-development cycle.
+
+**Git / exact next action:** `main` remains at `4c1fa8f`, with 15 intended modified tracked files (content/copy, regression expectations/tests, readiness diagnostic and this handoff), nothing staged, committed or pushed. `.git_backup_corrupt/` is untouched. Review the wording/distractor diff and the explicit baseline revisions; obtain approval before any commit. Resolve the targeted independent factual sign-off before public-release approval.
 
 ## Local integration — complete (2026-10-21)
 

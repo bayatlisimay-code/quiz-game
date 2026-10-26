@@ -44,7 +44,7 @@ for(const part of ["p2","p4"] as const) {
       learning:{reinforcementPriority:2,rationale:"Additional major movement; introduce after the preserved initial survey and reinforce established foundations first."},tags:["verified-art-content","historical-movements"],
       semantic:{subject:{id:subjectId,entityType:"category",caseSensitive:false},value:{id:valueId,entityType:part==="p2"?"work":"person",caseSensitive:false},qualifiers},
       assessment:{reviewStatus:"verified",answerLeakageReviewed:true,evidenceIds:[evidenceId],subjectType:"category",valueType:part==="p2"?"work":"person",factId:`movement:${m.id}:${relation}`,
-        scope:{text:scope,qualifierKeys:["assessmentScope"]},presentation:{scope:{...scopeWording(scope,"Original historical development, including foundational Cubist experiments.",[evidenceId]),reviewedAt:"2026-10-15"}}}};
+        scope:{text:scope,qualifierKeys:["assessmentScope"]},presentation:{scope:{...scopeWording(scope,"Original historical development; not later revivals or influences.",[evidenceId]),reviewedAt:"2026-10-21"}}}};
     return c;
   });
   const all=[...original,...added];

@@ -2,12 +2,13 @@ import type { AuthoredSet } from './sourceAuthoring';
 import type { SemanticEvidence } from '../../src/quizEngine/assessmentTypes';
 
 type Primary = readonly [label: string, value: string, url?: string, locator?: string];
-// Final editorial decisions, 2026-10-20. This overlay preserves the original
+// Final editorial decisions, 2026-10-20; accessible Theatre primaries updated
+// by the user on 2026-10-23. This overlay preserves the original
 // records and every original evidence assertion; only the active answer changes.
 export const approvedGenrePrimaries: Readonly<Record<string, Primary>> = {
  'oklahoma':['Musical','musical','https://www.concordtheatricals.com/p/44839/rodgers-hammersteins-oklahoma','Previously approved reserve classification: licensed original Rodgers and Hammerstein full-length musical, with its score and musical numbers; not Green Grow the Lilacs or the film adaptation.'],
  'pride-prejudice':['Novel of manners','novel-manners','https://shop.bl.uk/products/pride-and-prejudice-signature-gilded-edition','Synopsis explicitly identifies a novel of manners, with courtship and social judgements.'],
- 'jane-eyre':['Bildungsroman (coming-of-age fiction)','bildungsroman'],
+ 'jane-eyre':['Coming-of-age fiction','bildungsroman'],
  'moonstone':['Detective fiction','detective','https://www.penguinrandomhouse.com/books/260151/the-moonstone-by-wilkie-collins/','Publisher description: an early model of the detective novel in which Sergeant Cuff investigates the theft of a diamond; Britannica also calls it one of the first English detective novels.'],
  'wuthering-heights':['Gothic fiction','gothic','https://www.bronte.org.uk/about-the-brontes/the-bronte-novels','Emily Brontë section: nightmarish Gothic elements; genre-defining classic. Psychological fiction remains valid.'],
  'frankenstein':['Science fiction','science-fiction'],
@@ -15,33 +16,33 @@ export const approvedGenrePrimaries: Readonly<Record<string, Primary>> = {
  'moby-dick':['Adventure fiction','adventure','https://assets.penguinrandomhouse.com/book-resumes/MelvilleHerman_MobyDick_20241031.pdf','Book description: adventure, whaling lore and social commentary. Sea story remains valid.'],
  'scarlet-letter':['Historical fiction','historical'],
  'huckleberry-finn':['Adventure fiction','adventure'],
- 'little-women':['Bildungsroman (coming-of-age fiction)','bildungsroman','https://www.gutenberg.org/ebooks/514','About this eBook, Subject Bildungsromans and Domestic fiction; Part One maturation is assessed, not later Part Two events.'],
+ 'little-women':['Coming-of-age fiction','bildungsroman','https://www.gutenberg.org/ebooks/514','About this eBook, Subject Bildungsromans and Domestic fiction; Part One maturation is assessed, not later Part Two events.'],
  'don-quixote':['Satirical fiction','satire','https://cvc.cervantes.es/ensenanza/quijote_aula/unidad_02/construir_10.asp','Literary parody of chivalric books and its social critical purpose; Part One. Satirical fiction describes the sustained comic/parodic mode, not a claim that all other genre readings are false.'],
  'treasure-island':['Adventure fiction','adventure','https://penguinrandomhousehighereducation.com/book/?isbn=9780140437683','Scholarly edition description explicitly identifies the quintessential adventure story.'],
  'great-gatsby':['Modernist novel','modernist','https://www.cambridge.org/core/books/abs/cambridge-companion-to-f-scott-fitzgerald/great-art-small-art-and-modernist-cachet/B9BE748753C881A32D64774E5577A565','Public chapter abstract: Fitzgerald aligned Gatsby with international modernism, while retaining relatively conventional fiction and ordinary readers; modernist tradition does not exclude tragic or psychological readings.'],
  'fahrenheit-451':['Dystopian fiction','dystopian','https://www.simonandschuster.com/books/Fahrenheit-451/Ray-Bradbury/9781451673319','About the Book: dystopian future, banned books and Montag’s challenge to that society. Science fiction remains valid.'],
- 'their-eyes-watching-god':['Bildungsroman (coming-of-age fiction)','bildungsroman'],
+ 'their-eyes-watching-god':['Coming-of-age fiction','bildungsroman'],
  'joy-luck-club':['Family saga','family-saga'],
  'maltese-falcon':['Detective fiction','detective'],
- 'house-mango-street':['Bildungsroman (coming-of-age fiction)','bildungsroman'],
- 'my-antonia':['Bildungsroman (coming-of-age fiction)','bildungsroman'],
+ 'house-mango-street':['Coming-of-age fiction','bildungsroman'],
+ 'my-antonia':['Coming-of-age fiction','bildungsroman'],
  'farewell-arms':['War fiction','war','https://www.arts.gov/initiatives/nea-big-read/farewell-arms','Overview: Frederic Henry’s service, retreat and desertion during World War I intertwined with the tragic love story; war is sustained organising action, not a passing mention.'],
  'riders-purple-sage':['Western','western'],
  'wonderful-wizard-oz':['Fantasy','fantasy'],
  'red-harvest':['Detective fiction','detective'],
- 'hamlet':['Revenge tragedy','revenge-tragedy'],
- 'antigone':['Greek tragedy','greek-tragedy','https://assets.cambridge.org/97805211/34781/frontmatter/9780521134781_frontmatter.pdf','Antigone edition description explicitly identifies Greek tragedy; Sophocles’ original, not a later adaptation.'],
+ 'hamlet':['Tragedy','tragedy'],
+ 'antigone':['Tragedy','tragedy'],
  'tartuffe':['Comedy','comedy'],
- 'importance-earnest':['Comedy of manners','comedy-manners','https://www.bloomsbury.com/uk/importance-of-being-earnest-9781474260756/','Student edition description: comedy of manners and satire. Comedy and farce remain compatible.'],
+ 'importance-earnest':['Comedy','comedy'],
  'dolls-house':['Realist drama','realist-drama'],
- 'cyrano':['Heroic comedy','heroic-comedy'],
- 'bacchae':['Greek tragedy','greek-tragedy'],
- 'school-scandal':['Comedy of manners','comedy-manners'],
+ 'cyrano':['Comedy','comedy','https://www.reseau-canope.fr/edutheque-theatre-en-acte/oeuvre/edmond-rostand/cyrano-de-bergerac.html','The documented heroic comedy supports the broad Comedy answer. Its heroic-comedy, tragic and tragicomic readings remain valid; none is made false.'],
+ 'bacchae':['Tragedy','tragedy'],
+ 'school-scandal':['Comedy','comedy'],
  'she-stoops-conquer':['Comedy','comedy'],
  'doctor-faustus':['Tragedy','tragedy'],
- 'tempest':['Shakespearean romance','romance'],
+ 'tempest':['Comedy','comedy','https://www.folger.edu/blogs/collation/whats-in-a-genre/','The Tempest is included among the First Folio comedies. The existing romance and tragicomedy evidence remains valid.'],
  'our-town':['Drama','drama'],
- 'waiting-godot':['Tragicomedy','tragicomedy'],
+ 'waiting-godot':['Absurdist drama','absurd','https://livingarchive.royalcourttheatre.com/plays/waiting-for-godot/','Existing source comparison identifies the Theatre of the Absurd tradition; the tragicomedy subtitle remains a valid alternative.'],
  'glass-menagerie':['Memory play','memory-play'],
  'birthday-party':['Comedy of menace','comedy-menace','https://www.hampsteadtheatre.com/news/2020/october/harold-pinter-and-the-1950s-british-stage/','The Birthday Party and Irving Wardle’s comedy-of-menace term in the producing theatre’s historical account.'],
  'raisin-sun':['Realist drama','realist-drama','https://teachers.yale.edu/curriculum/units/2007/1/9/3','Reproduced Hansberry interview: genuine realism, explicitly distinguished from naturalism.'],
@@ -66,7 +67,7 @@ export function applyApprovedGenrePrimaries(set: AuthoredSet): AuthoredSet {
   const id = `approved-primary:${c.id}`;
   evidence.push({id,kind:'assertion',predicateId:c.relation,subjectId:c.semantic!.subject!.id!,valueId,
    qualifiers:c.semantic!.qualifiers ?? {},verdict:'valid',sourceUrl:url ?? original.sourceUrl,
-   locator:locator ?? original.locator,reviewStatus:'verified',reviewedAt:'2026-10-20',
+   locator:locator ?? original.locator,reviewStatus:'verified',reviewedAt:['antigone','importance-earnest','cyrano','bacchae','school-scandal','tempest','waiting-godot'].includes(work!)?'2026-10-23':'2026-10-20',
    reviewedBy:'Codex source comparison (not independent human source certification); final primary selected by user editorial review',
   } satisfies SemanticEvidence);
   return {...c,object:label,semantic:{...c.semantic!,value:{...c.semantic!.value!,id:valueId}},
@@ -79,6 +80,11 @@ export function applyApprovedGenrePrimaries(set: AuthoredSet): AuthoredSet {
 // Work-specific positives survive a primary change. Form and tradition labels
 // remain compatible; this list is neither exhaustive nor a source of negatives.
 const additionalPositives = [
+ // Preserve the previous approved labels when the broad primary changes.
+ ['antigone','greek-tragedy','https://assets.cambridge.org/97805211/34781/frontmatter/9780521134781_frontmatter.pdf','Retained previous approved primary: the Sophocles edition describes the original ancient Greek tragedy; broad Tragedy is now taught.'],
+ ['bacchae','greek-tragedy','https://api.pageplace.de/preview/DT0400.9781108956437_A49239509/preview-9781108956437_A49239509.pdf','Retained previous approved primary: the Cambridge Greek and Latin Classics introduction documents Euripides’ original Greek tragic play; broad Tragedy is now taught.'],
+ ['importance-earnest','comedy-manners','https://www.bloomsbury.com/uk/importance-of-being-earnest-9781474260756/','Retained previous approved primary: student edition describes a comedy of manners and satire. Broad Comedy is now taught; the narrower classification remains valid.'],
+ ['hamlet','revenge-tragedy','https://www.folger.edu/explore/shakespeares-works/hamlet/','Introduction: a revenge tragedy. Preserve the earlier supported narrower classification while teaching the user-approved broad answer Tragedy.'],
  ['jane-eyre','gothic','https://www.penguinrandomhouse.com/books/669992/dracula-by-bram-stoker/','Edition description places Jane Eyre and Dracula among Gothic literature.'],
  ['frankenstein','gothic','https://shop.bl.uk/products/frankenstein-1','British Library edition describes the Gothic novel; science fiction remains primary.'],
  ['frankenstein','horror','https://www.gutenberg.org/ebooks/84','About this eBook, Subject Horror tales; not the generated summary.'],

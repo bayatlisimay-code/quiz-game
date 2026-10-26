@@ -23,3 +23,11 @@ export const theatreVenueSet=joinSets(theatreVenues.flatMap((v,i)=>(['p1','p2','
   completeField:{valueIds:[valueId],reason:recognition?'The individually authored textual clue identifies this named venue and building phase.':country?'The named venue’s documented site lies within this present-day country.':'The source gives this calendar year or historical-century label for the explicitly named opening or initial construction phase; later rebuildings are separate events.'},
  });
 })));
+
+// Prefer other venue opening years over the ancient construction-period label.
+// This only ranks existing certified alternatives; it adds no negative evidence.
+for (const concept of theatreVenueSet.concepts) {
+  if (concept.partId === 'p4' && concept.assessment?.event === 'opening') {
+    concept.distractorGroup = 'theatre-venue-opening-years';
+  }
+}

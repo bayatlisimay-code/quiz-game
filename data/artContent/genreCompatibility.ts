@@ -2,7 +2,7 @@ import type { AuthoredSet } from './sourceAuthoring';
 import type { SemanticEvidence } from '../../src/quizEngine/assessmentTypes';
 
 type Review = Readonly<{
-  work: string; value: string; verdict: 'valid' | 'invalid'; url: string; locator: string; reviewer?: string; reviewedAt?: string;
+  work: string; value: string; verdict: 'valid' | 'invalid'; url: string; locator: string; reviewer?: string; reviewedAt?: string; reviewStatus?: 'verified' | 'pending';
 }>;
 const CLAUDE = 'Claude Code — source and work-feature comparison (not independent human editorial approval)';
 
@@ -10,6 +10,8 @@ const CLAUDE = 'Claude Code — source and work-feature comparison (not independ
 // A critical reading can support an additional classification; its existence
 // prevents using that classification as a distractor, even when noncanonical.
 const literature: readonly Review[] = [
+  {work:'moonstone',value:'bildungsroman',verdict:'valid',reviewedAt:'2026-10-22',url:'https://www.concentric-literature.url.tw/issues/Contested_Modernity_Place_Space_and_Culture/6.pdf',locator:'Ilsu Sohn, Rewriting the Bildungsroman and the Rise of Detective Fiction in The Moonstone, Concentric: Literary and Cultural Studies 44.2 (September 2018), pp. 145–161, DOI 10.6240/concentric.lit.201809_44(2).0006, abstract and argument: analyses the novel’s coming-of-age narrative and rewriting of the Bildungsroman. This documented alternative invalidates the former exclusion; Detective fiction remains primary.'},
+  {work:'dracula',value:'bildungsroman',verdict:'valid',reviewedAt:'2026-10-22',url:'https://www.cambridge.org/core/journals/victorian-literature-and-culture/article/vampiric-seduction-and-vicissitudes-of-masculine-identity-in-bram-stokers-dracula/8C5957AAE79F1018DA8A089A32F78F88',locator:'Dejan Kuzmanovic, Vampiric Seduction and Vicissitudes of Masculine Identity in Bram Stoker’s Dracula, Victorian Literature and Culture (online 1 September 2009), footnote 2: documents Alan Johnson’s Bildungsroman / education-novel reading of the young men and Van Helsing; bibliography identifies Johnson, Bent and Broken Necks: Signs of Design in Stoker’s Dracula, pp. 231–245. This is a supported critical reading, not the primary teaching classification; the Gothic fiction primary remains unchanged. It contradicts the former generic plot-summary exclusion.'},
   {work:'moonstone',value:'historical',verdict:'valid',reviewedAt:'2026-10-21',url:'https://ci.nii.ac.jp/ncid/BA23862288',locator:'CiNii Books record BA23862288 for Wilkie Collins, The Moonstone, Everyman’s Library 122, Knopf 1992, ISBN 0679417222 (unabridged novel, not a graded-reader adaptation): Subject Headings explicitly include Historical fiction (gsafd). Ohrstrom Library record 71859 (https://librarycatalog.sps.edu/cgi-bin/koha/opac-detail.pl?biblionumber=71859) for the same edition independently lists Historical fiction under Genre/Form. Preserve this documented alternative to the Detective fiction primary; the catalogue does not establish a sole genre.'},
   {work:'moby-dick',value:'psychological',verdict:'valid',url:'https://www.gutenberg.org/ebooks/2701',locator:'About this eBook, Subject field Psychological fiction, alongside Sea stories. The automatically generated summary is not evidence.'},
   {work:'moby-dick',value:'adventure',verdict:'valid',url:'https://www.gutenberg.org/ebooks/2701',locator:'About this eBook, Subject field Adventure stories, alongside Sea stories. These are non-exclusive classifications, not a complete set.'},
@@ -54,7 +56,7 @@ const literature: readonly Review[] = [
   {work:'house-mango-street',value:'detective',verdict:'invalid',url:'https://www.encyclopedia.com/children/academic-and-educational-journals/house-mango-street',locator:'Encyclopedia.com entry: a collection of short vignettes in which the girl Esperanza grows up in a working-class Latino neighborhood of Chicago. No crime investigation drives the vignettes. Compared with detective fiction as a story in which a detective investigates a crime (existing Oxford definition in literaryGenres).',reviewer:CLAUDE},
   {work:'house-mango-street',value:'war',verdict:'invalid',url:'https://www.encyclopedia.com/children/academic-and-educational-journals/house-mango-street',locator:'Encyclopedia.com entry: a collection of short vignettes in which the girl Esperanza grows up in a working-class Latino neighborhood of Chicago. War is not the organising action. Compared with war fiction as defined for this lesson: war is the sustained organising action, not background or a passing mention.',reviewer:CLAUDE},
   {work:'house-mango-street',value:'western',verdict:'invalid',url:'https://www.encyclopedia.com/children/academic-and-educational-journals/house-mango-street',locator:'Encyclopedia.com entry: a collection of short vignettes in which the girl Esperanza grows up in a working-class Latino neighborhood of Chicago. Set in Chicago, not the American West. Compared with the Western as literature about the western United States (existing Merriam-Webster definition in literaryGenres).',reviewer:CLAUDE},
-  {work:'red-harvest',value:'dystopian',verdict:'invalid',url:'https://www.loc.gov/exhibits/books-that-shaped-america/1900-to-1950.html',locator:'Library of Congress ‘Books That Shaped America’: Red Harvest (1929) is a hard-boiled detective thriller depicting crime and violence without sentimentality. A crime story in a realistic setting, not an imagined bleak society. Compared with dystopia as an imagined bleak world significantly worse than our own (Yale professor Joe Cleary, https://news.yale.edu/2017/03/10/why-has-dystopian-genre-made-comeback-yale-professor-weighs).',reviewer:CLAUDE},
+  {work:'red-harvest',value:'dystopian',verdict:'invalid',reviewStatus:'pending',url:'https://www.loc.gov/exhibits/books-that-shaped-america/1900-to-1950.html',locator:'Library of Congress ‘Books That Shaped America’: Red Harvest (1929) is a hard-boiled detective thriller depicting crime and violence without sentimentality. A crime story in a realistic setting, not an imagined bleak society. Compared with dystopia as an imagined bleak world significantly worse than our own (Yale professor Joe Cleary, https://news.yale.edu/2017/03/10/why-has-dystopian-genre-made-comeback-yale-professor-weighs).',reviewer:CLAUDE},
   {work:'red-harvest',value:'family-saga',verdict:'invalid',url:'https://www.loc.gov/exhibits/books-that-shaped-america/1900-to-1950.html',locator:'Library of Congress ‘Books That Shaped America’: Red Harvest (1929) is a hard-boiled detective thriller depicting crime and violence without sentimentality. A crime thriller, not a multi-generational family chronicle. Compared with the saga-novel sense (Dictionary.com, https://www.dictionary.com/browse/saga): a long novel following several generations or members of a family or social group.',reviewer:CLAUDE},
   {work:'red-harvest',value:'fantasy',verdict:'invalid',url:'https://www.loc.gov/exhibits/books-that-shaped-america/1900-to-1950.html',locator:'Library of Congress ‘Books That Shaped America’: Red Harvest (1929) is a hard-boiled detective thriller depicting crime and violence without sentimentality. Realistic crime fiction with no strange worlds or extraordinary beings. Compared with fantasy as imaginative fiction featuring strange worlds or extraordinary beings (existing Merriam-Webster definition in literaryGenres).',reviewer:CLAUDE},
   {work:'wonderful-wizard-oz',value:'detective',verdict:'invalid',url:'https://www.loc.gov/exhibits/books-that-shaped-america/1900-to-1950.html',locator:'Library of Congress ‘Books That Shaped America’: The Wonderful Wizard of Oz (1900) is the first fantasy written by an American to succeed on publication. A fantasy adventure, not a detective investigating a crime. Compared with detective fiction as a story in which a detective investigates a crime (existing Oxford definition in literaryGenres).',reviewer:CLAUDE},
@@ -62,13 +64,14 @@ const literature: readonly Review[] = [
   {work:'wonderful-wizard-oz',value:'war',verdict:'invalid',url:'https://www.loc.gov/exhibits/books-that-shaped-america/1900-to-1950.html',locator:'Library of Congress ‘Books That Shaped America’: The Wonderful Wizard of Oz (1900) is the first fantasy written by an American to succeed on publication. War is not the organising action. Compared with war fiction as defined for this lesson: war is the sustained organising action, not background or a passing mention.',reviewer:CLAUDE},
   {work:'maltese-falcon',value:'war',verdict:'invalid',url:'https://www.arts.gov/initiatives/nea-big-read/maltese-falcon',locator:'NEA Big Read overview: a six-day private-detective case in San Francisco, 5–10 December 1928. War is not the organising action. Compared with war fiction as defined for this lesson: war is the sustained organising action, not background or a passing mention.',reviewer:CLAUDE},
   {work:'riders-purple-sage',value:'war',verdict:'invalid',url:'https://www.penguinrandomhouse.com/books/328838/riders-of-the-purple-sage-by-zane-grey/',locator:'Publisher description (Penguin Random House): ‘the most famous novel of the American West’, driven by the conflict of values between Jane Withersteen and Lassiter. War is not the organising action. Compared with war fiction as defined for this lesson: war is the sustained organising action, not background or a passing mention.',reviewer:CLAUDE},
-  {work:'fahrenheit-451',value:'war',verdict:'invalid',url:'https://www.arts.gov/initiatives/nea-big-read/fahrenheit-451',locator:'NEA Big Read overview: fireman Guy Montag burns books, begins reading, loses his house and flees to a group of readers who memorise books; the story ends with a large fire across society. The organising action is Montag’s rebellion, not a war. Compared with war fiction as defined for this lesson: war is the sustained organising action, not background or a passing mention.',reviewer:CLAUDE},
+  {work:'fahrenheit-451',value:'war',verdict:'invalid',reviewStatus:'pending',url:'https://www.arts.gov/initiatives/nea-big-read/fahrenheit-451',locator:'NEA Big Read overview: fireman Guy Montag burns books, begins reading, loses his house and flees to a group of readers who memorise books; the story ends with a large fire across society. The organising action is Montag’s rebellion, not a war. Compared with war fiction as defined for this lesson: war is the sustained organising action, not background or a passing mention.',reviewer:CLAUDE},
   {work:'riders-purple-sage',value:'fantasy',verdict:'invalid',url:'https://www.penguinrandomhouse.com/books/328838/riders-of-the-purple-sage-by-zane-grey/',locator:'Publisher description (Penguin Random House): ‘the most famous novel of the American West’, about Jane Withersteen and Lassiter and the force of a real landscape. No strange worlds or extraordinary beings. Compared with fantasy as imaginative fiction featuring strange worlds or extraordinary beings (existing Merriam-Webster definition in literaryGenres).',reviewer:CLAUDE},
   {work:'maltese-falcon',value:'fantasy',verdict:'invalid',url:'https://www.arts.gov/initiatives/nea-big-read/maltese-falcon',locator:'NEA Big Read overview: a six-day private-detective case in San Francisco, 5–10 December 1928, in a real contemporary city; the falcon is a valuable statuette that rivals hunt. No strange worlds or extraordinary beings. Compared with fantasy as imaginative fiction featuring strange worlds or extraordinary beings (existing Merriam-Webster definition in literaryGenres).',reviewer:CLAUDE},
   {work:'wonderful-wizard-oz',value:'western',verdict:'invalid',url:'https://www.loc.gov/exhibits/books-that-shaped-america/1900-to-1950.html',locator:'Library of Congress ‘Books That Shaped America’: The Wonderful Wizard of Oz (1900) is the first fantasy written by an American to succeed on publication; a fantasy journey, not a story of the American West. Compared with the Western as literature about the western United States (existing Merriam-Webster definition in literaryGenres).',reviewer:CLAUDE},
 ];
 
 const theatre: readonly Review[] = [
+  {work:'waiting-godot',value:'historical',verdict:'invalid',reviewedAt:'2026-10-22',url:'https://qualifications.pearson.com/content/dam/pdf/A%20Level/Drama-and-Theatre/2016/teaching-and-learning-materials/A-level-Set-Text-Guide-Waiting-for-Godot.pdf',locator:'Pearson Edexcel AS/A Level set-text guide (2017), Social, cultural and historical background, printed p. 7: the action has unspecified time and place, with no explicit historical events beyond a post-Biblical world. Work-specific comparison: this indeterminate setting does not dramatise a documented historical event or period. Historical context, allegorical readings and historically situated productions are not denied. This replaces the old rationale that excluded only events and ignored periods.'},
   {work:'oklahoma',value:'memory-play',verdict:'invalid',reviewedAt:'2026-10-21',url:'https://rodgersandhammerstein.com/oklahoma-synopsis/',locator:'Creator estate, complete Act One/Act Two synopsis: the courtships and box social lead forward to the wedding and departure. Laurey’s dream ballet imagines a feared wedding and is interrupted when she wakes; it is not a recollection framing the staged past. Unlike Tom’s retrospective presentation in The Glass Menagerie, this original musical is not presented through a character’s memory. This distinguishes the documented structures, not musicals in general from memory plays.'},
   {work:'oklahoma',value:'absurd',verdict:'invalid',reviewedAt:'2026-10-21',url:'https://rodgersandhammerstein.com/show/oklahoma/',locator:'Creator estate, About the Show: an integrated musical whose creative elements support its story. Read with https://rodgersandhammerstein.com/oklahoma-synopsis/ (both acts): consistent characters, intelligible dialogue and causal courtship, auction and wedding action. The dream ballet expresses Laurey’s specific fears, not the collapse of language/narrative into existential uncertainty defining the Theatre of the Absurd in theatreGenres. This is a work-specific structural comparison; other musical forms or reinterpretations are not declared disjoint from absurdism.'},
   {work:'glass-menagerie',value:'musical',verdict:'invalid',reviewedAt:'2026-10-21',url:'https://www.concordtheatricals.com/p/98161/the-glass-menagerie',locator:'Licensed original stage work, Details and Summary: a spoken memory drama about Amanda, Tom, Laura and a gentleman caller. Court Theatre’s study guide (https://www.courttheatre.org/wp-content/uploads/2017/06/PG_GlassMenagerie.pdf), PDF pp. 4–5: synopsis locates dialogue, recollection and the gentleman caller at the centre of the action; music accompanies a brief dance and is discussed as a staging motif, not an integrated sung narrative. Musical here means the integrated song-and-dance dramatic form exemplified by Oklahoma! (https://rodgersandhammerstein.com/show/oklahoma/), not a play that uses incidental music. A separately musicalised adaptation would be a different assessment subject.'},
@@ -91,9 +94,9 @@ const theatre: readonly Review[] = [
   {work:'hamlet',value:'comedy-manners',verdict:'invalid',url:'https://www.folger.edu/explore/shakespeares-works/hamlet/read/5/2/',locator:'Folger Shakespeare Library introduction: Hamlet follows the form of a revenge tragedy in which Hamlet seeks vengeance on Claudius. Folger text, Act 5 Scene 2: Gertrude, Laertes, Claudius and Hamlet all die on stage and Fortinbras takes the crown; there is no comic restoration. Comic passages such as the gravedigger scene or Polonius’s advice are incidental and do not make the play a comedy. A comedy of manners must itself be a comedy (existing Merriam-Webster definition) and the action is revenge, not satire of a social group’s manners.',reviewer:CLAUDE},
   {work:'hamlet',value:'heroic-comedy',verdict:'invalid',url:'https://www.folger.edu/explore/shakespeares-works/hamlet/read/5/2/',locator:'Folger Shakespeare Library introduction: Hamlet follows the form of a revenge tragedy in which Hamlet seeks vengeance on Claudius. Folger text, Act 5 Scene 2: Gertrude, Laertes, Claudius and Hamlet all die on stage and Fortinbras takes the crown; there is no comic restoration. Comic passages such as the gravedigger scene or Polonius’s advice are incidental and do not make the play a comedy. Heroic comedy is Rostand’s comedy designation for Cyrano (existing bard.org study guides); Hamlet is not a comedy.',reviewer:CLAUDE},
   {work:'antigone',value:'heroic-comedy',verdict:'invalid',url:'https://www.bard.org/study-guides/heroic-comedy-or-romantic-tragedy/',locator:'Heroic comedy is the comedy designation Rostand gave Cyrano de Bergerac (Utah Shakespeare Festival study guide). Antigone already has a work-specific non-comedy certificate (Bloomsbury commentary and Jebb, Perseus 1999.04.0023): fatal conflict over the burial edict, so it is not a comedy of any kind.',reviewer:CLAUDE},
-  {work:'dolls-house',value:'comedy-manners',verdict:'invalid',url:'https://ibsen.uio.no/DRINNL_Du%7Cintro_performance.html',locator:'Ibsen Centre account of the 1879 reception: contemporaries call it a realistic drama and nearest a tragedy; the Nora-leaves ending was received as serious and painful, and no cited source calls it a comedy. A comedy of manners must itself be a comedy (existing Merriam-Webster definition). This does not exclude other genres.',reviewer:CLAUDE},
-  {work:'she-stoops-conquer',value:'revenge-tragedy',verdict:'invalid',url:'https://www.gutenberg.org/ebooks/383',locator:'Goldsmith’s original text, Acts I–IV: Tony Lumpkin’s trick makes Marlow and Hastings mistake Hardcastle’s house for an inn; Kate Hardcastle poses as a barmaid to test Marlow, and Hastings and Constance plan an elopement. No character’s pursuit of revenge drives the action (Tony only muses about it and never acts).  Compared with the required main revenge action in the PMLA definition already sourced in theatreGenres: incidental hostility or a revenge subplot is insufficient.',reviewer:CLAUDE},
-  {work:'she-stoops-conquer',value:'tragedy',verdict:'invalid',url:'https://www.gutenberg.org/ebooks/383',locator:'Goldsmith’s original text, Acts I–IV: Tony Lumpkin’s trick makes Marlow and Hastings mistake Hardcastle’s house for an inn; Kate Hardcastle poses as a barmaid to test Marlow, and Hastings and Constance plan an elopement. No character’s pursuit of revenge drives the action (Tony only muses about it and never acts). A mistaken-identity courtship comedy that ends happily; it is not a tragedy.',reviewer:CLAUDE},
+  {work:'dolls-house',value:'comedy-manners',verdict:'invalid',reviewStatus:'pending',url:'https://ibsen.uio.no/DRINNL_Du%7Cintro_performance.html',locator:'Ibsen Centre account of the 1879 reception: contemporaries call it a realistic drama and nearest a tragedy; the Nora-leaves ending was received as serious and painful, and no cited source calls it a comedy. A comedy of manners must itself be a comedy (existing Merriam-Webster definition). This does not exclude other genres.',reviewer:CLAUDE},
+  {work:'she-stoops-conquer',value:'revenge-tragedy',verdict:'invalid',url:'https://www.gutenberg.org/ebooks/383',locator:'Goldsmith’s original text, title and Acts I and V: Tony causes the inn/house misunderstanding; the final act resolves the courtships through forgiveness, consent and release of Constance’s fortune. Tony’s practical jokes are not evidence for the absence of retaliation. The work is explicitly titled A Comedy and its reconciliatory ending lacks the catastrophic structure required for tragedy.  Compared with the PMLA revenge-tragedy definition already sourced in theatreGenres, the original work lacks the required tragic structure; no claim that all its characters are free of retaliatory motives is necessary.',reviewer:CLAUDE},
+  {work:'she-stoops-conquer',value:'tragedy',verdict:'invalid',url:'https://www.gutenberg.org/ebooks/383',locator:'Goldsmith’s original text, title and Acts I and V: Tony causes the inn/house misunderstanding; the final act resolves the courtships through forgiveness, consent and release of Constance’s fortune. Tony’s practical jokes are not evidence for the absence of retaliation. The work is explicitly titled A Comedy and its reconciliatory ending lacks the catastrophic structure required for tragedy. A mistaken-identity courtship comedy that ends happily; it is not a tragedy.',reviewer:CLAUDE},
   {work:'school-scandal',value:'revenge-tragedy',verdict:'invalid',url:'https://www.gutenberg.org/ebooks/1929',locator:'Sheridan’s original text, Acts I–IV: Lady Sneerwell’s circle spreads scandal while Joseph Surface’s public virtue is contrasted with Charles Surface’s apparent vice and Sir Oliver returns to test both nephews. Lady Sneerwell’s resentment of slander is one motive among several, not the organising action.  Compared with the required main revenge action in the PMLA definition already sourced in theatreGenres: incidental hostility or a revenge subplot is insufficient.',reviewer:CLAUDE},
   {work:'school-scandal',value:'tragedy',verdict:'invalid',url:'https://www.gutenberg.org/ebooks/1929',locator:'Sheridan’s original text, Acts I–IV: Lady Sneerwell’s circle spreads scandal while Joseph Surface’s public virtue is contrasted with Charles Surface’s apparent vice and Sir Oliver returns to test both nephews. Lady Sneerwell’s resentment of slander is one motive among several, not the organising action. A comedy of manners (Bloomsbury, already cited for this fact) with a restorative ending; it is not a tragedy.',reviewer:CLAUDE},
   {work:'bacchae',value:'comedy',verdict:'invalid',url:'https://www.gutenberg.org/ebooks/35173',locator:'Euripides’ text (Gutenberg 35173): Dionysus arrives in Thebes, Pentheus resists him and is lured to spy on the Maenads, and is torn apart by his mother Agave; the play ends in grief, exile and the ruin of the royal house, with no comic or reconciling resolution; Cambridge Greek and Latin Classics (already cited for this fact) calls it a tragic play. Its structure is tragic, not comic.',reviewer:CLAUDE},
@@ -102,13 +105,15 @@ const theatre: readonly Review[] = [
   {work:'doctor-faustus',value:'comedy',verdict:'invalid',url:'https://www.gutenberg.org/ebooks/779',locator:'Marlowe’s text (Gutenberg 779), titled The Tragical History: Faustus trades his soul for twenty-four years of power and is carried off to hell at midnight, ending in damnation. Clown and horse-courser scenes are interludes inside a tragic structure. Its overall structure is tragic, not comic.',reviewer:CLAUDE},
   {work:'doctor-faustus',value:'comedy-manners',verdict:'invalid',url:'https://www.gutenberg.org/ebooks/779',locator:'Marlowe’s text (Gutenberg 779), titled The Tragical History: Faustus trades his soul for twenty-four years of power and is carried off to hell at midnight, ending in damnation. Clown and horse-courser scenes are interludes inside a tragic structure.  A comedy of manners must itself be a comedy and satirise a social group’s manners (existing Merriam-Webster definition in theatreGenres).',reviewer:CLAUDE},
   {work:'doctor-faustus',value:'heroic-comedy',verdict:'invalid',url:'https://www.gutenberg.org/ebooks/779',locator:'Marlowe’s text (Gutenberg 779), titled The Tragical History: Faustus trades his soul for twenty-four years of power and is carried off to hell at midnight, ending in damnation. Clown and horse-courser scenes are interludes inside a tragic structure. Heroic comedy is Rostand’s comedy designation for Cyrano (bard.org study guides already cited); Faustus is not a comedy.',reviewer:CLAUDE},
-  {work:'tempest',value:'comedy-manners',verdict:'invalid',url:'https://www.folger.edu/explore/shakespeares-works/the-tempest/',locator:'Folger Shakespeare Library page: Prospero uses magic through Ariel on his shipwrecked enemies on an island, and Miranda’s engagement to Ferdinand helps resolve the drama; the page does not present it as a satire of social manners.  A comedy of manners must satirise a social group’s manners (existing Merriam-Webster definition in theatreGenres).',reviewer:CLAUDE},
+  {work:'tempest',value:'comedy-manners',verdict:'invalid',reviewStatus:'pending',url:'https://www.folger.edu/explore/shakespeares-works/the-tempest/',locator:'Folger Shakespeare Library page: Prospero uses magic through Ariel on his shipwrecked enemies on an island, and Miranda’s engagement to Ferdinand helps resolve the drama; the page does not present it as a satire of social manners.  A comedy of manners must satirise a social group’s manners (existing Merriam-Webster definition in theatreGenres).',reviewer:CLAUDE},
   {work:'tempest',value:'realist-drama',verdict:'invalid',url:'https://www.folger.edu/explore/shakespeares-works/the-tempest/',locator:'Folger Shakespeare Library page: Prospero uses magic through Ariel on his shipwrecked enemies on an island, and Miranda’s engagement to Ferdinand helps resolve the drama; the page does not present it as a satire of social manners. Under the app’s descriptive definition of Realist drama (people and situations recognisably true to life), a play whose central action is magic and spirits on an island does not qualify. No historical-chronology argument is used.',reviewer:CLAUDE},
 ];
 
 
 // Literature l1 genre lesson: plain, definition-based negatives. A pair is included only when no reliable catalogue
 // classifies the work under that label and the label's definition does not plainly describe its organising action.
+// Stage 6: absence of a catalogue label is insufficient. Interpretive exclusions below
+// remain archived as pending; only verified assertions may support grading.
 // Pairs where a reasonable reading exists (for example Moby-Dick and Gothic, Frankenstein and adventure, Dracula and
 // detective work) are deliberately omitted and stay unknown.
 const gb = (id: number) => `https://www.gutenberg.org/ebooks/${id}`;
@@ -151,7 +156,8 @@ const l1Pairs: Readonly<Record<string, readonly string[]>> = {
 const literatureL1Plain: readonly Review[] = Object.entries(l1Pairs).flatMap(([work, labels]) => labels
   .filter(label => !literature.some(r => r.work === work && r.value === l1Labels[label][0]))
   .map(label => ({ work, value: l1Labels[label][0], verdict: 'invalid' as const, url: l1Basis[work][0],
-    locator: `${l1Basis[work][1]} ${l1Labels[label][1]} ${l1Labels[label][2]}`, reviewer: CLAUDE })));
+    locator: `${l1Basis[work][1]} ${l1Labels[label][1]} ${l1Labels[label][2]}`, reviewer: CLAUDE,
+    reviewStatus: ['adventure', 'bildungs', 'gothic', 'manners', 'satire'].includes(label) || (work === 'moby-dick' && label === 'historical') ? 'pending' as const : 'verified' as const })));
 
 
 // Theatre l5 genre lesson: plain, definition-based negatives under the same standard as the Literature l1 block.
@@ -196,7 +202,54 @@ const th5Pairs: Readonly<Record<string, readonly string[]>> = {
 const theatreL5Plain: readonly Review[] = Object.entries(th5Pairs).flatMap(([work, labels]) => labels
   .filter(label => !theatre.some(r => r.work === work && r.value === th5Labels[label][0]))
   .map(label => ({ work, value: th5Labels[label][0], verdict: 'invalid' as const, url: th5Basis[work][0],
-    locator: `${th5Basis[work][1]} ${th5Labels[label][1]} ${th5Labels[label][2]}`, reviewer: CLAUDE })));
+    locator: `${th5Basis[work][1]} ${th5Labels[label][1]} ${th5Labels[label][2]}`, reviewer: CLAUDE,
+    // A synopsis does not settle interpretive classifications or exclude a
+    // documented historical period. Preserve the claim for editorial review.
+    reviewStatus: ['feminist', 'historical', 'menace', 'tragedy', 'tragicomedy'].includes(label) ||
+      (label === 'absurd' && ['our-town', 'glass-menagerie'].includes(work)) ? 'pending' as const : 'verified' as const })));
+
+// Work-specific user decisions from “Implement Approved Genre Distractor Pools”,
+// 2026-10-23. These are manual editorial approvals, not externally researched
+// exclusions. Keep earlier source evidence and pending comparisons unchanged.
+const manualEditorialWrong: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>> = {
+ literature: {
+  'pride-prejudice': ['adventure'],
+  'moonstone': ['fantasy', 'western', 'dystopian', 'war', 'family-saga'],
+  'wuthering-heights': ['adventure', 'western', 'dystopian', 'war'],
+  'frankenstein': ['adventure', 'western', 'war', 'family-saga', 'novel-manners'],
+  'dracula': ['detective', 'western', 'war', 'novel-manners', 'family-saga'],
+  'moby-dick': ['western', 'dystopian', 'family-saga', 'novel-manners'],
+  'scarlet-letter': ['western', 'dystopian', 'war', 'fantasy'],
+  'huckleberry-finn': ['novel-manners', 'gothic', 'dystopian', 'war'],
+  'little-women': ['adventure', 'western', 'dystopian', 'war'],
+  'don-quixote': ['gothic', 'dystopian', 'western'],
+  'treasure-island': ['gothic', 'western', 'dystopian', 'family-saga'],
+ },
+ theatre: {
+  'hamlet': ['absurd', 'memory-play'],
+  'antigone': ['realist-drama', 'memory-play'],
+  'tartuffe': ['tragedy', 'realist-drama', 'absurd'],
+  'importance-earnest': ['tragedy', 'absurd', 'realist-drama'],
+  'dolls-house': ['comedy', 'absurd', 'memory-play'],
+  'cyrano': ['absurd', 'memory-play', 'realist-drama'],
+  'bacchae': ['realist-drama', 'memory-play'],
+  'school-scandal': ['realist-drama', 'absurd'],
+  'she-stoops-conquer': ['realist-drama', 'absurd'],
+  'doctor-faustus': ['realist-drama', 'memory-play'],
+  'tempest': ['absurd', 'memory-play', 'revenge-tragedy'],
+  'oklahoma': ['feminist-drama', 'historical', 'tragedy'],
+  'waiting-godot': ['feminist-drama', 'tragedy'],
+  'glass-menagerie': ['absurd', 'comedy', 'comedy-menace', 'historical'],
+  'birthday-party': ['historical', 'feminist-drama', 'realist-drama', 'tragedy'],
+  'raisin-sun': ['comedy-menace', 'historical', 'comedy'],
+  'fences': ['comedy-menace', 'feminist-drama'],
+  'rosencrantz-guildenstern': ['historical', 'feminist-drama'],
+  'top-girls': ['musical', 'comedy-menace', 'tragedy'],
+  'master-harold': ['musical', 'comedy-menace', 'tragedy'],
+  'bald-soprano': ['comedy-menace', 'tragedy'],
+  'crucible': ['comedy-menace', 'feminist-drama', 'tragedy'],
+ },
+};
 
 /** Append evidence without mutating any teaching record, priority or stage. */
 export function addGenreCompatibility(set: AuthoredSet, domain: 'literature' | 'theatre'): void {
@@ -208,8 +261,33 @@ export function addGenreCompatibility(set: AuthoredSet, domain: 'literature' | '
       id:`genre-comparison:${domain}:${review.work}:${review.value}`,kind:'assertion',
       predicateId:concept.relation,subjectId:`work:${review.work}`,valueId:`${domain === 'literature' ? 'literary' : 'theatre'}-genre:${review.value}`,
       qualifiers:concept.semantic?.qualifiers ?? {},verdict:review.verdict,sourceUrl:review.url,locator:review.locator,
-      reviewStatus:'verified',reviewedBy:review.reviewer ?? 'Codex — source and work-feature comparison (not independent human editorial approval)',reviewedAt:review.reviewedAt ?? '2026-10-20',
+      reviewStatus:review.reviewStatus ?? 'verified',reviewedBy:review.reviewer ?? 'Codex — source and work-feature comparison (not independent human editorial approval)',reviewedAt:review.reviewedAt ?? '2026-10-20',
     } satisfies SemanticEvidence);
+  }
+  for (const [work, wrong] of Object.entries(manualEditorialWrong[domain])) {
+    const concept = set.concepts.find(c => c.partId === 'p2' && c.semantic?.subject?.id === `work:${work}`);
+    if (!concept) continue;
+    const prefix = `${domain === 'literature' ? 'literary' : 'theatre'}-genre:`;
+    const approvals = [
+      ...wrong.map(value => ({value, verdict: 'invalid' as const})),
+      ...(domain === 'literature' && work === 'moonstone' ? [{value: 'adventure', verdict: 'valid' as const}] : []),
+    ];
+    const anchor = set.evidence.find(e => concept.assessment!.evidenceIds.includes(e.id))!;
+    for (const {value, verdict} of approvals) {
+      // Never override a known positive with a manual negative. Pending source
+      // comparisons remain untouched; they are not accepted negative evidence.
+      if (verdict === 'invalid' && set.evidence.some(e => e.kind === 'assertion' &&
+        e.predicateId === concept.relation && e.subjectId === `work:${work}` &&
+        e.valueId === `${prefix}${value}` && e.verdict === 'valid' && e.reviewStatus === 'verified')) continue;
+      set.evidence.push({
+        id: `manual-editorial:2026-10-23:${domain}:${work}:${value}`, kind: 'assertion',
+        predicateId: concept.relation, subjectId: `work:${work}`, valueId: `${prefix}${value}`,
+        qualifiers: concept.semantic?.qualifiers ?? {}, verdict,
+        sourceUrl: anchor.sourceUrl,
+        locator: `Manual editorial approval: user request “Implement Approved Genre Distractor Pools”, 2026-10-23; ${concept.subject} → ${value}: ${verdict === 'valid' ? 'accepted alternative classification' : 'approved incorrect alternative'}. The linked source identifies the work only; it is not external verification of this manual comparison.`,
+        reviewStatus: 'verified', reviewedBy: 'User — manual editorial approval (not external source verification)', reviewedAt: '2026-10-23',
+      });
+    }
   }
   // "Drama" is unqualified in the current records/questions. It cannot be
   // silently narrowed to a licensor's category meaning serious non-comedy.

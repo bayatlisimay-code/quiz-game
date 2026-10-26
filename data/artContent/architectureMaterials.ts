@@ -1,3 +1,4 @@
+import { definitionWording } from './learnerWording';
 import { reviewedCohort, reviewedDefinitions, type ReviewedTerm } from './reviewedDefinitions';
 const mf='https://cameo.mfa.org/wiki/';
 const nps='https://www.nps.gov/articles/000/earthen-architecture-glossary-of-terms.htm';
@@ -15,5 +16,7 @@ const terms:readonly ReviewedTerm[]=[
  r('fired-clay-brick','Fired-clay brick','A shaped clay building block hardened in a kiln.', 'https://podcast.history.org/2005/10/10/firing-the-brick-kiln/','Master brickmaker interview: clay, water, drying, kiln firing; qualified fired-clay sense, not concrete brick',3),
  r('aluminium','Aluminium','A lightweight, silvery-white metallic element used in building alloys.', 'https://periodic-table.rsc.org/element/13/aluminum','Appearance and Uses: element Al, low density, construction alloys; not a claim pure metal is used for every building frame',3),
 ];
-export const architectureMaterialSet=reviewedDefinitions('architecture','l5','p2',terms,reviewedCohort(terms.map(t=>t.id),
+const materialSet=reviewedDefinitions('architecture','l5','p2',terms,reviewedCohort(terms.map(t=>t.id),
  'Reviewed defining substances and processing distinctions: metal/alloy, igneous/metamorphic stone, hydrated minerals, sun-dried/fired units and joining mix. Composite concrete versus mortar remains unknown.', ['concrete|mortar']));
+
+export const architectureMaterialSet={...materialSet,concepts:materialSet.concepts.map((c,i)=>definitionWording(c,terms[i].id))};

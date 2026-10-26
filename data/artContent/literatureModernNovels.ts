@@ -17,7 +17,9 @@ const rows:readonly Row[]=[
 ];
 // User-approved genre-only re-staging (Literature l5 rank 1, 2026-10-20): the Western moves into A and one of the
 // two Bildungsroman works moves to B so the genre lesson has a safe matching quartet. Author and publication facts
-// keep the row-order priority.
-const genrePriorities:Readonly<Record<string,number>>={'riders-purple-sage':5,'house-mango-street':4};
+// keep the row-order priority. Final accessibility repair: the familiar Fantasy example
+// moves from C to B, while My Ántonia moves from B to C. All eleven works remain;
+// the existing Detective/War/Western/Fantasy quartet needs no new negative claims.
+const genrePriorities:Readonly<Record<string,number>>={'riders-purple-sage':5,'house-mango-street':4,'wonderful-wizard-oz':4,'my-antonia':3};
 export const modernNovels:readonly LiteraryWork[]=rows.map(([id,title,author,authorId,year,source,label,genreId,genreSource,scope],i)=>({id,title,author,authorId:`person:${authorId}`,source,priority:i<6?5:i<9?4:3,...(genrePriorities[id]===undefined?{}:{genrePriority:genrePriorities[id]}),genre:{label,id:genreId,source:genreSource??source},publication:{year,source,...(scope?{scope}:{})}}));
 export const literatureModernNovelsSet=novelSet('l5',modernNovels);

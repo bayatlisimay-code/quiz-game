@@ -108,7 +108,7 @@ test('historical version/event/uncertainty and declared typed names are not shor
   }
   expect(getAnswerLabel(reverseConcept(creator)!)).toBe(creator.subject);
   const completion = approvedArtContent.find(c => c.subject === 'The Last Supper' && c.partId === 'p4')!;
-  expect(getAssessmentTemplate(completion).question(completion.subject)).toContain('completion');
+  expect(getAssessmentTemplate(completion).question(completion.subject)).toContain('completed');
 });
 
 test('length diagnostics are warnings and never truncate essential text', () => {
@@ -117,4 +117,60 @@ test('length diagnostics are warnings and never truncate essential text', () => 
   const ex = { type: 'true_false' as const, conceptId: 'fixture', statement: text, correctAnswer: true, answerText: 'fixture' };
   expect(learnerTextDiagnostics(ex)).toEqual([{ field: 'statement', text, words: 28, target: 20 }]);
   expect(ex.statement).toBe(text);
+});
+
+
+test('movement examples drop the repeated original-movement note while preserving the historical claim internally', () => {
+  const examples = approvedArtContent.filter(c => c.subtopicId === 'painting' && c.levelId === 'l1' && ['p2', 'p4'].includes(c.partId));
+  expect(examples).toHaveLength(22);
+  for (const c of examples) {
+    const scope = c.assessment!.presentation!.scope!;
+    expect(scope.canonicalText).toBe(c.assessment!.scope!.text);
+    expect(c.semantic!.qualifiers!.assessmentScope).toBe('original-formative-historical-context');
+    expect(getAssessmentTemplate(c).question(c.subject)).not.toContain('(');
+    expect(getMatchingLabel(c)).toBe(c.subject);
+    expect(context.evaluate(c, c).verdict).toBe('valid');
+    expect(c.assessment!.scope!.text).toContain('original historical development; not later revivals');
+  }
+});
+
+test('notable-work and historical-period wording stays direct without losing historical qualifications', () => {
+  for (const [relation, noun] of [['notable_novel_of_author', 'novel'], ['example_of_notable_play_by_playwright', 'play']]) {
+    const c = approvedArtContent.find(c => c.relation === relation)!;
+    const wording = getAssessmentTemplate(c);
+    expect(wording.question(c.subject)).toContain(`Which of these is a notable ${noun} by ${c.subject}?`);
+    expect(wording.blank(c.subject)).toContain(`One notable ${noun} by ${c.subject} is _____.`);
+  }
+  const odyssey = approvedArtContent.find(c => c.id === 'art_literature_l9_p4_odyssey')!;
+  const wording = getAssessmentTemplate(odyssey);
+  expect(wording.question(odyssey.subject)).toContain('When was “Odyssey” composed?');
+  expect(wording.statement(odyssey.subject, odyssey.object)).toContain('Around the 8th century BCE');
+  expect(wording.question(odyssey.subject)).toContain('oral formation and textual fixation remain debated');
+});
+
+test('architecture identification clues retain their dates with readable word spacing', () => {
+  for (const [id, text] of [['eiffel-tower', 'the 1889 Paris exhibition'], ['santiago-bellas-artes', 'the 1910 centenary']]) {
+    const c = approvedArtContent.find(c => c.id === `art_architecture_l6_p1_${id}`)!;
+    expect(c.assessment!.identification!.description!.text).toContain(text);
+    expect(context.evaluate(c, c).verdict).toBe('valid');
+  }
+});
+
+
+test('venue opening questions prefer certified opening years to an ancient construction century', () => {
+  const pool = approvedArtContent.filter(c => c.subtopicId === 'theatre' && c.levelId === 'l9' && c.partId === 'p4');
+  const target = pool.find(c => c.id === 'art_theatre_l9_p4_bolshoi-1856')!;
+  const caps = getExerciseCapabilities(target, pool, context);
+  expect(caps.optionCandidates.length).toBeGreaterThanOrEqual(2);
+  expect(caps.optionCandidates.every(c => c.assessment?.event === 'opening')).toBe(true);
+  for (const form of ['mcq', 'blank_options'] as const) for (let attempt = 0; attempt < 20; attempt++) {
+    const result = generateExercise(target, caps, form, context, `venue-opening-editorial:${attempt}`);
+    expect(result.status).toBe('generated');
+    if (result.status === 'generated') expect(result.exercise.type).toBe(form === 'mcq' ? 'mcq' : 'fill_blank');
+    if (result.status === 'generated' && result.exercise.type !== 'matching') {
+      expect(result.exercise.answerText).toBe('1856');
+      if (result.exercise.type === 'mcq' || result.exercise.type === 'fill_blank') expect(result.exercise.options).not.toContain('4th century BCE');
+      expect(exerciseValidityViolations(result.exercise, pool, context)).toEqual([]);
+    }
+  }
 });

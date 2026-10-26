@@ -1,6 +1,6 @@
 import { literatureModernNovelsSet } from '../../../data/artContent/literatureModernNovels';
 import { theatrePlaySets, retainedOurTownGenreFact } from '../../../data/artContent/theatrePlays';
-import { approvedArtContent } from '../../../data/activeArtContent';
+import { approvedArtContent, retainedGenreSelections } from '../../../data/activeArtContent';
 import { activeSemanticContext as context } from '../contentSnapshot';
 import { getAssessmentTemplate } from '../assessmentTemplates';
 import { getExerciseCapabilities, generateExercise } from '../exerciseFactory';
@@ -8,7 +8,7 @@ import { getRelationTemplate } from '../templates';
 import { familyDefinitions } from '../relationDefinitions';
 import { isPermanentlyLockable } from '../matchingSafety';
 
-const fact=(id:string)=>{const c=approvedArtContent.find(c=>c.id===`art_${id}`);if(!c)throw new Error(id);return c;};
+const fact=(id:string)=>{const c=[...approvedArtContent,...retainedGenreSelections].find(c=>c.id===`art_${id}`);if(!c)throw new Error(id);return c;};
 
 test('shared classification wording asks for a displayed choice without asserting unique historical membership',()=>{
   for(const relation of ['genre_of_movie','genre_of_play','genre_of_song','genre_of_painting']) {
@@ -51,8 +51,12 @@ test('a subject with several valid genres still gets exactly one verified correc
       expect(context.evaluate(target,negative!).verdict).toBe('invalid');
     }
   }
-  // Unlisted genre membership remains unknown; never a fallback false option.
-  expect(context.evaluate(target,fact('theatre_l1_p2_dolls-house')).verdict).toBe('unknown');
+  // This exact Antigone/Realist comparison was manually approved; assert its
+  // provenance while retaining an unapproved unknown as the fail-closed guard.
+  expect(context.evaluate(target,fact('theatre_l1_p2_dolls-house'))).toMatchObject({
+    verdict:'invalid',evidenceIds:['manual-editorial:2026-10-23:theatre:antigone:realist-drama'],
+  });
+  expect(context.evaluate(fact('theatre_l1_p2_hamlet'),fact('theatre_l1_p2_dolls-house')).verdict).toBe('unknown');
 });
 
 test('parent genres and sourced critical overlaps remain valid in every assessment form',()=>{

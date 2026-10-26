@@ -4,7 +4,7 @@ import { compareEducationalPriority, teachingGroup } from "../../src/quizEngine/
 // share the same priority across recognition, creator and dating lessons.
 const priorities: Readonly<Record<string, number>> = {
     "artwork:met-18-2-4": 5, "artwork:nm-delhi-5721-195": 5, "artwork:met-47-100-1": 4,
-    "artwork:met-1989-281-41": 4, "artwork:met-66-173": 4, "artwork:met-ushumgal-stele": 4,
+    "artwork:met-1989-281-41": 4, "artwork:great-sphinx": 4, "artwork:met-66-173": 4, "artwork:met-ushumgal-stele": 4, "artwork:hongshan-jade-dragon": 4,
     "artwork:accademia-1076": 5, "artwork:vatican-pieta-original": 5, "artwork:pisa-baptistery-pulpit": 5,
     "artwork:opera-duomo-magdalene": 4, "artwork:orsanmichele-thomas": 4, "artwork:orsanmichele-matthew": 4,
     "artwork:loggia-perseus": 4, "artwork:uffizi-1890-878": 5, "artwork:ng1314": 4, "artwork:ng665": 4,

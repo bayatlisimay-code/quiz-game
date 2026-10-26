@@ -37,10 +37,10 @@ test('all 54 approved teaching placements contain eleven sourced distinct facts,
  expect(evidenceProblems(approvedArtEvidence)).toEqual([]);
 });
 
-test('baseline 598 Painting/Sculpture records and their 2052 evidence entries are byte-for-byte unchanged as serialized data',()=>{
+test('598 Painting/Sculpture records and their source evidence match the authorized accessibility baseline',()=>{
  const hash=(x:unknown)=>createHash('sha256').update(JSON.stringify(x)).digest('hex');
- expect(hash(approvedArtContent.filter(c=>['painting','sculpture'].includes(c.subtopicId)))).toBe('713551351afd550fa2a3ee20b775c76fffed53383f5bbe25765f18b205c3ab8a');
- expect(hash(approvedArtEvidence.slice(0,2052))).toBe('ba551027a9803b2efe4a444abf2852badc10ebb4127aeb24368dd66cdcbce8ec');
+ expect(hash(approvedArtContent.filter(c=>['painting','sculpture'].includes(c.subtopicId)))).toBe('347987cc2057dac704041ac72cb5dca39a6d7364146bd5d424b89167905ff9ad');
+ expect(hash(approvedArtEvidence.slice(0,2052))).toBe('76326eec62d6203d24578380d44f26286e98a62308c645487e88b211817a14b7');
 });
 
 test('all reviews reuse original teaching IDs; all five l10 parts aggregate the entire subtopic without duplicate weighting',()=>{
@@ -80,11 +80,12 @@ test('explicit heterogeneous creator domains certify only scoped negatives and p
 
 test('original designer, later script contributions, studio credits and identity introduction events remain scoped',()=>{
  const arial=find('art_design_l6_p4_arial');
- expect(arial.subject).toBe('Arial (family design)');
+ expect(arial.subject).toBe('Arial');
  expect(arial.assessment!.scope!.text).toContain('initial and family-design credits');
  expect(arial.semantic!.qualifiers).toMatchObject({creditScope:'initial-and-family-design'});
  const calibri=find('art_design_l6_p4_calibri');
- expect(calibri.subject).toContain('original Latin');
+ expect(calibri.subject).toBe('Calibri');
+ expect(calibri.assessment!.scope!.text).toContain('original type design');
  expect(calibri.assessment!.scope!.text).toContain('not later script additions');
  const gropius=find('art_architecture_l7_p2_bauhaus-dessau');
  const credit=approvedArtEvidence.find(e=>e.id===gropius.assessment!.evidenceIds[0]);

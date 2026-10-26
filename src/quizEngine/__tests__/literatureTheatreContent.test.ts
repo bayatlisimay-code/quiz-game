@@ -1,6 +1,6 @@
 import { literatureClassicsSet } from '../../../data/artContent/literatureClassics';
 import { createHash } from 'node:crypto';
-import { approvedArtContent, approvedArtEvidence } from '../../../data/activeArtContent';
+import { approvedArtContent, approvedArtEvidence, retainedGenreSelections } from '../../../data/activeArtContent';
 import { artAvailability, teachingRelation } from '../../../data/artCurriculum';
 import { ACTIVE_CONCEPT_SETS, activeSemanticContext as context } from '../contentSnapshot';
 import { getCurriculumPool } from '../curriculumPool';
@@ -11,12 +11,25 @@ import { evidenceProblems } from '../semanticEvidence';
 import { planAssessmentStimulus } from '../../images/assessmentImages';
 const additions=approvedArtContent.filter(c=>['literature','theatre'].includes(c.subtopicId));
 const pool=(s:string,l:string,p:string)=>getCurriculumPool(ACTIVE_CONCEPT_SETS,{topicId:'art',subtopicId:s,levelId:l,partId:p});
-const find=(id:string)=>{const c=additions.find(c=>c.id===id);if(!c)throw new Error(id);return c;};
+const find=(id:string)=>{const c=[...additions,...retainedGenreSelections].find(c=>c.id===id);if(!c)throw new Error(id);return c;};
 
-test('the complete baseline of four finished subtopics and its evidence remain byte-for-byte unchanged',()=>{
+const editorialIdentity = (concept: (typeof approvedArtContent)[number]) => {
+  const c = JSON.parse(JSON.stringify(concept)) as (typeof approvedArtContent)[number];
+  if (c.subtopicId === 'painting' && c.levelId === 'l1' && ['p2', 'p4'].includes(c.partId)) {
+    delete (c.assessment!.presentation!.scope as Partial<{ text: string; reviewedAt: string }>).text;
+    delete (c.assessment!.presentation!.scope as Partial<{ reviewedAt: string }>).reviewedAt;
+  }
+  if (['art_architecture_l6_p1_eiffel-tower', 'art_architecture_l6_p1_santiago-bellas-artes'].includes(c.id)) {
+    delete (c.assessment!.identification!.description as Partial<{ text: string }>).text;
+  }
+  return c;
+};
+
+test('completed Art matches the reviewed accessibility content and evidence baseline',()=>{
  const hash=(value:unknown)=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
- expect(hash(approvedArtContent.filter(c=>!['literature','theatre'].includes(c.subtopicId)))).toBe('9f374e3ad376d1192f5a389b811a65a230f930b6982626cff765372e2593b429');
- expect(hash(approvedArtEvidence.slice(0,4730))).toBe('2b59f80127e40209018313cbd4e93292d2bcc60f079cf2fd46e62e76632943d2');
+ expect(hash(approvedArtContent.filter(c=>!['literature','theatre'].includes(c.subtopicId)))).toBe('ddedc9f8399b9e9e5a362d37191c176797257136ad08afdf13e656d53840aaf1');
+ expect(hash(approvedArtContent.filter(c=>!['literature','theatre'].includes(c.subtopicId)).map(editorialIdentity))).toBe('75f93c18f6b9a1eae4ff7c283255395f105b8ae2d4943c81823499a642b35580');
+ expect(hash(approvedArtEvidence.slice(0,4730))).toBe('18eea856b7b59d367b16a268cdd33cde1db2174f5a800652c77104126dd8c5ae');
  expect(artAvailability.design).toBe('coming-soon');
 });
 
@@ -72,7 +85,7 @@ test('open overlaps stay unknown, while exact script and writer constraints supp
  const unqualified={...example,semantic:{...example.semantic!,qualifiers:{}}};
  expect(context.evaluate(unqualified,other).verdict).toBe('unknown');
  const writer=find('art_literature_l2_p4_epistolary');
- expect(getAssessmentTemplate(writer).question(writer.subject)).toContain('writing “Dracula”');
+ expect(getAssessmentTemplate(writer).question(writer.subject)).toBe('Which Epistolary fiction writer wrote “Dracula”?');
  expect(getMatchingLabel(writer)).not.toContain('?');
 });
 
@@ -114,8 +127,10 @@ test('tragedy terminology contrasts required motives and never declares the subg
  const tragedy=find('art_theatre_l2_p1_tragedy'),revenge=find('art_theatre_l2_p1_revenge-tragedy');
  expect(context.evaluate(tragedy,revenge).verdict).toBe('invalid');
  expect(tragedy.object).toContain('not required');
- expect(tragedy.assessment!.scope!.visibility).toBe('learner');
- expect(getAssessmentTemplate(tragedy).question(tragedy.subject)).toContain('Defining requirements');
+ expect(tragedy.assessment!.scope!.visibility).toBe('internal');
+ for(const text of [getAssessmentTemplate(tragedy).question(tragedy.subject),getAssessmentTemplate(tragedy).statement(tragedy.subject,tragedy.object),getAssessmentTemplate(tragedy).blank(tragedy.subject)])expect(text).toContain('essential features');
+ expect(getMatchingLabel(tragedy)).toContain('Essential features');
+ expect(getAssessmentTemplate(tragedy).question(tragedy.subject)).toContain('essential features');
  const bare={...tragedy,semantic:{...tragedy.semantic!,qualifiers:{sense:tragedy.semantic!.qualifiers!.sense}}};
  expect(context.evaluate(bare,revenge).verdict).toBe('unknown');
  const parent=find('art_theatre_l2_p1_comedy'),child=find('art_theatre_l2_p1_farce');

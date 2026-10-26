@@ -1,3 +1,5 @@
+import type { Concept } from "../../src/quizEngine/conceptTypes";
+import type { SemanticEvidence } from "../../src/quizEngine/assessmentTypes";
 import type { PilotArtwork } from "../artPilot/types";
 export const baroqueSculptures: readonly PilotArtwork[] = [
   { id: "borghese-apollo-daphne", title: "Apollo and Daphne", creatorId: "gian-lorenzo-bernini", creator: "Gian Lorenzo Bernini", introducedIn: "A", period: "Baroque", original: "Galleria Borghese original marble group",
@@ -31,3 +33,41 @@ export const baroqueSculptures: readonly PilotArtwork[] = [
     source: "Galleria Borghese", url: "https://galleriaborghese.cultura.gov.it/en/archivio-schede/paolina-borghese-as-venus-victorious/", locator: "Year 1804–1808; artist; reclining figure on cushions, apple and rotating base",
     date: "1804–1808", dateId: "date:year-interval:1804:1808", event: "creation", precision: "range", clue: "Napoleon's sister reclines on cushions, holding the apple awarded in a mythological beauty contest. A mechanism inside the couch allows the marble portrait to rotate in the Galleria Borghese.", notes: "Uses current entry's 1804–1808, rather than older visitor guide's 1805–1808." },
 ];
+
+// The existing lesson assesses meaningful chronology rather than neighbouring
+// creation-year ranges. All eleven source ranges lie wholly within one decade.
+// Original records/evidence remain in authoring history; new assertions state
+// only containment in that decade, never an invented exact creation year.
+const decadeSourceBounds: Readonly<Record<string, readonly [number, number]>> = {
+  "borghese-apollo-daphne": [1622,1625], "louvre-mr1777": [1793,1793],
+  "nga-voltaire-1963-10-240": [1778,1778], "vam-handel-a3-1965": [1738,1738],
+  "borghese-david-lxxvii": [1623,1624], "borghese-proserpine-cclxviii": [1621,1622],
+  "thorvaldsen-a822": [1828,1828], "vam-graces-a4-1994": [1814,1817],
+  "borghese-paolina-liv": [1804,1808], "met-62-55": [1787,1787], "getty-103rqz": [1610,1615],
+};
+export function authorBaroqueDecades(concepts: readonly Concept[], sourceEvidence: readonly SemanticEvidence[]) {
+  const evidence: SemanticEvidence[] = [];
+  const revised = concepts.map(c => {
+    if (c.subtopicId !== "sculpture" || c.levelId !== "l4" || c.partId !== "p4") return c;
+    const bounds = decadeSourceBounds[c.id.replace("art_sculpture_l4_p4_", "")];
+    if (!bounds) throw new Error(`Unreviewed decade conversion: ${c.id}`);
+    const [start,end] = bounds, decade = Math.floor(start / 10) * 10;
+    if (end > decade + 9) throw new Error(`Source range spans decades: ${c.id}`);
+    const original = sourceEvidence.find(e => c.assessment!.evidenceIds.includes(e.id))!;
+    const qualifiers = { event: c.assessment!.event!, datePrecision: "decade" };
+    const valueId = `date:decade:${decade}`, id = `decade-containment:${c.id}`;
+    const review = { sourceUrl: original.sourceUrl,
+      locator: `${original.locator} Source dating ${c.object} lies entirely within ${decade}–${decade+9}; assess the decade, retaining the source dating internally.`,
+      reviewStatus: "verified" as const, reviewedAt: "2026-10-22", reviewedBy: "Codex — source-date containment review (not independent human certification)",
+      predicateId: c.relation, subjectId: c.semantic!.subject!.id!, qualifiers };
+    evidence.push({ ...review, id, kind: "assertion", valueId, verdict: "valid" },
+      { ...review, id: `${id}:bounds`, kind: "date-bound", start, end, calendar: "gregorian-proleptic" });
+    return { ...c, object: `${decade}s`, semantic: { ...c.semantic!, qualifiers,
+      value: { id: valueId, entityType: "period" as const, caseSensitive: false,
+        temporal: { start: decade, end: decade+9, calendar: "gregorian-proleptic" as const } } },
+      assessment: { ...c.assessment!, valueType: "period" as const, evidenceIds: [id], presentation: undefined,
+        response: undefined, dateInterpretation: undefined,
+        scope: { text: "Creation of this version.", qualifierKeys: Object.keys(qualifiers), visibility: "internal" as const } } };
+  });
+  return { concepts: revised, evidence };
+}

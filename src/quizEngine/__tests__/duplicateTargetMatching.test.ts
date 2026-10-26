@@ -194,11 +194,12 @@ test.each(['created_in_decade', 'painted_by'])('unflagged %s keeps duplicate fix
   }
 });
 
-test('completed Art matching is byte-identical to all 1800 pre-change payload hashes', () => {
+test('completed Art matching matches all 1800 accessibility payload hashes and their reviewed non-wording structure', () => {
   const context = activeSemanticContext.withImages(developmentImages as unknown as RuntimeImageRegistry);
   const cases = catalogCoverageCases({ ...TOPIC_BY_ID.art, subtopics: TOPIC_BY_ID.art.subtopics.filter(s => baseline.subtopics.includes(s.id)) }, ACTIVE_CONCEPT_SETS);
   expect(cases).toHaveLength(baseline.cases);
   const hashes: Record<string, string> = {};
+  const structuralHashes: Record<string, string> = {};
   for (const entry of cases) {
     const session = prepareQuizSession({ ...entry, context });
     for (const fixed of baseline.seeds) {
@@ -208,7 +209,16 @@ test('completed Art matching is byte-identical to all 1800 pre-change payload ha
       const matching = result.exercises.filter(e => e.type === 'matching');
       expect(matching).toHaveLength(1);
       hashes[seed] = createHash('sha256').update(JSON.stringify(matching[0])).digest('hex');
+      const structure = JSON.parse(JSON.stringify(matching[0])) as {
+        pairs: { left?: string; stimulus?: { text?: string; fallbackText?: string } }[];
+      };
+      for (const pair of structure.pairs) {
+        delete pair.left;
+        if (pair.stimulus) { delete pair.stimulus.text; delete pair.stimulus.fallbackText; }
+      }
+      structuralHashes[seed] = createHash('sha256').update(JSON.stringify(structure)).digest('hex');
     }
   }
   expect(hashes).toEqual(baseline.hashes);
+  expect(createHash('sha256').update(JSON.stringify(structuralHashes)).digest('hex')).toBe(baseline.nonWordingPayloadHash);
 }, 300000);

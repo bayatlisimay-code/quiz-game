@@ -28,7 +28,11 @@ test("production pilot has 18 sourced originals, 54 teaching facts and four term
   expect(new Set(approvedArtContent.map(c => c.id)).size).toBe(approvedArtContent.length);
   expect(validateContent(approvedArtContent, targetRelationPolicies, undefined, { evidence: approvedArtEvidence }).filter(i => i.severity === "error")).toEqual([]);
   expect(() => createActiveArtSets(approvedArtContent)).not.toThrow();
-  expect(approvedArtEvidence.every(e => e.sourceUrl.startsWith("https://") && !e.sourceUrl.includes("example.invalid") && e.reviewedBy?.includes("not independent human"))).toBe(true);
+  expect(approvedArtEvidence.every(e => e.sourceUrl.startsWith("https://") && !e.sourceUrl.includes("example.invalid") &&
+    (e.id.startsWith("manual-editorial:2026-10-23:")
+      ? e.reviewedBy === "User — manual editorial approval (not external source verification)" &&
+        e.locator.startsWith("Manual editorial approval: user request") && e.locator.includes("not external verification")
+      : e.reviewedBy?.includes("not independent human")))).toBe(true);
   expect(Object.keys(context.images.bindings)).toEqual([]);
   for (const slice of slices) {
     const recognition = poolFor(slice.subtopicId, slice.levelId, "p1");
@@ -106,11 +110,11 @@ test("dating preserves uncertainty, collection labels, originals, and event dist
   expect(dates.map(c => c.object)).toContain("probably c. 1437–1445");
   const supper = dates.find(c => c.subject === "The Last Supper")!;
   expect(supper.assessment?.event).toBe("completion"); expect(supper.object).toBe("1498");
-  expect(getAssessmentTemplate(supper).question(supper.subject)).toContain("completion");
+  expect(getAssessmentTemplate(supper).question(supper.subject)).toBe("When was “The Last Supper” completed?");
   const cycle = dates.find(c => c.subject === "The School of Athens")!;
   expect(cycle.object).toBe("1508–1511");
-  expect(getAssessmentTemplate(cycle).question(cycle.subject)).toContain("whole fresco cycle");
-  for (const c of dates) expect(getAssessmentTemplate(c).statement(c.subject, c.object)).toContain("collection entry lists");
+  expect(getAssessmentTemplate(cycle).question(cycle.subject)).toContain("whole fresco series");
+  for (const c of dates) expect(getAssessmentTemplate(c).statement(c.subject, c.object)).toContain(c.object.replace(/^probably /, ""));
   expect(dates.every(c => reverseConcept(c) === undefined)).toBe(true); // Only independently reviewed creator inverses are enabled.
   const hidden = { ...supper, assessment: { ...supper.assessment!, dateInterpretation: undefined } };
   expect(getExerciseCapabilities(hidden, dates, context).forms.mcq.available).toBe(false);

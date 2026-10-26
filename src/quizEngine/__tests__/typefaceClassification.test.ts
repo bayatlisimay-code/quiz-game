@@ -18,7 +18,8 @@ test('compound classifications retain the same eleven typefaces and source-docum
   expect(c.assessment!.factId).toBe(`${c.semantic!.subject!.id}:classification_of_typeface`);
   expect(context.evaluate(c,c).verdict).toBe('valid');
  }
- for(const id of ['arial','calibri','verdana','trebuchet-ms'])expect(find(id).object).toBe('Proportional sans-serif text');
+ expect(find('arial').object).toBe('Sans-serif');
+ for(const id of ['calibri','verdana','trebuchet-ms'])expect(find(id).object).toBe('Proportional sans-serif text');
  for(const id of ['georgia','cambria'])expect(find(id).object).toBe('Proportional serif text');
  expect(find('consolas').object).toBe('Monospaced');
  const mono=find('consolas'),serif=find('georgia');

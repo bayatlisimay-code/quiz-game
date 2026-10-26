@@ -34,7 +34,7 @@ export type AssessmentScope = Readonly<{
   qualifierKeys: readonly string[];
   // Definition scopes default to internal meaning-validation notes. Explicit
   // learner visibility preserves an essential qualified terminology sense.
-  visibility?: "learner";
+  visibility?: "learner" | "internal";
 }>;
 export type AssessmentContract = Readonly<{
   reviewStatus: "verified" | "pending";

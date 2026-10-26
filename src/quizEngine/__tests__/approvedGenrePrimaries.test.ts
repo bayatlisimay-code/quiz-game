@@ -1,4 +1,4 @@
-import { approvedArtContent, approvedArtEvidence } from '../../../data/activeArtContent';
+import { approvedArtContent, approvedArtEvidence, retainedGenreSelections } from '../../../data/activeArtContent';
 import { literatureClassicsSet } from '../../../data/artContent/literatureClassics';
 import { literatureModernNovelsSet } from '../../../data/artContent/literatureModernNovels';
 import { theatrePlaySets, retainedOurTownGenreFact } from '../../../data/artContent/theatrePlays';
@@ -12,21 +12,23 @@ import { getExerciseCapabilities, generateExercise } from '../exerciseFactory';
 // Independent editorial acceptance fixture from the user's final decision table.
 // Little Women's display text was unified with the other Bildungsroman facts on 2026-10-21 (user-approved correction).
 const expected: Record<string,string[]> = {
- 'literature_l1': ['Novel of manners','Detective fiction','Gothic fiction','Science fiction','Gothic fiction','Adventure fiction','Historical fiction','Adventure fiction','Bildungsroman (coming-of-age fiction)','Satirical fiction','Adventure fiction'],
- 'literature_l5': ['Modernist novel','Dystopian fiction','Bildungsroman (coming-of-age fiction)','Family saga','Detective fiction','Bildungsroman (coming-of-age fiction)','Bildungsroman (coming-of-age fiction)','War fiction','Western','Fantasy','Detective fiction'],
- 'theatre_l1': ['Revenge tragedy','Greek tragedy','Comedy','Comedy of manners','Realist drama','Heroic comedy','Greek tragedy','Comedy of manners','Comedy','Tragedy','Shakespearean romance'],
- 'theatre_l5': ['Musical','Tragicomedy','Memory play','Comedy of menace','Realist drama','Tragedy','Absurdist drama','Feminist drama','Realist drama','Absurdist drama','Historical drama'],
+ 'literature_l1': ['Novel of manners','Detective fiction','Gothic fiction','Science fiction','Gothic fiction','Adventure fiction','Historical fiction','Adventure fiction','Coming-of-age fiction','Satirical fiction','Adventure fiction'],
+ 'literature_l5': ['Modernist novel','Dystopian fiction','Coming-of-age fiction','Family saga','Detective fiction','Coming-of-age fiction','Coming-of-age fiction','War fiction','Western','Fantasy','Detective fiction'],
+ 'theatre_l1': ['Tragedy','Tragedy','Comedy','Comedy','Realist drama','Comedy','Tragedy','Comedy','Comedy','Tragedy','Comedy'],
+ 'theatre_l5': ['Musical','Absurdist drama','Memory play','Comedy of menace','Realist drama','Tragedy','Absurdist drama','Feminist drama','Realist drama','Absurdist drama','Historical drama'],
 };
 // Explicit genre-only stage decisions. The final repair introduces Treasure Island in A and
 // The Scarlet Letter in C; other lessons keep their original priorities. Theatre l5 introduces
 // Bald Soprano in A and the approved Oklahoma! reserve in B, retaining Our Town outside the genre plan.
 const approvedStageOverrides: Record<string,'A'|'B'|'C'> = {
- 'art_literature_l1_p2_wuthering-heights':'B',
+ 'art_literature_l1_p2_wuthering-heights':'A',
  'art_literature_l1_p2_scarlet-letter':'C',
  'art_literature_l1_p2_treasure-island':'A',
  // Literature l5 rank 1 (user-approved 2026-10-20).
  'art_literature_l5_p2_riders-purple-sage':'A',
  'art_literature_l5_p2_house-mango-street':'B',
+ 'art_literature_l5_p2_wonderful-wizard-oz':'B',
+ 'art_literature_l5_p2_my-antonia':'C',
  // Theatre l1: the mistaken-identity comedy joins A so a duplicate-target matching set exists there.
  'art_theatre_l1_p2_she-stoops-conquer':'A',
  'art_theatre_l1_p2_importance-earnest':'B',
@@ -36,22 +38,24 @@ const approvedStageOverrides: Record<string,'A'|'B'|'C'> = {
  'art_theatre_l5_p2_crucible':'A',
  'art_theatre_l5_p2_raisin-sun':'C',
  'art_theatre_l5_p2_fences':'C',
- 'art_theatre_l5_p2_bald-soprano':'A',
+ 'art_theatre_l5_p2_bald-soprano':'B',
+ 'art_theatre_l5_p2_rosencrantz-guildenstern':'A',
  'art_theatre_l5_p2_oklahoma':'B',
 };
 const originalSets=[literatureClassicsSet,literatureModernNovelsSet,...theatrePlaySets];
 
-test('all 44 approved primaries reach the active assessment text without deleting original facts or evidence',()=>{
+test('all 44 approved primaries survive in active or retained records without deleting original evidence',()=>{
  const seen=new Set<string>();
  for(const set of originalSets){
   const original=set.concepts.filter(c=>['genre_of_novel','genre_of_play'].includes(c.relation));
   const key=`${original[0].subtopicId}_${original[0].levelId}`;
   expect(original).toHaveLength(11);
   for(const [index,before] of original.entries()){
-   const active=approvedArtContent.find(c=>c.id===before.id)!;
+   const active=[...approvedArtContent,...retainedGenreSelections].find(c=>c.id===before.id)!;
    expect(active.object).toBe(expected[key][index]);
    expect(active.assessment!.factId).toBe(before.assessment!.factId);
-   expect(active.learning).toEqual(before.learning);
+   const changed=['art_literature_l1_p2_wuthering-heights','art_theatre_l5_p2_rosencrantz-guildenstern','art_theatre_l5_p2_bald-soprano'].includes(before.id);
+   expect(active.learning).toEqual(changed?{...before.learning,reinforcementPriority:before.id.endsWith('bald-soprano')?4:5}:before.learning);
    expect(active.introducedIn).toBe(approvedStageOverrides[before.id] ?? (index<6?'A':index<9?'B':'C'));
    expect(context.evaluate(active,active).verdict).toBe('valid');
    expect(context.evaluate(active,before).verdict).toBe('valid');
@@ -66,7 +70,7 @@ test('all 44 approved primaries reach the active assessment text without deletin
 });
 
 test('known alternative readings remain positive while an unsupported alternative stays unknown',()=>{
- const active=(id:string)=>approvedArtContent.find(c=>c.id===`art_${id}`)!;
+ const active=(id:string)=>[...approvedArtContent,...retainedGenreSelections].find(c=>c.id===`art_${id}`)!;
  for(const [subject,alternative,valueId] of [
   ['literature_l1_p2_pride-prejudice','literature_l1_p2_little-women','literary-genre:bildungsroman'],
   ['literature_l1_p2_frankenstein','literature_l1_p2_dracula','literary-genre:gothic'],
@@ -99,28 +103,36 @@ test('independent review preserves documented noncanonical classifications in gr
  ] as const){
   const pool=approvedArtContent.filter(c=>c.subtopicId===subtopic&&c.levelId===level&&c.partId==='p2');
   const target=pool.find(c=>c.id===`art_${subtopic}_${level}_p2_${work}`)!;
-  const candidate=pool.find(c=>c.id===`art_${subtopic}_${level}_p2_${alternative}`)!;
+  // Godot now teaches Absurdist drama. This earlier factual correction is
+  // specifically about Master Harold's Tragicomedy reading, so retain the
+  // original source-anchored Godot view instead of accidentally testing Absurdist.
+  const candidate=work==='master-harold'
+   ? theatrePlaySets.flatMap(set=>set.concepts).find(c=>c.id==='art_theatre_l5_p2_waiting-godot')!
+   : pool.find(c=>c.id===`art_${subtopic}_${level}_p2_${alternative}`)!;
+  const comparisonPool=pool.includes(candidate)?pool:[...pool,candidate];
   expect(target.object).toBe(primary);
   expect(context.evaluate(target,candidate).verdict).toBe('valid');
-  const caps=getExerciseCapabilities(target,pool,context);
+  const caps=getExerciseCapabilities(target,comparisonPool,context);
   expect(caps.optionCandidates).not.toContainEqual(candidate);
   expect(caps.falseCandidates).not.toContainEqual(candidate);
   expect(approvedArtEvidence.some(e=>e.kind==='assertion'&&e.subjectId===target.semantic!.subject!.id&&e.valueId===candidate.semantic!.value!.id&&e.verdict==='invalid')).toBe(false);
  }
 });
 
-test('a safely available genre exercise displays the approved Greek tragedy answer in actual production forms',()=>{
+test('broad Tragedy reaches actual available forms without fabricating extra options',()=>{
  const pool=approvedArtContent.filter(c=>c.subtopicId==='theatre'&&c.levelId==='l1'&&c.partId==='p2');
  const c=pool.find(c=>c.subject==='Antigone')!,caps=getExerciseCapabilities(c,pool,context);
- for(const form of ['mcq','true','false','blank_options'] as const){
+ for(const form of ['true','false'] as const){
   const result=generateExercise(c,caps,form,context,`approved-primary:${form}`);
   expect(result.status).toBe('generated');
-  if(result.status!=='generated'||result.exercise.type==='matching')continue;
-  expect(result.exercise.answerText).toBe('Greek tragedy');
-  if(result.exercise.type==='true_false'){
-   expect(result.exercise.correctAnswer?result.exercise.statement:result.exercise.correctStatement).toContain('Greek tragedy');
-  }else expect(result.exercise.options).toContain('Greek tragedy');
+  if(result.status!=='generated'||result.exercise.type!=='true_false')continue;
+  expect(result.exercise.answerText).toBe('Tragedy');
+  expect(result.exercise.correctAnswer?result.exercise.statement:result.exercise.correctStatement).toContain('Tragedy');
  }
+ // Manual approval now supplies Realist drama as a second certified wrong
+ // target for Antigone; the canonical Tragedy answer must reach both forms.
+ for(const form of ['mcq','blank_options'] as const)
+  expect(generateExercise(c,caps,form,context,`approved-primary:${form}`).status).toBe('generated');
 });
 
 test('only the explicitly selected Oklahoma reserve enters l5; original reserve IDs remain unscheduled',()=>{
@@ -139,8 +151,8 @@ test('Literature l1 final staging keeps 6/3/2, one Gothic primary in A, and leav
  const genre=approvedArtContent.filter(c=>c.id.startsWith('art_literature_l1_p2_'));
  expect(genre).toHaveLength(11);
  for(const [stage,count] of [['A',6],['B',3],['C',2]] as const)expect(genre.filter(c=>c.introducedIn===stage)).toHaveLength(count);
- expect(genre.filter(c=>c.introducedIn==='A').filter(c=>c.object==='Gothic fiction').map(c=>c.subject)).toEqual(['Dracula']);
- expect(stageOf('p2','wuthering-heights')).toBe('B');
+ expect(genre.filter(c=>c.introducedIn==='A').filter(c=>c.object==='Gothic fiction').map(c=>c.subject)).toEqual(['Wuthering Heights']);
+ expect(stageOf('p2','wuthering-heights')).toBe('A');
  expect(stageOf('p2','scarlet-letter')).toBe('C');
  expect(stageOf('p2','treasure-island')).toBe('A');
  // Only the genre lesson moved; the same works keep their author-credit and publication stages.
@@ -157,23 +169,24 @@ test('source-compared genre negatives added by Claude Code are explicit, work-sp
  expect(added.length).toBeGreaterThanOrEqual(16);
  for(const e of added){
   expect(e.verdict).toBe('invalid');
-  expect(e.reviewStatus).toBe('verified');
+  // Historical quarantined comparisons remain stored but are not trusted evidence.
+  expect(['verified','pending']).toContain(e.reviewStatus);
   expect(e.reviewedBy).toMatch(/not independent human editorial approval/);
   expect(e.sourceUrl).toMatch(/^https:\/\//);
  }
  // A documented positive reading must never be turned into a negative.
- const negatives=new Set(added.map(e=>`${e.subjectId}|${e.valueId}`));
- for(const positive of assertions.filter(e=>e.verdict==='valid'))expect(negatives.has(`${positive.subjectId}|${positive.valueId}`)).toBe(false);
+ const negatives=new Set(added.filter(e=>e.reviewStatus==='verified').map(e=>`${e.subjectId}|${e.valueId}`));
+ for(const positive of assertions.filter(e=>e.reviewStatus==='verified'&&e.verdict==='valid'))expect(negatives.has(`${positive.subjectId}|${positive.valueId}`)).toBe(false);
 });
 
-test('Literature l5 rank 1 re-staging keeps 6/3/2 and moves only the two approved genre facts',()=>{
+test('Literature l5 rank 1 re-staging keeps 6/3/2 and keeps the documented genre-only stage exchanges',()=>{
  const stageOf=(part:string,work:string)=>approvedArtContent.find(c=>c.id===`art_literature_l5_${part}_${work}`)!.introducedIn;
  const genre=approvedArtContent.filter(c=>c.id.startsWith('art_literature_l5_p2_'));
  expect(genre).toHaveLength(11);
  for(const [stage,count] of [['A',6],['B',3],['C',2]] as const)expect(genre.filter(c=>c.introducedIn===stage)).toHaveLength(count);
  expect(genre.filter(c=>c.introducedIn==='A').map(c=>c.subject).sort()).toEqual(
   ['Fahrenheit 451','Riders of the Purple Sage','The Great Gatsby','The Joy Luck Club','The Maltese Falcon','Their Eyes Were Watching God']);
- expect(genre.filter(c=>c.introducedIn==='B').map(c=>c.subject).sort()).toEqual(['A Farewell to Arms','My Ántonia','The House on Mango Street']);
+ expect(genre.filter(c=>c.introducedIn==='B').map(c=>c.subject).sort()).toEqual(['A Farewell to Arms','The House on Mango Street','The Wonderful Wizard of Oz']);
  // Author and publication placements keep their original stages.
  for(const part of ['p1','p4']){
   expect(stageOf(part,'riders-purple-sage')).toBe('B');

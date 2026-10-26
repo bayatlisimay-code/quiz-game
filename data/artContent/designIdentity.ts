@@ -23,6 +23,7 @@ const identityRecords=joinSets(identities.flatMap(w=>(['p1','p2','p4'] as const)
   scope:recognition?'':creator?`${w.source.learnerLabel ?? w.source.label}; this identity version’s design credit.`:'This identity version’s first introduction.',
   description:recognition?w.clue:undefined,priority:w.priority,priorityReason:'Reinforce globally recognisable identity systems and distinguish revisions from company founding.',
   completeField:{valueIds:creator?[answerId,...(w.members??[])]:[answerId],...(creator?{valueTypes:['person','group'] as const}:{}),reason:recognition?'Reviewed descriptive identity of this specific logo version, not a reproduction or image dependency.':creator?'Source-qualified credited designer or team for this revision, including documented individuals and studio alternatives.':'Verified introduction year of the specified identity revision, distinguished from creation, registration, later reintroduction and company founding.'},
+  ...(!recognition&&!creator?{temporal:{start:w.introduced!.year,end:w.introduced!.year,calendar:'gregorian-proleptic' as const}}:{}),
   contract:creator?{attribution:{role:'designer',status:'certain',verb:'credited'}}:!recognition?{event:'introduction'}:undefined,
  })];
 })));
@@ -37,6 +38,7 @@ export const designIdentitySet=joinSets([identityRecords,joinSets(additionalIntr
  subtopic:'design',level:'l9',part:'p4',id,subject:title,subjectId:`identity:${id}`,subjectType:'design',
  answer:String(year),answerId:`introduction-year:${year}`,answerType:'date',source:{url,locator,label:'Brand historical archive'},
  qualifiers:{event:'introduction'},scope:'This identity version’s first introduction.',priority:3,
+ temporal:{start:year,end:year,calendar:'gregorian-proleptic'},
  priorityReason:'Distinguish identity revisions from earlier marks and company founding.',contract:{event:'introduction'},
  completeField:{valueIds:[`introduction-year:${year}`],reason:'The company explicitly documents introduction/unveiling of this particular version in this calendar year.'},
 }))) ]);
