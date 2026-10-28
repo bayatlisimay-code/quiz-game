@@ -200,7 +200,8 @@ const requiredContracts: Readonly<Record<string, string>> = Object.freeze({
   example_of_notable_song_by_band: "band-performance",
   example_of_notable_composition_by_composer: "composition",
   country_of_birth_of_novelist: "person", country_of_birth_of_director: "person", country_of_birth_of_composer: "person", country_of_birth_of_playwright: "person",
-  country_of_award_or_festival: "award-or-festival", inaugural_year_of_award_or_festival: "award-or-festival",
+  top_prize_of_award_or_festival: "award-or-festival", founded_decade_of_award_or_festival: "award-or-festival",
+  country_of_award_or_festival: "award-or-festival",
   country_of_birth_of_solo_artist: "solo", genre_associated_with_solo_artist: "solo",
   country_of_formation_of_band: "band", formation_year_of_band: "band",
   actor_portraying_character: "film-performance",
@@ -212,14 +213,15 @@ const allowedEvents: Readonly<Record<string, readonly string[]>> = Object.freeze
   creation_date_of_painting: ["creation", "completion"], created_in_decade: ["creation"],
   first_publication_year_of_novel: ["first publication"], first_publication_year_of_poem: ["first publication"], first_publication_year_of_short_fiction: ["first publication"],
   release_year_of_movie: ["release"], release_year_of_animated_movie: ["release"],
-  inaugural_year_of_award_or_festival: ["inaugural event"], formation_year_of_band: ["formation"],
+  founded_decade_of_award_or_festival: ["foundation"],
+  formation_year_of_band: ["formation"],
   creation_date_of_visual_work: ["creation", "completion"], creation_date_of_product: ["creation", "completion"],
   introduction_year_of_brand_identity: ["introduction"], creation_date_of_sculpture: ["creation", "completion", "casting"],
   period_or_year_of_play: ["writing", "first performance", "first publication"],
   historical_period_or_opening_year_of_theatre_venue: ["opening", "historical period"],
 });
 const duplicateTargetRelationIds: readonly string[] = Object.freeze([
-  "genre_of_novel", "genre_of_play",
+  "genre_of_novel", "genre_of_play", "genre_of_movie",
 ]);
 const reviewedPolicy = (relation: string): RelationPolicy => Object.freeze({
   status: "semantically-validated", allowedExerciseTypes: Object.freeze(["mcq", "true_false", "fill_blank"] as const),

@@ -1,6 +1,6 @@
 import { typedResponseIsSafe } from "./semanticEvidence";
 import { planAssessmentStimulus } from "../images/assessmentImages";
-import { getAssessmentTemplate, getMatchingLabel } from "./assessmentTemplates";
+import { getAssessmentTemplate, getMatchingLabel, getMatchingCompatibility } from "./assessmentTemplates";
 import { getAnswerLabel, presentationProblems } from "./learnerText";
 import { isPermanentlyLockable } from "./matchingSafety";
 import type { Concept, Exercise, MatchingExercise } from "./conceptTypes";
@@ -227,6 +227,7 @@ export function* matchingCandidates(
   concepts: readonly Concept[], seed: string, context: SemanticContext,
   budget: SearchBudget
 ): Generator<{ concepts: readonly Concept[]; exercise: MatchingExercise }> {
+  const evaluate = (a: Concept, b: Concept) => getMatchingCompatibility(a, b, context);
   const groups = new Map<string, Concept[]>();
   for (const concept of concepts) {
     const policy = getRelationPolicy(concept.relation, context.policies);
@@ -254,7 +255,7 @@ export function* matchingCandidates(
         (first.kind === "image" && second.kind === "image" && (first.image.imageId === second.image.imageId || first.image.uri === second.image.uri)));
       let result: boolean;
       if (allowDuplicateTargetAnswers) {
-        const ab = context.evaluate(a, b).verdict, ba = context.evaluate(b, a).verdict;
+        const ab = evaluate(a, b).verdict, ba = evaluate(b, a).verdict;
         const sameTarget = aa.identity === bb.identity &&
           normalizeSemanticText(getAnswerLabel(a, "matching")) === normalizeSemanticText(getAnswerLabel(b, "matching")) && ab === "valid" && ba === "valid";
         result = !indistinguishable &&
@@ -267,8 +268,11 @@ export function* matchingCandidates(
         result = !indistinguishable && normalizeSemanticText(getAnswerLabel(a, "matching")).toLowerCase() !== normalizeSemanticText(getAnswerLabel(b, "matching")).toLowerCase() &&
           normalizeSemanticText(getMatchingLabel(a)).toLowerCase() !== normalizeSemanticText(getMatchingLabel(b)).toLowerCase() && context.claim(a).subjectIdentity !== context.claim(b).subjectIdentity &&
           normalizeSemanticText(a.subject) !== normalizeSemanticText(b.subject) && (normalizeSemanticText(aa.text) !== normalizeSemanticText(bb.text) && ((aa.caseSensitive && bb.caseSensitive) || normalizeSemanticText(aa.text).toLowerCase() !== normalizeSemanticText(bb.text).toLowerCase())) && !equivalentAnswers(aa, bb) &&
-          context.evaluate(a, b).verdict !== "unknown" && context.evaluate(b, a).verdict !== "unknown";
+          evaluate(a, b).verdict !== "unknown" && evaluate(b, a).verdict !== "unknown";
       }
+      // Names-only cards must have exactly one same-movie answer each.
+      if (a.subtopicId === "movies" && a.relation === "associated_character_in_same_movie" &&
+          (evaluate(a, b).verdict !== "invalid" || evaluate(b, a).verdict !== "invalid")) result = false;
       compatibility.set(key, result);
       return result;
     };
@@ -276,8 +280,8 @@ export function* matchingCandidates(
       if (!spendSearchNode(budget)) return;
       if (selected.length === 4) {
         if (allowDuplicateTargetAnswers && new Set(selected.map(concept => context.claim(concept).answer.identity)).size < 3) return;
-        if (!selected.some((left) => selected.some((right) => context.evaluate(left, right).verdict === "invalid"))) return;
-        const matrix = selected.map(left => selected.map(right => context.evaluate(left, right).verdict === "valid"));
+        if (!selected.some((left) => selected.some((right) => evaluate(left, right).verdict === "invalid"))) return;
+        const matrix = selected.map(left => selected.map(right => evaluate(left, right).verdict === "valid"));
         if (!isPermanentlyLockable(matrix)) return;
         const pairs = selected.map((concept) => ({
           // Compact display is independent of the unchanged semantic claim and
@@ -285,10 +289,11 @@ export function* matchingCandidates(
           id: concept.id, left: getMatchingLabel(concept), right: getAnswerLabel(concept, "matching"),
           stimulus: planAssessmentStimulus(concept, context, "matching").stimulus,
           answerIdentity: context.claim(concept).answer.identity, caseSensitive: context.claim(concept).answer.caseSensitive,
-          acceptedAnswerIdentities: [...new Set(selected.filter((candidate) => context.evaluate(concept, candidate).verdict === "valid")
+          acceptedAnswerIdentities: [...new Set(selected.filter((candidate) => evaluate(concept, candidate).verdict === "valid")
             .map((candidate) => context.claim(candidate).answer.identity))],
         }));
-        yield { concepts: [...selected], exercise: { type: "matching", direction: selected[0].assessment?.direction ?? "forward", prompt: "Match the pairs", pairs } };
+        yield { concepts: [...selected], exercise: { type: "matching", direction: selected[0].assessment?.direction ?? "forward", prompt: selected[0].subtopicId === "movies" && selected[0].relation === "associated_character_in_same_movie"
+          ? "Match each character with another character from the same movie." : "Match the pairs", pairs } };
         return;
       }
       for (let i = start; i <= ordered.length - (4 - selected.length); i++) {

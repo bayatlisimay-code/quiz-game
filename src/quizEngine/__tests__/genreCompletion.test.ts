@@ -17,7 +17,7 @@ test('genre-only substitutions retain prior answers, manual evidence, and other 
  expect(find('literature_l1_p2_wuthering-heights').introducedIn).toBe('A');
  expect(find('theatre_l5_p2_rosencrantz-guildenstern').introducedIn).toBe('A');
  expect(find('theatre_l5_p2_bald-soprano').introducedIn).toBe('B');
- expect(evidence.filter(e=>e.id.startsWith('manual-editorial:')&&!e.id.startsWith('manual-editorial:2026-10-26:music:'))).toHaveLength(102);
+ expect(evidence.filter(e=>e.id.startsWith('manual-editorial:2026-10-23:'))).toHaveLength(102);
  expect(evidenceProblems(evidence)).toEqual([]);
  expect(context.evaluate(find('literature_l1_p2_treasure-island'),find('literature_l1_p2_pride-prejudice'))).toMatchObject({verdict:'invalid',evidenceIds:['genre-completion:2026-10-23:literature:treasure-island:novel-manners']});
  expect(context.evaluate(find('theatre_l1_p2_hamlet'),find('theatre_l1_p2_twelve-angry-men'))).toMatchObject({verdict:'invalid',evidenceIds:['genre-completion:2026-10-23:theatre:hamlet:courtroom']});

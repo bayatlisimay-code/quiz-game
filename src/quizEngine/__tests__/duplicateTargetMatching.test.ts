@@ -60,9 +60,9 @@ test('existing identity grading accepts interchangeable cards and permanently lo
   }
 });
 
-test('only the two reviewed opt-ins enable duplicate targets in the production policies', () => {
-  expect(Object.keys(targetRelationPolicies).filter(id => targetRelationPolicies[id].allowDuplicateTargetAnswers).sort()).toEqual(['genre_of_novel', 'genre_of_play']);
-  for (const relation of ['genre_of_novel', 'genre_of_play']) {
+test('only the three approved genre opt-ins enable duplicate targets in the production policies', () => {
+  expect(Object.keys(targetRelationPolicies).filter(id => targetRelationPolicies[id].allowDuplicateTargetAnswers).sort()).toEqual(['genre_of_movie', 'genre_of_novel', 'genre_of_play']);
+  for (const relation of ['genre_of_movie', 'genre_of_novel', 'genre_of_play']) {
     expect(relationDefinitions[relation]).toBeDefined();
     expect(targetRelationPolicies[relation]).toMatchObject({ semanticStrategy: 'reviewed-evidence', allowDuplicateTargetAnswers: true });
   }

@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { approvedArtContent as facts, approvedArtEvidence as evidence, approvedArtEvidence as allEvidence, retainedGenreSelections } from '../../../data/activeArtContent';
 import { theatrePlaySets } from '../../../data/artContent/theatrePlays';
 import { musicTeachingContent } from '../../../data/artContent/musicContent';
+import { moviesTeachingContent } from '../../../data/artContent/moviesContent';
 import { activeSemanticContext as context } from '../contentSnapshot';
 import { evidenceProblems } from '../semanticEvidence';
 import { buildQuizResult, quizCompositionViolations } from '../buildQuiz';
@@ -210,10 +211,10 @@ test('all 101 approved negatives and the explicit Moonstone positive have manual
 });
 
 test('all previous teaching records and evidence, including quarantined comparisons, are unchanged',()=>{
- // Music was registered later; this baseline covers the content that existed then.
- const music=new Set(musicTeachingContent.evidence.map(e=>e.id));
- const evidence=allEvidence.filter(e=>!music.has(e.id));
- const original=facts.filter(c=>c.subtopicId!=='music').map(c=>{
+ // Music and Movies were registered later; this baseline covers the content that existed then.
+ const laterEvidence=new Set([...musicTeachingContent.evidence,...moviesTeachingContent.evidence].map(e=>e.id));
+ const evidence=allEvidence.filter(e=>!laterEvidence.has(e.id));
+ const original=facts.filter(c=>!['music','movies'].includes(c.subtopicId)).map(c=>{
   if(c.id==='art_literature_l1_p2_robinson-crusoe')return retainedGenreSelections.find(c=>c.id==='art_literature_l1_p2_dracula')!;
   if(c.id==='art_theatre_l1_p2_twelve-angry-men')return retainedGenreSelections.find(c=>c.id==='art_theatre_l1_p2_cyrano')!;
   if(c.id==='art_literature_l1_p2_wuthering-heights'||c.id==='art_theatre_l5_p2_rosencrantz-guildenstern')return {...c,introducedIn:'B',learning:{...c.learning!,reinforcementPriority:4}};

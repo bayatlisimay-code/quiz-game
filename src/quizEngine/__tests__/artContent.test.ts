@@ -40,7 +40,7 @@ test('all 54 teaching placements are populated in their approved positions; pilo
   expect(example.semantic?.value?.id).toBe(recognition.semantic?.value?.id);
 
   expect(new Set(approvedArtContent.map(c => c.id)).size).toBe(approvedArtContent.length);
-  expect(approvedArtContent.every(c => ['painting', 'sculpture', 'architecture', 'design', 'literature', 'theatre', 'music'].includes(c.subtopicId))).toBe(true);
+  expect(approvedArtContent.every(c => ['painting', 'sculpture', 'architecture', 'design', 'literature', 'theatre', 'music', 'movies'].includes(c.subtopicId))).toBe(true);
   for (const subtopic of topic.subtopics) for (let level = 1; level <= 9; level++) for (const part of ['p1', 'p2', 'p4']) {
     const teaching = pool(subtopic.id, `l${level}`, part);
     expect(teaching.length).toBeGreaterThanOrEqual(11);

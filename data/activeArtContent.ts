@@ -52,6 +52,7 @@ import { literatureModernNovelsSet } from './artContent/literatureModernNovels';
 import { literaturePoetrySet } from './artContent/literaturePoetry';
 import { theatreVenueSet } from './artContent/theatreVenues';
 import { musicTeachingContent } from './artContent/musicContent';
+import { moviesTeachingContent } from './artContent/moviesContent';
 
 // Production authoring boundary. Source-checked teaching facts, including preserved pilot originals;
 // synthetic engine fixtures never enter this list. No image approvals implied.
@@ -79,9 +80,12 @@ const authoredArtEvidence: readonly SemanticEvidence[] = Object.freeze([...sculp
 const baroqueDecades = authorBaroqueDecades(authoredArtContent, authoredArtEvidence);
 // Music is already scheduled and worded by its own modules (6/3/2 over the 11
 // introduced facts per placement). Its 189 reserves stay in musicContent and
-// never enter review. Registered after the Art-wide passes so neither changes it.
-export const approvedArtContent: readonly Concept[] = Object.freeze([...baroqueDecades.concepts, ...musicTeachingContent.concepts]);
-export const approvedArtEvidence: readonly SemanticEvidence[] = Object.freeze([...authoredArtEvidence, ...baroqueDecades.evidence, ...musicTeachingContent.evidence]);
+// never enter review. Movies passed its complete 486-fact source/content audit
+// and 20-attempt generation/fresh-progression gate before registration. Its 297
+// taught facts and 189 retained reserves use the same boundary. Both are appended
+// after the Art-wide passes, preserving the seven earlier subtopics exactly.
+export const approvedArtContent: readonly Concept[] = Object.freeze([...baroqueDecades.concepts, ...musicTeachingContent.concepts, ...moviesTeachingContent.concepts]);
+export const approvedArtEvidence: readonly SemanticEvidence[] = Object.freeze([...authoredArtEvidence, ...baroqueDecades.evidence, ...musicTeachingContent.evidence, ...moviesTeachingContent.evidence]);
 
 export function createActiveArtSets(records: readonly Concept[]) {
   const sets: Record<string, { id: string; concepts: Concept[] }> = {};

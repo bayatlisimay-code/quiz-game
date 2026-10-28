@@ -5,7 +5,7 @@ import type { Concept, Exercise } from "./conceptTypes";
 import { buildQuizResult, prepareQuizSession, quizCompositionViolations } from "./buildQuiz";
 import type { QuizGenerationResult } from "./buildQuiz";
 import type { SemanticContext } from "./semanticValidation";
-import { getAssessmentTemplate, reverseConcept } from "./assessmentTemplates";
+import { getAssessmentTemplate, reverseConcept, getMatchingCompatibility } from "./assessmentTemplates";
 import { getAnswerLabel } from "./learnerText";
 import { isPermanentlyLockable, hasIndistinguishableAnswers } from "./matchingSafety";
 import { isMatchingPairCorrect, getExerciseCapabilities } from "./exerciseFactory";
@@ -85,7 +85,7 @@ export function exerciseValidityViolations(exercise: Exercise, pool: readonly Co
       if (!target || !candidate) { errors.push("Matching escaped curriculum scope"); continue; }
       const policy = context.policies[target.relation];
       if (!policy?.allowMatching || policy.status === "blocked-pending-metadata") errors.push("Matching escaped policy");
-      const verdict = context.evaluate(target, candidate).verdict;
+      const verdict = getMatchingCompatibility(target, candidate, context).verdict;
       if (verdict === "unknown") errors.push("Uncertified matching cross-pairing");
       if (verdict !== "unknown" && isMatchingPairCorrect(left, right) !== (verdict === "valid")) errors.push("Matching misgrades semantic compatibility");
       if (left.answerIdentity === right.answerIdentity && !isMatchingPairCorrect(left, right)) errors.push("Equivalent matching cards graded wrong");

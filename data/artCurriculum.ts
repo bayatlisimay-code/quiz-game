@@ -161,7 +161,7 @@ export const artCurriculum: Readonly<Record<string, Readonly<Record<string, ArtC
   },
   "movies": {
     "l1": {
-      "title": "Famous Movies I (Classics)",
+      "title": "Famous Movies I",
       "relations": {
         "p1": "director_of_movie",
         "p2": "genre_of_movie",
@@ -177,7 +177,7 @@ export const artCurriculum: Readonly<Record<string, Readonly<Record<string, ArtC
       }
     },
     "l3": {
-      "title": "Famous Directors I (Classics)",
+      "title": "Famous Directors I",
       "relations": {
         "p1": "country_of_birth_of_director",
         "p2": "example_of_notable_movie_by_director",
@@ -201,7 +201,7 @@ export const artCurriculum: Readonly<Record<string, Readonly<Record<string, ArtC
       }
     },
     "l6": {
-      "title": "Famous Movies II (Modern & Contemporary)",
+      "title": "Famous Movies II",
       "relations": {
         "p1": "director_of_movie",
         "p2": "genre_of_movie",
@@ -209,7 +209,7 @@ export const artCurriculum: Readonly<Record<string, Readonly<Record<string, ArtC
       }
     },
     "l7": {
-      "title": "Famous Directors II (Modern & Contemporary)",
+      "title": "Famous Directors II",
       "relations": {
         "p1": "country_of_birth_of_director",
         "p2": "example_of_notable_movie_by_director",
@@ -220,8 +220,8 @@ export const artCurriculum: Readonly<Record<string, Readonly<Record<string, ArtC
       "title": "Film Awards & Festivals",
       "relations": {
         "p1": "country_of_award_or_festival",
-        "p2": "notable_award_category_or_festival_prize",
-        "p4": "inaugural_year_of_award_or_festival"
+        "p2": "top_prize_of_award_or_festival",
+        "p4": "founded_decade_of_award_or_festival"
       }
     },
     "l9": {

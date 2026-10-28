@@ -1,5 +1,7 @@
 import { relationDefinitions } from "./relationCatalogue";
 import { creatorVerbs } from "./relationDefinitions";
+import type { SemanticContext, SemanticDecision } from "./semanticValidation";
+import { scopeKey } from "./semanticEvidence";
 import type { Concept } from "./conceptTypes";
 import { getRelationTemplate } from "./templates";
 import type { RelationTemplate } from "./templates";
@@ -16,10 +18,26 @@ export function getVisibleAssessmentScope(concept: Concept): string | undefined 
   return concept.assessment?.scope?.text.trim() || undefined;
 }
 
+/** Movies names-only matching has a broader claim than its ordinary relationship
+ * questions. Require separately reviewed co-appearance assertions; neither the
+ * canonical relationship nor different work IDs establishes a negative. */
+export function getMatchingCompatibility(target: Concept, candidate: Concept, context: SemanticContext): SemanticDecision {
+  if (target.subtopicId !== "movies" || target.relation !== "associated_character_in_same_movie") return context.evaluate(target, candidate);
+  const qualifiers = { ...target.semantic?.qualifiers, matchingScope: "same-movie" };
+  const assertion = context.evidenceForId(`movies-same-movie:${target.id}:${candidate.id}`);
+  if (!assertion || assertion.kind !== "assertion" || assertion.reviewStatus !== "verified" || context.evidenceIssues.length ||
+      assertion.predicateId !== target.relation || assertion.subjectId !== target.semantic?.subject?.id ||
+      assertion.valueId !== candidate.semantic?.value?.id || scopeKey(assertion.qualifiers) !== scopeKey(qualifiers)) {
+    return { verdict: "unknown", reason: "Missing or conflicting reviewed same-movie comparison" };
+  }
+  return { verdict: assertion.verdict, reason: "Reviewed Movies screen-character co-appearance comparison" };
+}
+
 /** Card labels are facts/entities, not interrogative question stems. Keep the
  * authored subject (including version qualifiers) and retain necessary scoped
  * distinctions. Recognition continues to use its independently authored stimulus. */
 export function getMatchingLabel(concept: Concept): string {
+  if (concept.subtopicId === "movies" && concept.relation === "associated_character_in_same_movie") return concept.subject.split(" — ")[0];
   const definition = relationDefinitions[concept.relation];
   if (!definition || !concept.assessment) return getAssessmentTemplate(concept).question(concept.subject);
   const scope = getVisibleAssessmentScope(concept);
@@ -67,7 +85,7 @@ function fromDate(answer: string): string {
 }
 const eventVerbs: Readonly<Record<string, string>> = {
   creation: "created", completion: "completed", "first performance": "first performed", "first publication": "first published",
-  writing: "written", introduction: "introduced", "historical period": "built", formation: "formed",
+  writing: "written", introduction: "introduced", "historical period": "built", formation: "formed", foundation: "founded", release: "released",
 };
 
 export function getAssessmentTemplate(concept: Concept): RelationTemplate {
@@ -152,13 +170,13 @@ export function getAssessmentTemplate(concept: Concept): RelationTemplate {
   const attributionWording = qualified ?? creatorWording;
   const focus = concept.assessment.focus;
   const action = focus?.action ?? "designed";
-  const contributor = action === "recorded" ? "act" : focus?.collectiveCredit ? "team" : action === "wrote" ? "writer" : action === "designed" ? "designer" : "figure";
+  const contributor = action === "directed" ? "director" : action === "recorded" ? "act" : focus?.collectiveCredit ? "team" : action === "wrote" ? "writer" : action === "designed" ? "designer" : "figure";
   // “Product design” + designer reads as “Product designer”.
   const who = (subject: string) => contributor === "designer" && subject.endsWith(" design") ? `${subject}er` : `${subject} ${contributor}`;
   const focused = focus?.kind === "example-credit" ? {
-    question: `Which work by ${focus.label} is an example of {s}?`,
-    statement: `“{a}”, by ${focus.label}, is an example of {s}.`,
-    blank: `An example of {s} by ${focus.label} is _____.`,
+    question: action === "directed" ? `Which film directed by ${focus.label} is an example of {s}?` : `Which work by ${focus.label} is an example of {s}?`,
+    statement: action === "directed" ? `“{a}”, directed by ${focus.label}, is an example of {s}.` : `“{a}”, by ${focus.label}, is an example of {s}.`,
+    blank: action === "directed" ? `An example of {s} directed by ${focus.label} is _____.` : `An example of {s} by ${focus.label} is _____.`,
   } : focus?.kind === "project-credit" ? {
     question: `Which {who} ${action} “${focus.label}”?`,
     statement: `{a} is the {who} who ${action} “${focus.label}”.`,

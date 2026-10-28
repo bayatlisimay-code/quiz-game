@@ -1,0 +1,24 @@
+// Read-only Movies release diagnostics. Does not register content or write assets.
+const fs=require('node:fs');
+const ts=require('typescript');
+require.extensions['.ts']=(module,filename)=>module._compile(ts.transpileModule(fs.readFileSync(filename,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText,filename);
+const {moviesContent,moviesTeachingContent,moviesReserveConcepts}=require('../data/artContent/moviesContent.ts');
+const {createActiveArtSets}=require('../data/activeArtContent.ts');
+const {TOPIC_BY_ID}=require('../data/catalog.ts');
+const {createSemanticContext}=require('../src/quizEngine/semanticValidation.ts');
+const {targetRelationPolicies}=require('../src/quizEngine/relationPolicies.ts');
+const {catalogCoverageCases,measureGenerationCoverage}=require('../src/quizEngine/generationCoverage.ts');
+const {measureLearningCoverage}=require('../src/quizEngine/learningCoverage.ts');
+const {validateContent}=require('../src/quizEngine/contentValidation.ts');
+const {buildQuizResult}=require('../src/quizEngine/buildQuiz.ts');
+const attempts=Number(process.argv.find(a=>a.startsWith('--attempts='))?.split('=')[1]??20);
+if(!Number.isInteger(attempts)||attempts<1)throw new Error('Positive integer attempts required');
+const context=createSemanticContext(moviesContent.concepts,{policies:targetRelationPolicies,evidence:moviesContent.evidence});
+const topic={...TOPIC_BY_ID.art,subtopics:TOPIC_BY_ID.art.subtopics.filter(s=>s.id==='movies')};
+const cases=catalogCoverageCases(topic,createActiveArtSets(moviesTeachingContent.concepts));
+const coverage=measureGenerationCoverage(cases,context,attempts);
+const learning=measureLearningCoverage(cases,context,attempts);
+const validation=validateContent(moviesContent.concepts,targetRelationPolicies,undefined,{evidence:moviesContent.evidence});
+const samples=cases.filter(c=>c.mode==='teaching').map(c=>({id:c.id,variant:c.variant,result:buildQuizResult({...c,context,seed:`movies-editorial:${c.id}:${c.variant}`})}));
+console.log(JSON.stringify({registration:'active; 297 introduced facts; 189 retained reserves excluded from review',concepts:moviesContent.concepts.length,taught:moviesTeachingContent.concepts.length,reserves:moviesReserveConcepts.length,evidence:moviesContent.evidence.length,evidenceIssues:context.evidenceIssues,validation,coverage,learning,samples},null,2));
+if(context.evidenceIssues.length||validation.some(i=>i.severity==='error')||coverage.counts.failures||learning.counts.violations||(process.argv.includes('--require-ready')&&(coverage.counts.insufficient||learning.counts.insufficient||learning.counts.prerequisiteBlocked)))process.exitCode=1;

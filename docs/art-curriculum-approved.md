@@ -149,7 +149,9 @@ p5 = final cumulative review
 
 # Movies
 
-**l1 — Famous Movies I (Classics)**
+Reconciled with the user’s authoritative October 12 Movies curriculum supplied on 2026-10-26. Earlier parenthetical I/II titles and L8 prize/inaugural-year identifiers are superseded for Movies only.
+
+**l1 — Famous Movies I**
 p1 = director_of_movie
 p2 = genre_of_movie
 p3 = review
@@ -163,7 +165,7 @@ p3 = review
 p4 = notable_director_of_genre
 p5 = final review
 
-**l3 — Famous Directors I (Classics)**
+**l3 — Famous Directors I**
 p1 = country_of_birth_of_director
 p2 = example_of_notable_movie_by_director
 p3 = review
@@ -184,14 +186,14 @@ p3 = review
 p4 = definition_of_filmmaking_technique
 p5 = final review
 
-**l6 — Famous Movies II (Modern & Contemporary)**
+**l6 — Famous Movies II**
 p1 = director_of_movie
 p2 = genre_of_movie
 p3 = review
 p4 = release_year_of_movie
 p5 = final review
 
-**l7 — Famous Directors II (Modern & Contemporary)**
+**l7 — Famous Directors II**
 p1 = country_of_birth_of_director
 p2 = example_of_notable_movie_by_director
 p3 = review
@@ -200,9 +202,9 @@ p5 = final review
 
 **l8 — Film Awards & Festivals**
 p1 = country_of_award_or_festival
-p2 = notable_award_category_or_festival_prize
+p2 = top_prize_of_award_or_festival
 p3 = review
-p4 = inaugural_year_of_award_or_festival
+p4 = founded_decade_of_award_or_festival
 p5 = final review
 
 **l9 — Characters & Movies**

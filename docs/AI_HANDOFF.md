@@ -1,5 +1,47 @@
 # AI handoff — Quiz Game (Codex ⇄ Claude Code)
 
+Read [AGENTS.md](../AGENTS.md) and [CLAUDE.md](../CLAUDE.md). This current section supersedes the older status notes below.
+
+**Updated 2026-10-28 — Final Movies checkpoint authorized for commit and publication.** Checkout `/Users/simaybayatli/Developer/quiz-game`, branch `main`, parent baseline `3a4fd6f2a7f48e075d6a20a6abbcbf1c23f7e75e`. This checkpoint contains the 34 approved Movies implementation, evidence, registration, safety, test and documentation files; the exact manifest is in [Movies content/status](art-movies-content.md). The user authorized `feat(art): complete Movies as eighth Art subtopic` and a normal push to `origin/main`. Post-commit hash, push outcome and clean-tree verification are reported in the completion message; use Git for the resulting checkpoint hash. No backup, credentials, assets, progress or previous Art content changed.
+
+- **Genres:** 85 explicit user-approved editorial negatives, separately labelled from external source verification. Umbrellas → Comedy is **unknown**, Musical remains canonical; secondary positives preserved. Removing that negative initially blocked L1/p2/C. After an in-memory 3,000/3,000 generation/progression proof, the user explicitly approved the existing `genre_of_movie` duplicate-target opt-in. Minimum three identities / at most one duplicated pair / interchangeable grading / permanent locks remain intact. No content substitutions, stage changes or unsupported exclusions.
+- **L9/p4 matching:** names-only cards and “Match each character with another character from the same movie.” Separate scoped co-appearance evidence (130 assertions; taught cohort 11 own positives + 110 cross-negatives) is required by both generation and validation. Missing evidence rejects a quartet; Luke/Leia cross-positives reject their ambiguous combination. Ordinary MCQ/TF/blank relationship wording and answers remain unchanged. No UI or interaction/grading changes.
+- **Final validation, 2026-10-27:** focused Movies/duplicate-target **53/53**; Movies **150/150**, 3,000/3,000 generation and fresh progression, zero violations. Prior seven **21,000/21,000** in both sweeps, zero violations; their 210 saved generated samples are unchanged. TypeScript, lint, content/evidence, image and whitespace checks pass. Registered development-image Movies also passes 3,000/3,000 generation and fresh progression with zero violations. Initial full Jest: 676/677, sole failure a historical Literature/Theatre manual-evidence count accidentally including the 85 Movies approvals. Scoped that test to its original 2026-10-23 cohort, keeping the expected 102 unchanged; affected tests pass 3/3. Final full Jest rerun: **677/677 tests, 37/37 suites**, 509.927 s. All requested checks pass.
+- **Release limits / next action:** real iOS/Android narrow-screen and enlarged-text checks remain; no simulator/device claim is made. The longest L9/p4 labels are removed, other Movies matching formats stay unchanged. Other positive facts retain their documented AI/source-review qualifications. Validation is complete: **677/677 tests across 37 suites**, Movies **150/150**, and all eight Art subtopics remain ready. Checkpoint commit/push approval was granted on 2026-10-28. Next release action is the real-device iOS/Android narrow-screen and enlarged-text layout check; no new content generation or unrelated implementation is authorized. Only this handoff changes during checkpoint finalization, so the full suite is not rerun.
+
+## Previous Movies implementation checkpoint (superseded by the decisions above)
+
+**Updated 2026-10-26 — Movies implemented and registered after the catalogue gate passed.** Checkout `/Users/simaybayatli/Developer/quiz-game`, branch `main`, HEAD `3a4fd6f2a7f48e075d6a20a6abbcbf1c23f7e75e` (also the local `origin/main` tracking ref). The checkout was clean at task start. All Movies work remains unstaged/uncommitted; no push, merge, history rewrite, credential/image/progress or backup-directory change.
+
+## Current Movies state
+
+- See [Movies content/status](art-movies-content.md) for the exact curriculum reconciliation, source distinctions, evidence provenance, sample review, validation and file map.
+- **486 source-checked positive concepts**, 18 × 27 placements; **297 taught / 189 reserves**, with unchanged A6/B3/C2 and p3/p5/L10 behavior. Text-only. The eight active subtopics now include Movies; Design remains Coming soon.
+- The supplied October 12 Movies specification supersedes four older parenthetical level titles and the old L8 prize/inaugural-year identifiers. Other curricula and the seven completed content sets are unchanged.
+- Checked source fields: 606 ledger entries / 285 URLs, including retained checks. Genre tables explicitly retain 38 secondary positives and 86 subject-specific source-feature negative inferences. **No new user manual approvals were invented. AI source comparison/inference is not independent human editorial certification.** Unknown comparisons stay unknown.
+- Corrections include coordinated Chadha/Cuarón debut selections, co-directed debut qualifications, real animation studios/co-production, Hermione's Crookshanks film version, Frodo/Leia relationship corrections, Cannes 1939-vs-1946 distinction, Tallinn 1997 and original-release dates. L8/p4 alone teaches IFFI's unambiguous founding decade instead of the qualified Cannes reserve. Full explanations are in the Movies document.
+- Reuses existing authoring, evidence, focus and registration paths. Minimal shared changes add the `directed` focus action, release/foundation wording and required relation metadata. No matching/grading/progression redesign. Movies has no duplicate-target opt-in; existing Literature/Theatre interchangeability stays intact.
+
+## Validation, 2026-10-26
+
+| Scope / delivery | Generation | Fresh progression | Shortages / violations |
+|---|---:|---:|---:|
+| Movies, isolated pre-registration gate | 3,000/3,000 | 3,000/3,000 | 0 / 0 |
+| Movies, registered text-only | 3,000/3,000 | 3,000/3,000 | 0 / 0 |
+| All eight Art, development-image mode | 24,000/24,000 | 24,000/24,000 | 0 / 0 |
+
+Every subtopic is **150/150**; the prior seven retain **21,000/21,000** generation and progression. Full catalogue and production content validation: zero errors. TypeScript, lint, whitespace, read-only image check and Literature/Theatre readiness/genre checks pass. Images unchanged: 19 staged / 0 production-approved. All frozen expected hashes remain unchanged; scope filters exclude the later Movies addition.
+
+Final standalone Jest: **675/675 tests across 37/37 suites, 483.812 s**. Movies focused tests: **35/35**. The earlier concurrent run had one unchanged image-preparation timeout (674/675); its isolated suite passed **17/17 in 6.4 s**, then the complete standalone suite passed. No timeout or expectation was relaxed. The final Cannes reserve semantic-basis clarification passes the full suite and TypeScript; active quiz selections are unchanged.
+
+## Exact next action / release limits
+
+Implementation and final validation are complete. Git: **29 intended files changed (14 modified, 15 new), all unstaged**, HEAD remains `3a4fd6f`, no staged changes. The exact file manifest is in the Movies document. **Wait for the user’s review and explicit approval before any staging, checkpoint commit or push.** No known active factual/generation blocker remains. Preserve unknown comparisons and source-specific debut/credit/date qualifications. Human editorial review of AI-authored classifications/inferences and a real-device long-title/clue layout check remain release items. Limited matching variety in some genre variants is documented; do not manufacture comparisons to expand it.
+
+## Previous Music checkpoint (retained history)
+
+# AI handoff — Quiz Game (Codex ⇄ Claude Code)
+
 Shared rules: [AGENTS.md](../AGENTS.md) (authoritative) · [CLAUDE.md](../CLAUDE.md). This file holds **current task state only**. Application docs: [progression](quiz-learning-progression.md) · [validity](quiz-validity.md) · [curriculum](art-curriculum-approved.md) · [Literature/Theatre status](art-literature-theatre-content.md) · [genre report](art-genre-completion.md). Earlier research (matching architecture, duplicate-target design, the Codex prompt) lives in commits `2055707` and `ca8d66a`.
 
 **Last updated:** 2026-10-26 (Claude Code) — **Music is registered as the seventh active Art subtopic**, with the user's approval. It is 150/150 ready through the production context with complete fresh progression. Baseline `9359a38a0e8075790e94c410f9d13cce9bdb37c8`, branch `main` in `/Users/simaybayatli/Developer/quiz-game`. Committed locally as a checkpoint; not pushed.
